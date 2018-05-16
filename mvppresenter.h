@@ -1,8 +1,9 @@
 #ifndef MVPPRESENTER_H
 #define MVPPRESENTER_H
 #include <mvpmodel.h>
-#include <mainwindow.h>
 #include <modelData.h>
+#include <qfile.h>
+class MainWindow;
 
 class MvpPresenter
 {
@@ -14,7 +15,7 @@ public:
 	void setView(MainWindow * view) { this->view = view; }
 	MvpModel * getModel() const { return model; }
 	MainWindow * getView() const { return view; }
-
+	void exportHair(QFile* file);
 private:
 
 	MvpModel * model;

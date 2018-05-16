@@ -5,24 +5,6 @@ ModelData::ModelData(const char * path)
     loadModel(path);
 }
 
-/*
-void ModelData::createBuffers()
-{
-	for (unsigned int i = 0; i < meshes.size(); i++)
-	{
-		meshes[i].setupMesh();
-	}
-}
-
-void ModelData::cleanupBuffers()
-{
-	for (unsigned int i = 0; i < meshes.size(); i++)
-	{
-		meshes[i].cleanUp();
-	}
-}
-*/
-
 void ModelData::loadModel(string path)
 {
     Assimp::Importer import;

@@ -25,15 +25,6 @@ GLWidget::~GLWidget()
 	cleanup();
 }
 
-QSize GLWidget::minimumSizeHint() const
-{
-	return QSize(50, 50);
-}
-
-QSize GLWidget::sizeHint() const
-{
-	return QSize(400, 400);
-}
 
 void GLWidget::cleanup()
 {
@@ -46,7 +37,6 @@ void GLWidget::cleanup()
 	m_program = 0;
 
 	doneCurrent();
-
 }
 
 
@@ -57,7 +47,7 @@ void GLWidget::initializeGL()
 	initializeOpenGLFunctions();
 
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(1, 0, 0, 1);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 	m_program = new QOpenGLShaderProgram;
 	m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vert.vert");
@@ -73,8 +63,6 @@ void GLWidget::initializeGL()
 	setupUniforms();
 
 	m_testModel.setupModel(view->getPresenter()->getModel()->getReferenceModel());
-
-
 }
 
 void GLWidget::paintGL()

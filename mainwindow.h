@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 
-class MvpPresenter;
+#include <mvppresenter.h>
 
 namespace Ui {
 	class MainWindow;
@@ -19,6 +19,9 @@ public:
 	// Getters/Setters
 	void setPresenter(MvpPresenter * presenter) { this->presenter = presenter;}
 	MvpPresenter * getPresenter() const { return presenter; }
+
+private slots:
+    void on_actionExport_triggered();
 
 private:
 	Ui::MainWindow *ui;

@@ -334,7 +334,6 @@ ASALocalRun/
 *.lai
 *.so
 *.dylib
-*.dll
 
 # Qt-es
 object_script.*.Release
