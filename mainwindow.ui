@@ -31,7 +31,14 @@
     </property>
     <addaction name="actionTest"/>
    </widget>
+   <widget class="QMenu" name="menuHair">
+    <property name="title">
+     <string>Hair</string>
+    </property>
+    <addaction name="actionExport"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuHair"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget">
@@ -61,6 +68,11 @@
   <action name="actionTest">
    <property name="text">
     <string>New (Ctrl + N)</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="text">
+    <string>Export</string>
    </property>
   </action>
  </widget>

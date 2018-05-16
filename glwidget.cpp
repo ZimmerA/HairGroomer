@@ -46,7 +46,6 @@ void GLWidget::cleanup()
 	m_program = 0;
 
 	doneCurrent();
-
 }
 
 
@@ -73,8 +72,6 @@ void GLWidget::initializeGL()
 	setupUniforms();
 
 	m_testModel.setupModel(view->getPresenter()->getModel()->getReferenceModel());
-
-
 }
 
 void GLWidget::paintGL()
