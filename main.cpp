@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 {
 
 	QApplication a(argc, argv);
-
+    a.setStyle("plastique");
 	QCoreApplication::setApplicationName("Hair Groomer");
 	QCoreApplication::setOrganizationName("Adrian Zimmer");
 	QCoreApplication::setApplicationVersion(QT_VERSION_STR);
@@ -35,7 +35,11 @@ int main(int argc, char *argv[])
 	if (parser.isSet(coreProfileOption)) {
 		fmt.setVersion(3, 2);
 		fmt.setProfile(QSurfaceFormat::CoreProfile);
+
 	}
+    // Else the window resizing will be painfully slow
+    fmt.setSwapInterval(0);
+
 	QSurfaceFormat::setDefaultFormat(fmt);
 
 	// Setup MVP Pattern
@@ -46,9 +50,6 @@ int main(int argc, char *argv[])
 	MainWindow view;
 	view.setPresenter(&presenter);
 	presenter.setView(&view);
-
-
-
 
 	view.show();
 	int result = a.exec();
