@@ -67,18 +67,36 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
+    glViewport(0,0,width()/2,height());
+    glScissor(0,0,width()/2,height());
+    glEnable(GL_SCISSOR_TEST);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_program->bind();
 	m_testModel.draw(m_program);
 	m_program->release();
+
+    glScissor(width()/2,0,width(),height());
+    glClearColor(1.0f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(width()/2,0,width()/2,height());
+    m_program->bind();
+    m_testModel.draw(m_program);
+    m_program->release();
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
 	m_projection.setIdentity();
-	m_projection = mat4::perspective(45.0f, w / float(h), 0.1f, 100.0f);
-	glViewport(0, 0, w, h);
+    m_projection = mat4::perspective(45.0f, w/ float(h)/2.0f, 0.1f, 1000.0f);
+
+    m_program->bind();
+    glUniformMatrix4fv(m_projLoc, 1, GL_FALSE, (GLfloat *)&m_projection);
+    m_program->release();
+
 }
 
 /*
@@ -91,15 +109,17 @@ void GLWidget::resizeGL(int w, int h)
 void GLWidget::setupUniforms()
 {
 	m_viewMatrix.setIdentity();
-	m_viewMatrix.translate(0, 0, -30.0f);
+    m_viewMatrix.translate(10, -80, -190.0f);
 
 	glUniformMatrix4fv(m_viewLoc, 1, GL_FALSE, (GLfloat *)&m_viewMatrix);
 
 	m_model.setIdentity();
 	glUniformMatrix4fv(m_modelLoc, 1, GL_FALSE, (GLfloat *)&m_model);
 
-	m_projection = mat4::perspective(45.0f, width() / float(height()), 0.1f, 100.0f);
+    m_projection = mat4::perspective(45.0f, (width()/2.0f) / float(height()), 0.1f, 1000.0f);
 	glUniformMatrix4fv(m_projLoc, 1, GL_FALSE, (GLfloat *)&m_projection);
-	glViewport(0, 0, width(), float(height()));
+
+
+    glScissor(0,0,width()/2,float(height()));
 }
 

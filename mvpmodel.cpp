@@ -11,6 +11,6 @@ MvpModel::MvpModel()
 
 void MvpModel::loadModels()
 {
-    referenceModel = new ModelData("F:/FH/6. Semester/Bachelor Arbeit/SoftwareRepository/Marsienne_Base.obj");
+    referenceModel = new ModelData("D:/FH/6._Semester/Bachelor Arbeit/SoftwareRepository/bb8.obj");
 }
 
