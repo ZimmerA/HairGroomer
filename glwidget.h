@@ -1,13 +1,17 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include <linalg.hpp>
+#include <mainwindow.h>
+#include <modeldata.h>
+#include <glModel.h>
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
-#include <linalg.hpp>
-#include <modeldata.h>
-#include <mainwindow.h>
+#include <QOpenGLFramebufferObject>
+
 #include <vector>
-#include <glModel.h>
+
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
@@ -18,9 +22,6 @@ public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
 
-    static bool isTransparent() { return m_transparent; }
-    static void setTransparent(bool t) { m_transparent = t; }
-
 public slots:
     void cleanup();
 
@@ -30,19 +31,31 @@ protected:
     void resizeGL(int width, int height) override;
 
 private:
-
+    void setupShaders();
     void setupUniforms();
-    static bool m_transparent;
+    void createDrawBufferQuad();
+
+    // Framebuffer for painting hair
+    QOpenGLFramebufferObject *drawBuffer;
+
+    // is core profile active?
     bool m_core;
 
+    // default shader uniform locations
 	int m_viewLoc;
 	int m_modelLoc;
 	int m_projLoc;
 
+    // Matrices
 	mat4 m_model, m_viewMatrix , m_projection;
-	QOpenGLShaderProgram *m_program;
 
+    // Shader Programs
+    QOpenGLShaderProgram *m_defaultShader, *m_uvMapShader,*m_drawBufferShader, *m_hairShader;
+
+    // Test model
 	GlModel m_testModel;
+
+    // MVP design pattern reference of view
 	MainWindow * view;
 };
 

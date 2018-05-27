@@ -10,7 +10,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = HairGroomer
 TEMPLATE = app
-
+LIBS += -lopengl32
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -55,7 +55,11 @@ INCLUDEPATH += $$PWD/libs/linalg \
 
 DISTFILES += \
     frag.frag \
-    vert.vert
+    vert.vert \
+    uvmap.vert \
+    uvmap.frag \
+    drawbuffer.frag \
+    drawbuffer.vert
 
 RESOURCES += \
     assets.qrc
