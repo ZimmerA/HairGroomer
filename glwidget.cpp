@@ -31,8 +31,11 @@ void GLWidget::cleanup()
 
 	makeCurrent();
 	m_testModel.cleanupModel();
-    delete m_defaultShader, m_uvMapShader, m_drawBufferShader, m_hairShader, drawBuffer;
-    drawBuffer= m_defaultShader = m_uvMapShader = m_hairShader = m_drawBufferShader =  0;
+    m_drawBufferQuadVao.destroy();
+    m_drawBufferQuadVbo.destroy();
+
+    delete m_defaultShader, m_uvMapShader, m_drawBufferShader, m_hairShader, m_drawBuffer;
+    //m_drawBuffer = m_defaultShader = m_uvMapShader = m_hairShader = m_drawBufferShader =  0;
 	doneCurrent();
 }
 
@@ -43,15 +46,17 @@ void GLWidget::initializeGL()
 	connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &GLWidget::cleanup);
     // QT function
 	initializeOpenGLFunctions();
-	glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     // Enable Scissor test for viewport splitting
     glEnable(GL_SCISSOR_TEST);
     // Setup shaders
     setupShaders();
 
+
+    createDrawBufferQuad();
     // setup model using the vertex data in our mvpModel
 	m_testModel.setupModel(view->getPresenter()->getModel()->getReferenceModel());
-    drawBuffer = new QOpenGLFramebufferObject(800,600);
+    m_drawBuffer = new QOpenGLFramebufferObject(800,600);
 
 }
 
@@ -81,7 +86,7 @@ void GLWidget::setupShaders()
     m_uvMapShader->bindAttributeLocation("aUV", 2);
     m_uvMapShader->link();
 
-    // Draws the framebuffer content on a quad
+    // used for drawing the framebuffer
     m_drawBufferShader = new QOpenGLShaderProgram;
     m_drawBufferShader->addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/drawbuffer.vert");
     m_drawBufferShader->addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/drawbuffer.frag");
@@ -105,6 +110,19 @@ void GLWidget::createDrawBufferQuad()
          1.0f,  1.0f,  1.0f, 1.0f
     };
 
+    m_drawBufferQuadVao.create();
+    m_drawBufferQuadVbo.create();
+
+    QOpenGLVertexArrayObject::Binder vaoBinder(&m_drawBufferQuadVao);
+
+    m_drawBufferQuadVbo.bind();
+    m_drawBufferQuadVbo.allocate(quadVertices,sizeof(quadVertices));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,4 * sizeof(GLfloat), 0);
+    glVertexAttribPointer(1,2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), reinterpret_cast<void *>(2 * sizeof(GLfloat)));
+    m_drawBufferQuadVao.release();
+
 }
 
 void GLWidget::paintGL()
@@ -118,29 +136,42 @@ void GLWidget::paintGL()
 
     m_defaultShader->bind();
     m_testModel.draw(m_defaultShader);
+
     m_defaultShader->release();
 
     // Right half of context (UVmap/drawing window)
     glViewport(width()/2,0,width()/2,height());
     glScissor(width()/2,0,width(),height());
     glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     m_uvMapShader->bind();
     m_testModel.draw(m_defaultShader);
     m_uvMapShader->release();
+
+    renderDrawBuffer();
+}
+void GLWidget::renderDrawBuffer()
+{
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    m_drawBufferShader->bind();
+    QOpenGLVertexArrayObject::Binder vaoBinder(&m_drawBufferQuadVao);
+    glDrawArrays(GL_TRIANGLES,0,6);
+    m_drawBufferShader->release();
 }
 
 void GLWidget::resizeGL(int w, int h)
 {
+    QOpenGLFunctions_4_0_Core *f = QOpenGLContext::currentContext()->functions();
 	m_projection.setIdentity();
     m_projection = mat4::perspective(45.0f, w/ float(h)/2.0f, 0.1f, 1000.0f);
 
     m_defaultShader->bind();
-    glUniformMatrix4fv(m_projLoc, 1, GL_FALSE, (GLfloat *)&m_projection);
+    f->glUniformMatrix4fv(m_projLoc, 1, GL_FALSE, (GLfloat *)&m_projection);
     m_defaultShader->release();
-
 }
 
 /*

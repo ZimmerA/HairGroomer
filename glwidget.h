@@ -7,14 +7,14 @@
 #include <glModel.h>
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_4_0_Core>
 #include <QOpenGLFramebufferObject>
 
 #include <vector>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
+class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_0_Core
 {
     Q_OBJECT
 
@@ -34,9 +34,12 @@ private:
     void setupShaders();
     void setupUniforms();
     void createDrawBufferQuad();
-
+    void renderDrawBuffer();
     // Framebuffer for painting hair
-    QOpenGLFramebufferObject *drawBuffer;
+    QOpenGLFramebufferObject *m_drawBuffer;
+    // Contains the a quad for rendering the drawBuffer content
+    QOpenGLVertexArrayObject m_drawBufferQuadVao;
+    QOpenGLBuffer m_drawBufferQuadVbo;
 
     // is core profile active?
     bool m_core;
