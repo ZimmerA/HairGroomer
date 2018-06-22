@@ -11,23 +11,21 @@
 */
 class GlMesh
 {
-
 public:
-    GlMesh();
-	void draw(QOpenGLShaderProgram * shader);
+	GlMesh();
+	void draw(QOpenGLShaderProgram* shader);
 	// Creates buffers and fills them with the mesh data
-	void setupBuffers(MeshData * mesh);
+	void setup_buffers(MeshData* mesh_data);
 	// Calls destroy on all buffers of the mesh
-	void destroyBuffers();
+	void destroy_buffers();
 
 private:
-	QOpenGLVertexArrayObject m_vao;
-	QOpenGLBuffer m_vbo;
-	QOpenGLBuffer m_ibo;
-	
-	// To be used in the GlDrawElements Function
-	unsigned int m_indicieAmount; 
+	QOpenGLVertexArrayObject m_vao_;
+	QOpenGLBuffer m_vbo_;
+	QOpenGLBuffer m_ibo_;
 
+	// To be used in the GlDrawElements Function
+	unsigned int m_indicie_amount_;
 };
 
 #endif // GLMESH_H

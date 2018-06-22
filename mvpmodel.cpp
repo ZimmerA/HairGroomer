@@ -2,15 +2,11 @@
 
 MvpModel::MvpModel()
 {
-    referenceModel = NULL;
-    growthMesh = NULL;
-
 	// Load the Model data into Memory (No openGL buffers are created yet)
-	loadModels();
+	load_models();
 }
 
-void MvpModel::loadModels()
+void MvpModel::load_models()
 {
-    referenceModel = new ModelData("F:/FH/6. Semester/Bachelor Arbeit/SoftwareRepository/Marsienne_Base.obj");
+	m_reference_model_ = new ModelData("D:/FH/6._Semester/Bachelor Arbeit/SoftwareRepository/Marsienne_Base.obj");
 }
-

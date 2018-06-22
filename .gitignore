@@ -367,3 +367,8 @@ target_wrapper.*
 
 # QtCreator CMake
 CMakeLists.txt.user*
+Eva_Dressed_Animated.fbx
+Eva_Dressed_Animated.fbm/diffuseSkin.bmp
+Eva_Dressed_Animated.fbm/eva7eyesmap03d_1007.jpg
+Eva_Dressed_Animated.fbm/eva7lashesmap01_1006.jpg
+Eva_Dressed_Animated.fbm/eva7mouthmapd_1005.jpg

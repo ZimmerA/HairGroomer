@@ -3,63 +3,66 @@
 
 #include <linalg.hpp>
 #include <mainwindow.h>
-#include <modeldata.h>
 #include <glModel.h>
-
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_0_Core>
 #include <QOpenGLFramebufferObject>
-
-#include <vector>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_0_Core
+class GlWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_0_Core
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    GLWidget(QWidget *parent = 0);
-    ~GLWidget();
+	explicit GlWidget(QWidget* parent = nullptr);
+	virtual ~GlWidget();
 
 public slots:
-    void cleanup();
+	void cleanup();
 
 protected:
-    void initializeGL() override;
-    void paintGL() override;
-    void resizeGL(int width, int height) override;
+	void initializeGL() override;
+	void paintGL() override;
+	void resizeGL(int w, int h) override;
 
 private:
-    void setupShaders();
-    void setupUniforms();
-    void createDrawBufferQuad();
-    void renderDrawBuffer();
-    // Framebuffer for painting hair
-    QOpenGLFramebufferObject *m_drawBuffer;
-    // Contains the a quad for rendering the drawBuffer content
-    QOpenGLVertexArrayObject m_drawBufferQuadVao;
-    QOpenGLBuffer m_drawBufferQuadVbo;
+	void setup_shaders();
+	void setup_mvp();
+	void create_drawbuffer();
+	void create_drawbuffer_quad();
+	void render_drawbuffer();
+	// Framebuffer for painting hair
+	QOpenGLFramebufferObject* m_drawbuffer_{};
 
-    // is core profile active?
-    bool m_core;
+	// Contains the a quad for rendering the drawBuffer content
+	QOpenGLVertexArrayObject m_drawbuffer_quad_vao_;
+	QOpenGLBuffer m_drawbuffer_quad_vbo_;
 
-    // default shader uniform locations
-	int m_viewLoc;
-	int m_modelLoc;
-	int m_projLoc;
+	// is core profile active?
+	bool m_core_;
 
-    // Matrices
-	mat4 m_model, m_viewMatrix , m_projection;
+	// default shader uniform locations
+	int m_view_loc_{};
+	int m_model_loc_{};
+	int m_proj_loc_{};
 
-    // Shader Programs
-    QOpenGLShaderProgram *m_defaultShader, *m_uvMapShader,*m_drawBufferShader, *m_hairShader;
+	mat4 m_model_matrix_;
+	mat4 m_view_matrix_;
+	mat4 m_projection_matrix_;
 
-    // Test model
-	GlModel m_testModel;
+	QOpenGLShaderProgram* m_default_shader_{};
+	QOpenGLShaderProgram* m_uv_map_shader_{};
+	QOpenGLShaderProgram* m_drawbuffer_shader_{};
+	QOpenGLShaderProgram* m_hair_shader_{};
 
-    // MVP design pattern reference of view
-	MainWindow * view;
+	// Test model
+	GlModel m_test_model_;
+
+	// MVP design pattern reference of view
+	MainWindow* m_view_;
 };
 
 #endif

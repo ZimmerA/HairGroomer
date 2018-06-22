@@ -6,16 +6,18 @@
 
 using namespace std;
 
-struct Vertex{
-    vec3 Position;
-    vec3 Normal;
-    vec2 UV;
+struct Vertex
+{
+	vec3 m_position;
+	vec3 m_normal;
+	vec2 m_uv;
 };
 
-struct Texture {
-    unsigned int id;
-    std::string type;
-    std::string path;
+struct Texture
+{
+	unsigned int m_id;
+	std::string m_type;
+	std::string m_path;
 };
 
 /*
@@ -25,11 +27,11 @@ struct Texture {
 class MeshData
 {
 public:
-    MeshData(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
+	MeshData(const vector<Vertex>& vertices, const vector<unsigned int>& indices, const vector<Texture>& textures);
 
-    vector<Vertex> vertices;
-    vector<unsigned int> indices;
-    vector<Texture> textures;
+	vector<Vertex> m_vertices;
+	vector<unsigned int> m_indices;
+	vector<Texture> m_textures;
 };
 
 #endif // MESHDATA_H

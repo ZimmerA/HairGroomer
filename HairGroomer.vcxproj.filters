@@ -131,7 +131,19 @@
     <QtRcc Include="assets.qrc">
       <Filter>Resource Files</Filter>
     </QtRcc>
+    <None Include="drawbuffer.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="drawbuffer.vert">
+      <Filter>Resource Files</Filter>
+    </None>
     <None Include="frag.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="uvmap.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="uvmap.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="vert.vert">
@@ -139,13 +151,29 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="drawbuffer.frag">
+      <Filter>Distribution Files</Filter>
+    </None>
+    <None Include="drawbuffer.vert">
+      <Filter>Distribution Files</Filter>
+    </None>
     <None Include="frag.frag">
+      <Filter>Distribution Files</Filter>
+    </None>
+    <None Include="uvmap.frag">
+      <Filter>Distribution Files</Filter>
+    </None>
+    <None Include="uvmap.vert">
       <Filter>Distribution Files</Filter>
     </None>
     <None Include="vert.vert">
       <Filter>Distribution Files</Filter>
     </None>
+    <None Include="drawbuffer.frag" />
+    <None Include="drawbuffer.vert" />
     <None Include="frag.frag" />
+    <None Include="uvmap.frag" />
+    <None Include="uvmap.vert" />
     <None Include="vert.vert" />
   </ItemGroup>
 </Project>

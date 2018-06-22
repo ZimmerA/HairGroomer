@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>951</width>
+    <width>1122</width>
     <height>574</height>
    </rect>
   </property>
@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="GLWidget" name="openGLWidget_2">
+     <widget class="GlWidget" name="openGLWidget_2">
       <property name="minimumSize">
        <size>
         <width>700</width>
@@ -32,8 +32,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>951</width>
-     <height>17</height>
+     <width>1122</width>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -56,7 +56,7 @@
    <property name="minimumSize">
     <size>
      <width>400</width>
-     <height>33</height>
+     <height>43</height>
     </size>
    </property>
    <property name="autoFillBackground">
@@ -87,7 +87,7 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>GLWidget</class>
+   <class>GlWidget</class>
    <extends>QOpenGLWidget</extends>
    <header>glwidget.h</header>
   </customwidget>

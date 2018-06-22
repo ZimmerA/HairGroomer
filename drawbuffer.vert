@@ -1,4 +1,4 @@
-#version 330 core
+#version 150
 in vec2 aVertex;
 in vec2 aUV;
 

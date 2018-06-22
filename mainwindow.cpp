@@ -4,36 +4,35 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QFileDialog>
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+
+MainWindow::MainWindow(QWidget* parent) :
+	QMainWindow(parent),
+	m_ui_(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+	m_ui_->setupUi(this);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+	delete m_ui_;
 }
 
 void MainWindow::on_actionExport_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-         tr("Export Hair"), "",
-         tr("Nvidia APX File (*.apx);;All Files (*)"));
+	QString file_name = QFileDialog::getSaveFileName(this,
+	                                                tr("Export Hair"), "",
+	                                                tr("Nvidia APX File (*.apx);;All Files (*)"));
 
-    if (fileName.isEmpty())
-        return;
-	else {
-		QFile file(fileName);
-		if (!file.open(QIODevice::WriteOnly)) {
-			QMessageBox::information(this, tr("Unable to open file"),
-				file.errorString());
-			return;
-		}
-
-		// File could be opened delegate exporting to presenter
-		presenter->exportHair(&file);
+	if (file_name.isEmpty())
+		return;
+	QFile file(file_name);
+	if (!file.open(QIODevice::WriteOnly))
+	{
+		QMessageBox::information(this, tr("Unable to open file"),
+		                         file.errorString());
+		return;
 	}
 
+	// File could be opened delegate exporting to presenter
+	m_presenter_->export_hair(&file);
 }

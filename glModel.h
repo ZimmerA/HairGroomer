@@ -9,16 +9,14 @@
 class GlModel
 {
 public:
-    GlModel();
-	void draw(QOpenGLShaderProgram * shader);
+	GlModel();
+	void draw(QOpenGLShaderProgram* shader);
 	// Takes modeldata and creates the according glMeshes
-	void setupModel(ModelData * model);
-	void cleanupModel();
+	void setup_model(ModelData* model_data);
+	void cleanup_model();
 
 private:
-    vector<std::unique_ptr<GlMesh>> meshes;
-
-
+	vector<std::unique_ptr<GlMesh>> m_meshes_;
 };
 
 #endif // GLMODEL_H

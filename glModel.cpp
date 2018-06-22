@@ -1,39 +1,39 @@
 #include "glModel.h"
-#include <assert.h>
+#include <cassert>
+
 GlModel::GlModel()
-{
-}
+= default;
 
 // Iterate over the glMeshes and draw each
-void GlModel::draw(QOpenGLShaderProgram * shader)
+void GlModel::draw(QOpenGLShaderProgram* shader)
 {
-	for (unsigned int i = 0; i < meshes.size(); i++)
+	for (auto& mesh : m_meshes_)
 	{
-        meshes[i]->draw(shader);
+		mesh->draw(shader);
 	}
 }
 
 // Iterates over every meshData in the modelData and creates a glMesh for it, then sets up the buffers
-void GlModel::setupModel(ModelData * modelData)
+void GlModel::setup_model(ModelData* model_data)
 {
-	meshes.clear();
-	for (unsigned int i = 0; i < modelData->meshes.size(); i++)
+	m_meshes_.clear();
+	for (auto& mesh : model_data->m_meshes)
 	{
 		// Create a unique Pointer to a glMesh and setup the buffers
-        std::unique_ptr <GlMesh> tempMesh(new GlMesh);
-        tempMesh->setupBuffers(&modelData->meshes.at(i));
+		std::unique_ptr<GlMesh> temp_mesh(new GlMesh);
+		temp_mesh->setup_buffers(&mesh);
 
 		// Move it into the pointer cause we cant create copies of unique pointers
-        meshes.push_back(std::move(tempMesh));
+		m_meshes_.push_back(std::move(temp_mesh));
 	}
 }
 
 // Destroys the buffer of every glmesh, then clears the list of glMeshes
-void GlModel::cleanupModel()
+void GlModel::cleanup_model()
 {
-	for (unsigned int i = 0; i < meshes.size(); i++)
+	for (auto& mesh : m_meshes_)
 	{
-		meshes.at(i)->destroyBuffers();
+		mesh->destroy_buffers();
 	}
-	meshes.clear();
+	m_meshes_.clear();
 }

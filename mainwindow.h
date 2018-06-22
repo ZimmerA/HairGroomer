@@ -4,29 +4,29 @@
 
 #include <mvppresenter.h>
 
-namespace Ui {
+namespace Ui
+{
 	class MainWindow;
 }
 
 class MainWindow : public QMainWindow
 {
-	Q_OBJECT
+Q_OBJECT
 
 public:
-	explicit MainWindow(QWidget *parent = 0);
+	explicit MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
 	// Getters/Setters
-	void setPresenter(MvpPresenter * presenter) { this->presenter = presenter;}
-	MvpPresenter * getPresenter() const { return presenter; }
+	void set_presenter(MvpPresenter* presenter) { this->m_presenter_ = presenter; }
+	MvpPresenter* get_presenter() const { return m_presenter_; }
 
 private slots:
-    void on_actionExport_triggered();
+	void on_actionExport_triggered();
 
 private:
-	Ui::MainWindow *ui;
-	MvpPresenter * presenter;
-
+	Ui::MainWindow* m_ui_;
+	MvpPresenter* m_presenter_{};
 };
 
 #endif // MAINWINDOW_H
