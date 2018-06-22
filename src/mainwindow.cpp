@@ -34,5 +34,5 @@ void MainWindow::on_actionExport_triggered()
 	}
 
 	// File could be opened delegate exporting to presenter
-	m_presenter_->export_hair(&file);
+	MvpPresenter::export_hair(&file);
 }

@@ -8,5 +8,5 @@ MvpModel::MvpModel()
 
 void MvpModel::load_models()
 {
-	m_reference_model_ = new ModelData("D:/FH/6._Semester/Bachelor Arbeit/SoftwareRepository/Marsienne_Base.obj");
+	m_reference_model_ = new ModelData("./res/Marsienne_Base.obj");
 }
