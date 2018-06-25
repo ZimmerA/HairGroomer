@@ -114,20 +114,8 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="drawbuffer.frag">
-      <Filter>Distribution Files</Filter>
-    </None>
-    <None Include="drawbuffer.vert">
-      <Filter>Distribution Files</Filter>
-    </None>
-    <None Include="vert.vert">
-      <Filter>Distribution Files</Filter>
-    </None>
     <None Include="drawbuffer.frag" />
     <None Include="drawbuffer.vert" />
-    <None Include="frag.frag" />
-    <None Include="uvmap.frag" />
-    <None Include="uvmap.vert" />
     <None Include="vert.vert" />
     <None Include="res\test.png">
       <Filter>Resource Files</Filter>
@@ -152,6 +140,9 @@
     </None>
     <None Include="src\shaders\paintbrush.vert" />
     <None Include="src\shaders\paintbrush.frag" />
+    <None Include="src\shaders\hair.vert" />
+    <None Include="src\shaders\hair.geom" />
+    <None Include="src\shaders\hair.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\glMesh.h">

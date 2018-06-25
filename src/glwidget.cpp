@@ -3,13 +3,14 @@
 #include <QOpenGLShaderProgram>
 #include <mvppresenter.h>
 #include <qapplication.h>
-
+#include <QDebug>
 
 GlWidget::GlWidget(QWidget* parent)
 	: QOpenGLWidget(parent)
 {
 	m_core_ = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
 	setMouseTracking(true);
+	setFocus();
 	// Find our parent window (which is the view in the mvp design pattern)
 	foreach(QWidget *widget, QApplication::topLevelWidgets())
 	{
@@ -65,17 +66,23 @@ void GlWidget::initializeGL()
 
 	// Enable Scissor test for viewport splitting
 	glEnable(GL_SCISSOR_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
+	// Compile and link shaders, set relavant uniforms
 	setup_shaders();
+	// Create the framebuffer for hair drawing
 	create_drawbuffer();
+	// load all relevant textures
 	load_textures();
+
 	// Create a quad for rendering textures
 	create_quad_vao();
-	m_paintbrush_model_matrix_.scale(0.1f);
+
+	m_paintbrush_model_matrix_.scale(0.05f);
+
 	// setup model using the vertex data in our mvpModel
 	m_test_model_.setup_model(m_view_->get_presenter()->get_model()->get_reference_model());
+	m_colormask_[0] = true;
+	m_colormask_[1] = m_colormask_[2] = false;
 }
 
 /**
@@ -124,11 +131,22 @@ void GlWidget::setup_shaders()
 	m_paintbrush_shader_->bindAttributeLocation("aVertex", 0);
 	m_paintbrush_shader_->bindAttributeLocation("aUV", 1);
 	m_paintbrush_shader_->link();
-	m_paintbrush_shader_->bind();
 	// look for the framebuffer texture in texture location 0
 	m_paintbrush_shader_->setUniformValue("screenTexture", 0);
-
 	m_paintbrushmodel_loc_ = m_paintbrush_shader_->uniformLocation("model");
+
+	// used for drawing the hair
+	m_hair_shader_ = new QOpenGLShaderProgram;
+	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/shaders/hair.vert");
+	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Geometry, "./src/shaders/hair.geom");
+	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/shaders/hair.frag");
+	m_hair_shader_->bindAttributeLocation("aVertex", 0);
+	m_hair_shader_->bindAttributeLocation("aNormal", 1);
+	m_hair_shader_->bindAttributeLocation("aUV", 2);
+	// look for the framebuffer texture in texture location 0
+	m_hair_shader_->link();
+	m_hair_shader_->bind();
+	m_hair_shader_->setUniformValue("hairMap", 0);
 }
 
 /**
@@ -136,67 +154,103 @@ void GlWidget::setup_shaders()
  */
 void GlWidget::paintGL()
 {
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	// Left half of context (Mesh)
-	glViewport(0, 0, width() / 2, height());
-	glScissor(0, 0, width() / 2, height());
 	render_left_half();
 
-	// draw to frameBuffer
-	if (m_is_pressed_)
-	{
-		// Disable depth testing cause of alpha blending (were only drawing textures anyways)
-		glDisable(GL_DEPTH_TEST);
-		// enable alpha blending to visualize transparency of the brush
-		glEnable(GL_BLEND);
-		glViewport(0, 0, 800, 600);
-		glScissor(0, 0, 800, 600);
-		m_drawbuffer_->bind();
-
-		// Draw the paintbrush at the mouse position
-		render_paintbrush();
-		m_drawbuffer_->release();
-		// disable alpha blending for the next frame
-		glDisable(GL_BLEND);
-		// Enable depth testing for coming frames
-		glEnable(GL_DEPTH_TEST);
-	}
-
 	// Right half of context (UVmap/drawing window)
-	glViewport(width() / 2, 0, width() / 2, height());
-	glScissor(width() / 2, 0, width(), height());
 	render_right_half();
 }
 
+/**
+ * \brief Renders the left half of the viewport
+ */
 void GlWidget::render_left_half()
 {
+	glViewport(0, 0, width() / 2, height());
+	glScissor(0, 0, width() / 2, height());
 	// we dont want the mesh to be a wireframe
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 	// draw the growth mesh
 	m_default_shader_->bind();
 	m_test_model_.draw(m_default_shader_);
 	m_default_shader_->release();
+
+
+	// draw the hair
+	m_hair_shader_->bind();
+	mat4 mvp = m_defaultprojection_matrix_ * m_defaultview_matrix_ * m_defaultmodel_matrix_;
+	mat4 vp = m_defaultprojection_matrix_ * m_defaultview_matrix_;
+	glUniformMatrix4fv(m_hair_shader_->uniformLocation("model"), 1, GL_FALSE,
+	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
+	glUniformMatrix4fv(m_hair_shader_->uniformLocation("view"), 1, GL_FALSE,
+	                   reinterpret_cast<GLfloat *>(&m_defaultview_matrix_));
+	glUniformMatrix4fv(m_hair_shader_->uniformLocation("mvp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
+	glUniformMatrix4fv(m_hair_shader_->uniformLocation("vp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&vp));
+	m_hair_shader_->setUniformValue("maxHairLength", 2.0f);
+	// Bind framebuffer texture to texunit 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
+	m_test_model_.draw(m_hair_shader_);
+	m_hair_shader_->release();
 }
 
+/**
+ * \brief Renders the right half of the viewport
+ */
 void GlWidget::render_right_half()
 {
 	// Disable depth testing cause of alpha blending (were only drawing textures anyways)
 	glDisable(GL_DEPTH_TEST);
-	// enable alpha blending to visualize transparency of the brush
 	glEnable(GL_BLEND);
+
+	// draw brush to framebuffer
+	if (m_is_leftmouse_pressed_)
+		paint_to_frame_buffer();
+
+	// Split the Viewport
+	glViewport(width() / 2, 0, width() / 2, height());
+	glScissor(width() / 2, 0, width(), height());
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	// Draw the Texture of the framebuffer to a quad
+	render_drawbuffer();
+
 	// Draw the UV map of the growth mesh
 	render_uv_map();
 	// Draw the paintbrush at the mouse position
 	render_paintbrush();
-	// Draw the Texture of the framebuffer to a quad
-	render_drawbuffer();
-	// disable alpha blending for the next frame
+
+	// Disable alpha blending for the next frame
 	glDisable(GL_BLEND);
 	// Enable depth testing for coming frames
 	glEnable(GL_DEPTH_TEST);
 }
 
+/**
+ * \brief Draws the paintbrush at its current position into the framebuffer
+ */
+void GlWidget::paint_to_frame_buffer()
+{
+	glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+	m_drawbuffer_->bind();
+	glViewport(0, 0, 800, 600);
+	glScissor(0, 0, 800, 600);
+	glColorMask(m_colormask_[0], m_colormask_[1], m_colormask_[2], GL_TRUE);
+	// Draw the paintbrush into the framebuffer at the mouse position
+	render_paintbrush();
+	m_drawbuffer_->release();
+	// Disable Colormask again
+	glColorMask(GL_TRUE,GL_TRUE, GL_TRUE, GL_TRUE);
+}
+
+/**
+ * \brief Uses the uvmap shader to draw the uvmap of the growthmesh in wireframe mode
+ */
 void GlWidget::render_uv_map()
 {
 	// Draw the uv map (wireframe)
@@ -239,7 +293,9 @@ void GlWidget::render_paintbrush()
 	m_paintbrush_shader_->release();
 }
 
-
+/**
+ * \brief Load all relevant textures
+ */
 void GlWidget::load_textures()
 {
 	m_paint_brush_texture_ = new QOpenGLTexture(QImage("./res/brush.png").mirrored());
@@ -247,39 +303,16 @@ void GlWidget::load_textures()
 	m_paint_brush_texture_->setMagnificationFilter(QOpenGLTexture::Linear);
 }
 
-void GlWidget::mouseMoveEvent(QMouseEvent* event)
-{
-	// Map mouse position to normalized device coordinates
-	const auto mouse_pos_x = static_cast<float>(event->pos().x()) / width() * 2.0f - 1.0f;
-	const auto mouse_pos_y = static_cast<float>(event->pos().y()) / height() * 2.0f - 1.0f;
-
-	// were inside the drawing window
-	if (mouse_pos_x >= 0.0f)
-	{
-		m_paintbrush_model_matrix_.setIdentity();
-		m_paintbrush_model_matrix_.translate(-1.0f, 1.0f);
-		m_paintbrush_model_matrix_.translate(mouse_pos_x * 2.0f, - (mouse_pos_y + 1));
-		m_paintbrush_model_matrix_.scale(0.1f);
-
-		update();
-	}
-}
-
-void GlWidget::mousePressEvent(QMouseEvent* event)
-{
-	m_is_pressed_ = true;
-	update();
-}
-
-void GlWidget::mouseReleaseEvent(QMouseEvent* event)
-{
-	m_is_pressed_ = false;
-	update();
-}
-
+/**
+ * \brief Creates the framebuffer for drawing with the paintbrush
+ */
 void GlWidget::create_drawbuffer()
 {
 	m_drawbuffer_ = new QOpenGLFramebufferObject(800, 600);
+	m_drawbuffer_->bind();
+	glClearColor(0.f, 0.5f, 0.5f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	m_drawbuffer_->release();
 }
 
 /**
@@ -345,4 +378,64 @@ void GlWidget::setup_mvp()
 
 	m_defaultprojection_matrix_ = mat4::perspective(45.0f, (width() / 2.0f) / float(height()), 0.1f, 1000.0f);
 	glUniformMatrix4fv(m_defaultproj_loc_, 1, GL_FALSE, reinterpret_cast<GLfloat *>(&m_defaultprojection_matrix_));
+}
+
+/**
+ * \brief  Sets the position of the paintbrush at mouse position if the mouse is in the uvmap window
+ * \param event The mouseevent sent by QT
+ */
+void GlWidget::mouseMoveEvent(QMouseEvent* event)
+{
+	// Map mouse position to normalized device coordinates
+	const auto mouse_pos_x = static_cast<float>(event->pos().x()) / width() * 2.0f - 1.0f;
+	const auto mouse_pos_y = static_cast<float>(event->pos().y()) / height() * 2.0f - 1.0f;
+
+	// were inside the drawing window
+	if (mouse_pos_x >= 0.0f)
+	{
+		m_paintbrush_model_matrix_.setIdentity();
+		m_paintbrush_model_matrix_.translate(-1.0f, 1.0f);
+		m_paintbrush_model_matrix_.translate(mouse_pos_x * 2.0f, - (mouse_pos_y + 1));
+		m_paintbrush_model_matrix_.scale(0.1f);
+		// call paintgl
+		update();
+	}
+}
+
+void GlWidget::mousePressEvent(QMouseEvent* event)
+{
+	m_is_leftmouse_pressed_ = true;
+	// Call paintgl
+	update();
+}
+
+void GlWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+	m_is_leftmouse_pressed_ = false;
+	// call paintgl
+	update();
+}
+
+void GlWidget::keyPressEvent(QKeyEvent* event)
+{
+
+	qDebug() <<"test";
+	switch (event->key())
+	{
+	case Qt::Key_L:
+		m_colormask_[0] = m_colormask_[1] = m_colormask_[2] = false;
+		m_colormask_[0] = true;
+		break;
+	case Qt::Key_T:
+		m_colormask_[0] = m_colormask_[1] = m_colormask_[2] = false;
+		m_colormask_[1] = true;
+		break;
+	case Qt::Key_B:
+		m_colormask_[0] = m_colormask_[1] = m_colormask_[2] = false;
+		m_colormask_[2] = true;
+		break;
+	default:
+		QOpenGLWidget::keyPressEvent(event);
+		break;
+	}
 }
