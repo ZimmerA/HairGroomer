@@ -7,6 +7,10 @@ ModelData::ModelData(const char* path)
 	load_model(path);
 }
 
+/**
+ * \brief Loads the model of the given path using Assimp
+ * \param path Path to the model
+ */
 void ModelData::load_model(const string& path)
 {
 	Assimp::Importer import;
@@ -22,6 +26,11 @@ void ModelData::load_model(const string& path)
 	process_node(scene->mRootNode, scene);
 }
 
+/**
+ * \brief Recursively iterate over every node in the model
+ * \param node The according Assimp node
+ * \param scene The according Assimp scene
+ */
 void ModelData::process_node(aiNode* node, const aiScene* scene)
 {
 	// process all the node's meshes (if any)
@@ -37,11 +46,17 @@ void ModelData::process_node(aiNode* node, const aiScene* scene)
 	}
 }
 
+
+/**
+ * \brief Processes a mesh of a node
+ * \param mesh The according Assimp mesh
+ * \param scene The according Assimp scene
+ * \return A MeshData object which holds the indices and vertices of the mesh
+ */
 MeshData ModelData::process_mesh(aiMesh* mesh, const aiScene* scene)
 {
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
-	vector<Texture> textures;
 
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -70,6 +85,7 @@ MeshData ModelData::process_mesh(aiMesh* mesh, const aiScene* scene)
 
 		vertices.push_back(vertex);
 	}
+
 	// process indices
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
 	{
@@ -78,10 +94,5 @@ MeshData ModelData::process_mesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 	}
 
-	// TODO: process material
-	if (mesh->mMaterialIndex >= 0)
-	{
-	}
-
-	return MeshData(vertices, indices, textures);
+	return MeshData(vertices, indices);
 }

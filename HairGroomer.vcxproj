@@ -201,9 +201,11 @@
     </QtUic>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\glMesh.cpp" />
-    <ClCompile Include="src\glModel.cpp" />
-    <ClCompile Include="src\glwidget.cpp" />
+    <ClCompile Include="orbitcamera.cpp" />
+    <ClCompile Include="src\opengl\Paintbrush.cpp" />
+    <ClCompile Include="src\opengl\glMesh.cpp" />
+    <ClCompile Include="src\opengl\glModel.cpp" />
+    <ClCompile Include="src\opengl\glwidget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mainwindow.cpp" />
     <ClCompile Include="src\meshData.cpp" />
@@ -212,9 +214,16 @@
     <ClCompile Include="src\mvppresenter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\glMesh.h" />
-    <ClInclude Include="src\glModel.h" />
-    <QtMoc Include="src\glwidget.h">
+    <ClInclude Include="orbitcamera.h" />
+    <ClInclude Include="src\opengl\Paintbrush.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\release;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG</Define>
+    </ClInclude>
+    <ClInclude Include="src\opengl\glMesh.h" />
+    <ClInclude Include="src\opengl\glModel.h" />
+    <QtMoc Include="src\opengl\glwidget.h">
     </QtMoc>
     <QtMoc Include="src\mainwindow.h">
     </QtMoc>
@@ -247,17 +256,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\test.png" />
-    <None Include="src\shaders\drawbuffer.frag" />
-    <None Include="src\shaders\drawbuffer.vert" />
-    <None Include="src\shaders\hair.frag" />
-    <None Include="src\shaders\hair.geom" />
-    <None Include="src\shaders\hair.vert" />
-    <None Include="src\shaders\mesh.frag" />
-    <None Include="src\shaders\paintbrush.frag" />
-    <None Include="src\shaders\paintbrush.vert" />
-    <None Include="src\shaders\uvmap.frag" />
-    <None Include="src\shaders\uvmap.vert" />
-    <None Include="src\shaders\mesh.vert" />
+    <None Include="src\opengl\shaders\paintwindow\drawbuffer.frag" />
+    <None Include="src\opengl\shaders\paintwindow\drawbuffer.vert" />
+    <None Include="src\opengl\shaders\hair\hair.frag" />
+    <None Include="src\opengl\shaders\hair\hair.geom" />
+    <None Include="src\opengl\shaders\hair\hair.vert" />
+    <None Include="src\opengl\shaders\viewport\mesh.frag" />
+    <None Include="src\opengl\shaders\paintwindow\paintbrush.frag" />
+    <None Include="src\opengl\shaders\paintwindow\paintbrush.vert" />
+    <None Include="src\opengl\shaders\paintwindow\uvmap.frag" />
+    <None Include="src\opengl\shaders\paintwindow\uvmap.vert" />
+    <None Include="src\opengl\shaders\viewport\mesh.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

@@ -1,4 +1,4 @@
-#version 330
+#version 330 core
 
 in vec3 aVertex;
 in vec3 aNormal;
@@ -11,13 +11,13 @@ out vec2 UV;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform mat4 mvp;
 
 void main()
 {
    Normal = vec3(model * vec4(aNormal,1.0f));
    FragPos = vec3(model * vec4(aVertex,1.0f));
    UV = aUV;
-   gl_Position =  projection * view * model * vec4(aVertex, 1.0f);
-
-
+   
+   gl_Position =  mvp * vec4(aVertex, 1.0f);
 }

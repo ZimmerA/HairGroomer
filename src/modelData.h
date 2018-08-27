@@ -3,17 +3,20 @@
 
 #include <QOpenGLShaderProgram>
 #include <vector>
-#include <meshData.h>
+#include "meshData.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 
 using namespace std;
 
+/**
+ * \brief Stores all the relevant data of a model, contains a list of meshes that makes up the model
+ */
 class ModelData
 {
 public:
 	explicit ModelData(const char* path);
-	// Meshdata for every submodel
+	// MeshData for every sub model
 	vector<MeshData> m_meshes;
 private:
 	string m_directory_;

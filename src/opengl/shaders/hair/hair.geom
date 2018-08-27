@@ -11,15 +11,21 @@ in VS_OUT {
 } gs_in[];
 
 out vec4 vertColor;
+out vec3 dOut;
+out vec3 worldPosOut;
 uniform mat4 model;
 uniform mat4 vp;
+
 
 // Hair uniforms
 uniform sampler2D hairMap;
 uniform float maxHairLength;
+uniform int numSegments;
+uniform vec3 hairColor;
+uniform vec3 rootColor;
 
 const float PI = 3.14159265359f;
-const float maxHairBendAngle = 25.0f;
+const float maxHairBendAngle = 180.0f;
 
 float degToRad(float deg)
 {
@@ -101,8 +107,8 @@ mat3 calculateHairBendMatrix(float greenChannel, float blueChanel)
     float bitangentBend = reMapColorValue(blueChanel);
 
     // Generate rotationMatrices
-    mat3 mRotT = rotXMatrix(tangentBend);
-    mat3 mRotB = rotYMatrix(bitangentBend);
+    mat3 mRotT = rotXMatrix(tangentBend/numSegments);
+    mat3 mRotB = rotYMatrix(bitangentBend/numSegments);
 
     mat3 hairRot = mRotB * mRotT;
     return hairRot;
@@ -147,18 +153,22 @@ void main() {
         tbn[2] = worldNorm;
 
         // Hair startpoint
-        vertColor = vec4(0,0,0,1);
+        vertColor = vec4(rootColor,1);
         vec3 d = vec3(0,0,1);
+		dOut = tbn * d;
+		worldPosOut = worldPos;
         gl_Position = vp * vec4(worldPos,1.0);
+
         EmitVertex();
 
         // Hair segments
-        int numSegments =5;
         for(int i = 0; i < numSegments ; i++)
         {
-            vertColor = vec4(0.06, 0.39,0.31,1);
+            vertColor = vec4(hairColor,1);
             d = mHairRot*  d;
+			dOut = tbn * d;
             worldPos = worldPos + maxHairLength / numSegments * tbn * d;
+			worldPosOut = worldPos;
             gl_Position = vp * vec4(worldPos,1.0);
             EmitVertex(); 
         }

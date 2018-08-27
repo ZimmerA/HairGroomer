@@ -4,7 +4,11 @@
 GlModel::GlModel()
 = default;
 
-// Iterate over the glMeshes and draw each
+
+/**
+ * \brief Iterates over each mesh of the model and draws it
+ * \param shader The shader program used to draw the model
+ */
 void GlModel::draw(QOpenGLShaderProgram* shader)
 {
 	for (auto& mesh : m_meshes_)
@@ -13,7 +17,11 @@ void GlModel::draw(QOpenGLShaderProgram* shader)
 	}
 }
 
-// Iterates over every meshData in the modelData and creates a glMesh for it, then sets up the buffers
+// 
+/**
+ * \brief Iterates over every meshData in the modelData and creates a glMesh for it, then sets up the buffers
+ * \param model_data The model data
+ */
 void GlModel::setup_model(ModelData* model_data)
 {
 	m_meshes_.clear();
@@ -28,7 +36,10 @@ void GlModel::setup_model(ModelData* model_data)
 	}
 }
 
-// Destroys the buffer of every glmesh, then clears the list of glMeshes
+
+/**
+ * \brief Destroys the buffer of every glmesh, then clears the list of glMeshes
+ */
 void GlModel::cleanup_model()
 {
 	for (auto& mesh : m_meshes_)

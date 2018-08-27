@@ -4,7 +4,7 @@
 #include <qopenglshaderprogram.h>
 #include <qopenglvertexarrayobject.h>
 #include <qopenglbuffer.h>
-#include <meshData.h>
+#include "./meshData.h"
 
 /*
 * Used by the GLWidget to draw meshes

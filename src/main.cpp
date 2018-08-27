@@ -1,7 +1,7 @@
 #include <QCommandLineParser>
 #include <QCommandLineOption>
 #include <QApplication>
-#include "glwidget.h"
+#include "opengl/glwidget.h"
 #include "mainwindow.h"
 #include "mvpmodel.h"
 #include "mvppresenter.h"
@@ -31,10 +31,11 @@ int main(int argc, char* argv[])
 		fmt.setSamples(4);
 	if (parser.isSet(core_profile_option))
 	{
-		fmt.setVersion(4, 0);
+		fmt.setVersion(3, 3);
 		fmt.setProfile(QSurfaceFormat::CoreProfile);
 	}
-	// Else the window resizing will be painfully slow
+
+	// set swap interval to 0 to increase window resize performance
 	fmt.setSwapInterval(0);
 
 	QSurfaceFormat::setDefaultFormat(fmt);
@@ -49,6 +50,10 @@ int main(int argc, char* argv[])
 	presenter.set_view(&view);
 
 	view.show();
+
+	// Load the default values of the ui control elements
+	presenter.load_default_values();
+
 	const auto result = QApplication::exec();
 	return result;
 }

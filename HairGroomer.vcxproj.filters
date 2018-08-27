@@ -60,41 +60,53 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\glModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\glMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\glwidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\meshData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mvpmodel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\modelData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\mainwindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\opengl\glMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\glModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\glwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\opengl\Paintbrush.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\meshData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\modelData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mvpmodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="src\mvppresenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="orbitcamera.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\glModel.h">
+    <ClInclude Include="src\opengl\glMesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <QtMoc Include="src\glwidget.h">
+    <ClInclude Include="src\opengl\glModel.h">
       <Filter>Header Files</Filter>
-    </QtMoc>
+    </ClInclude>
+    <ClInclude Include="src\opengl\Paintbrush.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\meshData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\modelData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -103,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="src\mvppresenter.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="orbitcamera.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -114,46 +129,38 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="drawbuffer.frag" />
-    <None Include="drawbuffer.vert" />
-    <None Include="vert.vert" />
     <None Include="res\test.png">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="src\shaders\drawbuffer.frag">
+    <None Include="src\opengl\shaders\hair\hair.frag" />
+    <None Include="src\opengl\shaders\hair\hair.geom" />
+    <None Include="src\opengl\shaders\hair\hair.vert" />
+    <None Include="src\opengl\shaders\paintwindow\drawbuffer.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\drawbuffer.vert">
+    <None Include="src\opengl\shaders\paintwindow\drawbuffer.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\uvmap.frag">
+    <None Include="src\opengl\shaders\paintwindow\paintbrush.frag" />
+    <None Include="src\opengl\shaders\paintwindow\paintbrush.vert" />
+    <None Include="src\opengl\shaders\paintwindow\uvmap.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\uvmap.vert">
+    <None Include="src\opengl\shaders\paintwindow\uvmap.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\mesh.frag">
+    <None Include="src\opengl\shaders\viewport\mesh.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\mesh.vert">
+    <None Include="src\opengl\shaders\viewport\mesh.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="src\shaders\paintbrush.vert" />
-    <None Include="src\shaders\paintbrush.frag" />
-    <None Include="src\shaders\hair.vert" />
-    <None Include="src\shaders\hair.geom" />
-    <None Include="src\shaders\hair.frag" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\glMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\meshData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\mainwindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="src\opengl\glwidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
