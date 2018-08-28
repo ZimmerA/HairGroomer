@@ -11,7 +11,7 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLTexture>
 #include "Paintbrush.h"
-#include "../../orbitcamera.h"
+#include "./opengl/orbitcamera.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -96,6 +96,7 @@ private:
 
 	// Growth mesh for hair grooming
 	GlModel m_growth_mesh_;
+	GlModel m_reference_model_;
 
 	QMap<int, bool> m_keys_;
 	void process_input();

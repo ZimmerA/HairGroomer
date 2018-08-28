@@ -90,7 +90,7 @@
     <ClCompile Include="src\mvppresenter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="orbitcamera.cpp">
+    <ClCompile Include="src\opengl\orbitcamera.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +116,7 @@
     <ClInclude Include="src\mvppresenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="orbitcamera.h">
+    <ClInclude Include="src\opengl\orbitcamera.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>

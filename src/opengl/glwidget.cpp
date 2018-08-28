@@ -78,7 +78,8 @@ void GlWidget::initializeGL()
 	create_quad_vao();
 
 	// setup model using the vertex data in our mvpModel
-	m_growth_mesh_.setup_model(m_view_->get_presenter()->get_model()->get_reference_model());
+	m_growth_mesh_.setup_model(m_view_->get_presenter()->get_model()->get_growth_mesh());
+	m_reference_model_.setup_model(m_view_->get_presenter()->get_model()->get_reference_model());
 }
 
 /**
@@ -254,6 +255,9 @@ void GlWidget::render_left_half()
 	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
 	glUniformMatrix4fv(m_default_shader_->uniformLocation("mvp"), 1,GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
 	m_growth_mesh_.draw(m_default_shader_);
+
+	// draw the reference mesh
+	m_reference_model_.draw(m_default_shader_);
 	m_default_shader_->release();
 
 	// draw the hair
@@ -264,6 +268,7 @@ void GlWidget::render_left_half()
 	                   reinterpret_cast<GLfloat *>(&m_defaultview_matrix_));
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("mvp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("vp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&vp));
+
 	// Bind framebuffer texture to texunit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
@@ -459,16 +464,13 @@ void GlWidget::mouseMoveEvent(QMouseEvent* event)
 			if (!m_keys_[Qt::Key_Alt])
 			{
 				m_camera_.handle_mouse_move(delta_x, delta_y);
-
-
-
 			}
 			else
 			{
 				m_camera_.move_pivot_point(delta_x, delta_y);
 			}
-							update();
-							m_last_mouse_pos_ = event->pos();
+			update();
+			m_last_mouse_pos_ = event->pos();
 		}
 }
 

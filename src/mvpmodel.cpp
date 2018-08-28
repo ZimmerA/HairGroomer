@@ -12,6 +12,7 @@ MvpModel::MvpModel()
 void MvpModel::load_models()
 {
 	m_reference_model_ = new ModelData("./res/eva3.fbx");
+	m_growth_mesh_ = new ModelData("./res/test.fbx");
 }
 
 /**
