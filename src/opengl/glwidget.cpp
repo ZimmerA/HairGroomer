@@ -11,6 +11,7 @@ GlWidget::GlWidget(QWidget* parent)
 	setMouseTracking(true);
 	setFocus();
 
+
 	// Find our parent window (which is the view in the mvp design pattern)
 	foreach(QWidget *widget, QApplication::topLevelWidgets())
 	{
@@ -77,7 +78,7 @@ void GlWidget::initializeGL()
 	// Create a quad for rendering textures
 	create_quad_vao();
 
-	// setup model using the vertex data in our mvpModel
+	// setup models using the vertex data in our mvpModel
 	m_growth_mesh_.setup_model(m_view_->get_presenter()->get_model()->get_growth_mesh());
 	m_reference_model_.setup_model(m_view_->get_presenter()->get_model()->get_reference_model());
 }
@@ -93,7 +94,9 @@ void GlWidget::setup_shaders()
 	m_default_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/opengl/shaders/viewport/mesh.frag");
 	m_default_shader_->bindAttributeLocation("aVertex", 0);
 	m_default_shader_->bindAttributeLocation("aNormal", 1);
-	m_default_shader_->bindAttributeLocation("aUV", 2);
+	m_default_shader_->bindAttributeLocation("aTangent", 2);
+	m_default_shader_->bindAttributeLocation("aBitangent", 3);
+	m_default_shader_->bindAttributeLocation("aUV", 4);
 	m_default_shader_->link();
 	m_default_shader_->bind();
 	setup_mvp();
@@ -104,7 +107,7 @@ void GlWidget::setup_shaders()
 	m_uv_map_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/opengl/shaders//paintwindow/uvmap.frag");
 	m_uv_map_shader_->bindAttributeLocation("aVertex", 0);
 	m_uv_map_shader_->bindAttributeLocation("aNormal", 1);
-	m_uv_map_shader_->bindAttributeLocation("aUV", 2);
+	m_uv_map_shader_->bindAttributeLocation("aUV", 4);
 	m_uv_map_shader_->link();
 
 	// used for drawing the framebuffer
@@ -138,11 +141,15 @@ void GlWidget::setup_shaders()
 	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/opengl/shaders/hair/hair.frag");
 	m_hair_shader_->bindAttributeLocation("aVertex", 0);
 	m_hair_shader_->bindAttributeLocation("aNormal", 1);
-	m_hair_shader_->bindAttributeLocation("aUV", 2);
+	m_hair_shader_->bindAttributeLocation("aTangent", 2);
+	m_hair_shader_->bindAttributeLocation("aBitangent", 3);
+	m_hair_shader_->bindAttributeLocation("aUV", 4);
 	m_hair_shader_->link();
 	m_hair_shader_->bind();
 	// look for the framebuffer texture in texture location 0
 	m_hair_shader_->setUniformValue("hairMap", 0);
+
+	set_light_position_uniform(0.f,550.f,0.f);
 }
 
 /**
@@ -248,20 +255,27 @@ void GlWidget::render_left_half()
 	m_defaultview_matrix_ = m_camera_.get_view_matrix();
 	mat4 mvp = m_defaultprojection_matrix_ * m_defaultview_matrix_ * m_defaultmodel_matrix_;
 	mat4 vp = m_defaultprojection_matrix_ * m_defaultview_matrix_;
-
-	// draw the growth mesh
 	m_default_shader_->bind();
 	glUniformMatrix4fv(m_default_shader_->uniformLocation("model"), 1,GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
 	glUniformMatrix4fv(m_default_shader_->uniformLocation("mvp"), 1,GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
-	m_growth_mesh_.draw(m_default_shader_);
 
-	// draw the reference mesh
-	m_reference_model_.draw(m_default_shader_);
-	m_default_shader_->release();
+	if (m_should_render_growthmesh_)
+	{
+		// draw the growth mesh
+		m_growth_mesh_.draw(m_default_shader_);
+	}
+
+	if (m_should_render_refrencemodel_)
+	{
+		// draw the reference mesh
+		m_reference_model_.draw(m_default_shader_);
+		m_default_shader_->release();
+	}
 
 	// draw the hair
 	m_hair_shader_->bind();
+	m_hair_shader_->setUniformValue(m_camera_.m_position_.x,m_camera_.m_position_.y, m_camera_.m_position_.z );
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("model"), 1, GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("view"), 1, GL_FALSE,
@@ -272,7 +286,8 @@ void GlWidget::render_left_half()
 	// Bind framebuffer texture to texunit 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
-	m_growth_mesh_.draw(m_hair_shader_);
+
+	m_growth_mesh_.draw_points(m_hair_shader_);
 	m_hair_shader_->release();
 }
 
@@ -512,9 +527,9 @@ void GlWidget::keyReleaseEvent(QKeyEvent* event)
 
 void GlWidget::wheelEvent(QWheelEvent* event)
 {
-	QPoint numDegrees = event->angleDelta() / 8;
-	QPoint numSteps = numDegrees / 15;
-	m_camera_.handle_mouse_wheel(numSteps.y());
+	const QPoint numDegrees = event->angleDelta() / 8;
+	QPoint num_steps = numDegrees / 15;
+	m_camera_.handle_mouse_wheel(num_steps.y());
 
 	update();
 }
@@ -526,9 +541,12 @@ void GlWidget::process_input()
 		reset_drawbuffer();
 
 	if (m_keys_[Qt::Key_Shift])
-		m_brush.set_erase_mode(true);
+		m_brush.set_opposite_mode(true);
 	else
-		m_brush.set_erase_mode(false);
+		m_brush.set_opposite_mode(false);
+
+	if (m_keys_[Qt::Key_Q])
+		m_camera_.reset_position();
 }
 
 /**
@@ -549,6 +567,16 @@ void GlWidget::reset_drawbuffer()
 void GlWidget::set_uv_overlay_visible(const bool visible)
 {
 	m_should_draw_uv_map_ = visible;
+}
+
+void GlWidget::set_should_render_growthmesh(const bool visible)
+{
+	m_should_render_growthmesh_ = visible;
+}
+
+void GlWidget::set_should_render_referencemodel(const bool visible)
+{
+	m_should_render_refrencemodel_ = visible;
 }
 
 void GlWidget::set_hair_length_uniform(const float length)
@@ -586,6 +614,13 @@ void GlWidget::set_light_hair_uniform(const bool enabled)
 	m_hair_shader_->setUniformValue("lighting", enabled);
 }
 
+void GlWidget::set_light_mesh_uniform(const bool enabled)
+{
+	makeCurrent();
+	m_default_shader_->bind();
+	m_default_shader_->setUniformValue("lighting", enabled);
+}
+
 void GlWidget::set_light_color_uniform(const int r, const int g, const int b)
 {
 	makeCurrent();
@@ -593,4 +628,13 @@ void GlWidget::set_light_color_uniform(const int r, const int g, const int b)
 	m_hair_shader_->setUniformValue("lightColor", r / 255.0f, g / 255.0f, b / 255.0f);
 	m_default_shader_->bind();
 	m_default_shader_->setUniformValue("lightColor", r / 255.0f, g / 255.0f, b / 255.0f);;
+}
+
+void GlWidget::set_light_position_uniform(const float x, const float y, const float z)
+{
+	makeCurrent();
+	m_default_shader_->bind();
+	m_default_shader_->setUniformValue("lightPos",x,y,z);
+	m_hair_shader_->bind();
+	m_hair_shader_->setUniformValue("lightPos",x,y,z);
 }

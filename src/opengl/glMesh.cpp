@@ -32,20 +32,34 @@ void GlMesh::setup_buffers(MeshData* mesh_data)
 	f->glEnableVertexAttribArray(0);
 	f->glEnableVertexAttribArray(1);
 	f->glEnableVertexAttribArray(2);
+	f->glEnableVertexAttribArray(3);
+	f->glEnableVertexAttribArray(4);
 
 	// position
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
 	// normals
 	f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
 	                         reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
+	// tangent
+	f->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+	                         reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
+	// bitangent
+	f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+	                         reinterpret_cast<void*>(offsetof(Vertex, m_bitangent)));
 	// UV
-	f->glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
+	f->glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
 }
 
 void GlMesh::draw(QOpenGLShaderProgram* shader)
 {
-	// TODO: Set texture uniforms in shader
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	f->glDrawElements(GL_TRIANGLES, m_indicie_amount_, GL_UNSIGNED_INT, nullptr);
+}
+
+void GlMesh::draw_points(QOpenGLShaderProgram* shader)
+{
+	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
+	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
+	f->glDrawArrays(GL_POINTS, 0, m_indicie_amount_);
 }

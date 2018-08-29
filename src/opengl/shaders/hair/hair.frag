@@ -1,4 +1,4 @@
-#version 400 core
+#version 330 core
 
 out vec4 color;
 
@@ -14,14 +14,14 @@ const float shininess = 64;
 
 uniform bool lighting;
 uniform vec3 lightColor;
+uniform vec3 lightPos;
+uniform vec3 cameraPos;
 
 void main()
 {
 	if(lighting)
 	{
-		vec3 camPos = vec3(0.0f,0.0f,-40.0f);
-		vec3 lightPosition = vec3(0.0f,15.0f,-40.0f);
-		vec3 lightDir = normalize(lightPosition - worldPosOut);
+		vec3 lightDir = normalize(lightPos - worldPosOut);
 		float lDotD = dot(lightDir, dOut);
 		float lDotN = sqrt(1 - (lDotD*lDotD));
 
@@ -32,7 +32,7 @@ void main()
 
 		if(lambert > 0.0) 
 		{
-			vec3 viewDir = normalize(camPos-worldPosOut);       
+			vec3 viewDir = normalize(cameraPos-worldPosOut);       
 			vec3 h = normalize(lightDir + viewDir);        
 			float dDotH = dot(dOut, h);
 			float nDotH = sqrt(1-(dDotH*dDotH));

@@ -17,6 +17,13 @@ void GlModel::draw(QOpenGLShaderProgram* shader)
 	}
 }
 
+void GlModel::draw_points(QOpenGLShaderProgram* shader)
+{
+	for (auto& mesh : m_meshes_)
+	{
+		mesh->draw_points(shader);
+	}
+}
 // 
 /**
  * \brief Iterates over every meshData in the modelData and creates a glMesh for it, then sets up the buffers

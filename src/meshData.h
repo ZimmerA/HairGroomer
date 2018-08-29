@@ -10,6 +10,8 @@ struct Vertex
 {
 	vec3 m_position;
 	vec3 m_normal;
+	vec3 m_tangent;
+	vec3 m_bitangent;
 	vec2 m_uv;
 };
 

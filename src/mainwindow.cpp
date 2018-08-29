@@ -147,8 +147,17 @@ void MainWindow::connect_signals_and_slots()
 	/* Light Settings */
 	// Light Hair
 	connect(m_ui_->cb_light_hair,SIGNAL(toggled(bool)), this, SLOT(light_hair_changed_listener(bool)));
+	// Light Hair
+	connect(m_ui_->cb_light_mesh,SIGNAL(toggled(bool)), this, SLOT(light_mesh_changed_listener(bool)));
 	// Light color
 	connect(m_ui_->b_light_color,SIGNAL(clicked(bool)), this, SLOT(light_color_clicked_listener()));
+
+
+	// Mesh settings
+	// Light Hair
+	connect(m_ui_->cb_growthmesh_show,SIGNAL(toggled(bool)), this, SLOT(growthmesh_show_changed_listener(bool)));
+	// Light Hair
+	connect(m_ui_->cb_referencemodel_show,SIGNAL(toggled(bool)), this, SLOT(referencemodel_show_changed_listener(bool)));
 }
 
 /**
@@ -168,6 +177,16 @@ void MainWindow::uv_visibility_changed_listener(const bool b) const
 void MainWindow::light_hair_changed_listener(const bool enabled) const
 {
 	m_ui_->widget_gl->set_light_hair_uniform(enabled);
+	m_ui_->widget_gl->update();
+}
+
+/**
+ * \brief Listener that gets called when the mesh lighting is turned on or off
+ * \param enabled The state of the mesh lighting
+ */
+void MainWindow::light_mesh_changed_listener(const bool enabled) const
+{
+	m_ui_->widget_gl->set_light_mesh_uniform(enabled);
 	m_ui_->widget_gl->update();
 }
 
@@ -301,6 +320,26 @@ void MainWindow::brush_mode_changed_listener(int mode, const bool checked) const
 	}
 }
 
+/**
+ * \brief Listener that gets called when the growthmesh rendering gets turned on or off
+ * \param enabled The state of the growthmesh rendering
+ */
+void MainWindow::growthmesh_show_changed_listener(const bool enabled) const
+{
+	m_ui_->widget_gl->set_should_render_growthmesh(enabled);
+	m_ui_->widget_gl->update();
+}
+
+/**
+ * \brief Listener that gets called when the reference model rendering gets turned on or off
+ * \param enabled The state of the reference model  rendering
+ */
+void MainWindow::referencemodel_show_changed_listener(const bool enabled) const
+{
+	m_ui_->widget_gl->set_should_render_referencemodel(enabled);
+	m_ui_->widget_gl->update();
+}
+
 void MainWindow::set_uv_grid_visibility(const bool visible) const
 {
 	m_ui_->cb_show_uv->setChecked(visible);
@@ -359,7 +398,22 @@ void MainWindow::set_light_hair(const bool active) const
 	m_ui_->cb_light_hair->setChecked(active);
 }
 
+void MainWindow::set_light_mesh(const bool active) const
+{
+	m_ui_->cb_light_mesh->setChecked(active);
+}
+
 void MainWindow::set_light_color(const QColor& color) const
 {
 	light_color_selected_listener(color);
+}
+
+void MainWindow::set_growthmesh_show(const bool active) const
+{
+	m_ui_->cb_growthmesh_show->setChecked(active);
+}
+
+void MainWindow::set_referencemodel_show(const bool active) const
+{
+	m_ui_->cb_referencemodel_show->setChecked(active);
 }

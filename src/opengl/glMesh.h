@@ -14,6 +14,7 @@ class GlMesh
 public:
 	GlMesh();
 	void draw(QOpenGLShaderProgram* shader);
+	void draw_points(QOpenGLShaderProgram* shader);
 	// Creates buffers and fills them with the mesh data
 	void setup_buffers(MeshData* mesh_data);
 	// Calls destroy on all buffers of the mesh

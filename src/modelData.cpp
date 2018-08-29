@@ -14,7 +14,7 @@ ModelData::ModelData(const char* path)
 void ModelData::load_model(const string& path)
 {
 	Assimp::Importer import;
-	const auto scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const auto scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
@@ -72,16 +72,32 @@ MeshData ModelData::process_mesh(aiMesh* mesh, const aiScene* scene)
 		vector.y = mesh->mNormals[i].y;
 		vector.z = mesh->mNormals[i].z;
 		vertex.m_normal = vector;
-
-		if (mesh->mTextureCoords[0]) // does the mesh contain texture coordinates?
+		// does the mesh contain texture coordinates?
+		if (mesh->mTextureCoords[0]) 
 		{
 			vec2 vec;
 			vec.x = mesh->mTextureCoords[0][i].x;
 			vec.y = mesh->mTextureCoords[0][i].y;
 			vertex.m_uv = vec;
+
+			vertex.m_bitangent = vector;
 		}
 		else
+		{
 			vertex.m_uv = vec2(0.0f, 0.0f);
+		}
+		if (mesh->mTangents)
+		{
+			vector.x = mesh->mTangents[i].x;
+			vector.y = mesh->mTangents[i].y;
+			vector.z = mesh->mTangents[i].z;
+			vertex.m_tangent = vector;
+
+			vector.x = mesh->mBitangents[i].x;
+			vector.y = mesh->mBitangents[i].y;
+			vector.z = mesh->mBitangents[i].z;
+			vertex.m_bitangent = vector;
+		}
 
 		vertices.push_back(vertex);
 	}

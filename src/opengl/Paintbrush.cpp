@@ -6,6 +6,7 @@ Paintbrush::Paintbrush()
 {
 	m_brush_size_ = .10f;
 	m_intensity_ = 1.0f;
+
 	// Set hair length as default channel (red)
 	m_colormask_[0] = true;
 	m_colormask_[1] = m_colormask_[2] = false;
@@ -21,9 +22,9 @@ void Paintbrush::set_brush_intensity(const double d)
 	this->m_intensity_ = d;
 }
 
-void Paintbrush::set_erase_mode(const bool value)
+void Paintbrush::set_opposite_mode(const bool value)
 {
-	m_erase_mode_ = value;
+	m_opposite_mode_ = value;
 }
 
 void Paintbrush::set_position(const float x, const float y)
@@ -66,6 +67,7 @@ void Paintbrush::begin(QOpenGLShaderProgram* shader, const bool painting_to_fram
 	m_transform_.translate(m_brush_position_.x, m_brush_position_.y);
 	m_transform_.scale(m_brush_size_);
 	auto f = QOpenGLContext::currentContext()->functions();
+
 	//TODO: wrapper class for shaders that stores uniformlocations instead of looking them up every tick
 	f->glUniformMatrix4fv(shader->uniformLocation("model"), 1, GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_transform_));
@@ -77,9 +79,9 @@ void Paintbrush::begin(QOpenGLShaderProgram* shader, const bool painting_to_fram
 		// Additive blending
 		f->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		f->glColorMask(m_colormask_[0],m_colormask_[1], m_colormask_[2], GL_TRUE);
-		if(m_erase_mode_)
+		if(m_opposite_mode_)
 		{
-			intensity = 0.0f;
+			intensity = 1.0f - m_intensity_;
 		}
 	}
 

@@ -36,7 +36,12 @@ void MvpModel::default_settings()
 
 	// Light
 	m_light_hair_default = true;
+	m_light_mesh_default = true;
 	m_light_color_default.setRgb(255,255,255);
+
+	// Meshes
+	m_growthmesh_show_default = false;
+	m_referencemodel_show_default = true;
 }
 
 /**

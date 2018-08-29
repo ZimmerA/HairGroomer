@@ -35,7 +35,10 @@ public:
 	void set_brush_size(double size) const;
 	void set_brush_intensity(double intensity) const;
 	void set_light_hair(bool active) const;
+	void set_light_mesh(bool active) const;
 	void set_light_color(const QColor& color) const;
+	void set_growthmesh_show(bool active) const;
+	void set_referencemodel_show(bool active) const;
 
 private slots:
 	void on_actionExport_triggered() const;
@@ -56,9 +59,12 @@ private slots:
 	void brush_intensity_changed_listener(double intensity) const;
 	void brush_size_changed_listener(double size) const;
 	void brush_mode_changed_listener(int mode, bool checked) const;
+	void growthmesh_show_changed_listener(bool enabled) const;
+	void referencemodel_show_changed_listener(bool enabled) const;
 
 	//light listeners
 	void light_hair_changed_listener(bool enabled) const;
+	void light_mesh_changed_listener(bool enabled) const;
 	void light_color_clicked_listener();
 	void light_color_selected_listener(const QColor& color) const;
 

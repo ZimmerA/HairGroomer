@@ -1,10 +1,10 @@
-#include <QCommandLineParser>
-#include <QCommandLineOption>
 #include <QApplication>
 #include "opengl/glwidget.h"
 #include "mainwindow.h"
 #include "mvpmodel.h"
 #include "mvppresenter.h"
+#include <QMessageBox>
+
 
 int main(int argc, char* argv[])
 {
@@ -14,30 +14,12 @@ int main(int argc, char* argv[])
 	QCoreApplication::setOrganizationName("Adrian Zimmer");
 	QCoreApplication::setApplicationVersion(QT_VERSION_STR);
 
-	// Setup Default OpenGl Context Information
-	QCommandLineParser parser;
-	parser.setApplicationDescription(QCoreApplication::applicationName());
-	parser.addHelpOption();
-	parser.addVersionOption();
-	const QCommandLineOption multiple_sample_option("multisample", "Multisampling");
-	parser.addOption(multiple_sample_option);
-	const QCommandLineOption core_profile_option("coreprofile", "Use core profile");
-	parser.addOption(core_profile_option);
-	parser.process(a);
 	QSurfaceFormat fmt;
 	fmt.setDepthBufferSize(24);
-
-	if (parser.isSet(multiple_sample_option))
-		fmt.setSamples(4);
-	if (parser.isSet(core_profile_option))
-	{
-		fmt.setVersion(3, 3);
-		fmt.setProfile(QSurfaceFormat::CoreProfile);
-	}
-
+	fmt.setVersion(4, 0);
+	fmt.setProfile(QSurfaceFormat::CoreProfile);
 	// set swap interval to 0 to increase window resize performance
 	fmt.setSwapInterval(0);
-
 	QSurfaceFormat::setDefaultFormat(fmt);
 
 	// Setup MVP Pattern
@@ -48,12 +30,18 @@ int main(int argc, char* argv[])
 	MainWindow view;
 	view.set_presenter(&presenter);
 	presenter.set_view(&view);
+	QOpenGLContext c;
 
+	QOpenGLFunctions_3_3_Core* funcs = 0;
+	funcs = c.versionFunctions<QOpenGLFunctions_3_3_Core>();
+	if (! funcs)
+	{
+		QMessageBox::critical(0, "Error", "Error creating opengl context for version 3.3. The reason for this might be outdated graphics drivers or that your gpu is too old. Closing application.");
+		exit(1);
+	}
 	view.show();
-
 	// Load the default values of the ui control elements
 	presenter.load_default_values();
-
 	const auto result = QApplication::exec();
 	return result;
 }

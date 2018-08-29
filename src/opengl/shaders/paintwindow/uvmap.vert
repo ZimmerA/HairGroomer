@@ -4,6 +4,8 @@
 */
 #version 330 core
 in vec3 aVertex;
+in vec3 aTangent;
+in vec3 aBitangent;
 in vec3 aNormal;
 in vec2 aUV;
 

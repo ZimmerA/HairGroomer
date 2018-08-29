@@ -14,6 +14,7 @@ class GlModel
 public:
 	GlModel();
 	void draw(QOpenGLShaderProgram* shader);
+	void draw_points(QOpenGLShaderProgram* shader);
 	// Takes modeldata and creates the according glMeshes
 	void setup_model(ModelData* model_data);
 	void cleanup_model();

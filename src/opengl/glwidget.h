@@ -28,12 +28,17 @@ public:
 	
 	Paintbrush m_brush;
 	void set_uv_overlay_visible(bool visible);
+	void set_should_render_growthmesh(bool visibile);
+	void set_should_render_referencemodel(bool visible);
 	void set_hair_length_uniform(float length);
 	void set_hair_num_segments_uniform(int segment_count);
 	void set_hair_color_unfirom(int r, int g, int b);
 	void set_hair_root_color_uniform(int r, int g, int b);
 	void set_light_hair_uniform(bool enabled);
+	void set_light_mesh_uniform(bool enabled);
 	void set_light_color_uniform(int r, int g, int b);
+	void set_light_position_uniform(float x, float y, float z);
+	void set_camera_position_uniform(float x, float y, float z);
 	void grab_drawbuffer_content_to_image(QImage& image);
 	void set_drawbuffer_content(QImage& image);
 
@@ -95,7 +100,9 @@ private:
 	MainWindow* m_view_;
 
 	// Growth mesh for hair grooming
+	bool m_should_render_growthmesh_{};
 	GlModel m_growth_mesh_;
+	bool m_should_render_refrencemodel_{};
 	GlModel m_reference_model_;
 
 	QMap<int, bool> m_keys_;

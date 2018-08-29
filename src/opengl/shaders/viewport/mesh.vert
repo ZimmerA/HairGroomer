@@ -2,6 +2,8 @@
 
 in vec3 aVertex;
 in vec3 aNormal;
+in vec3 aTangent;
+in vec4 aBitangent;
 in vec2 aUV;
 
 out vec3 Normal;
@@ -12,6 +14,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 mvp;
+
 
 void main()
 {

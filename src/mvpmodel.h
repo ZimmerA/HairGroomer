@@ -30,15 +30,19 @@ public:
 	double m_hairsegment_count_default{};
 	QColor m_hair_color_default;
 	QColor m_hair_root_color_default;
-
 	// Brush
 	Paintbrush::paintmode m_brushmode_default{};
 	double m_brush_size_default{};
 	double m_brush_intensity_default{};
+
 	// Light
 	bool m_light_hair_default{};
+	bool m_light_mesh_default{};
 	QColor m_light_color_default;
 
+	// meshes
+	bool m_growthmesh_show_default{};
+	bool m_referencemodel_show_default{};
 private:
 	ModelData* m_reference_model_{};
 	ModelData* m_growth_mesh_{};
