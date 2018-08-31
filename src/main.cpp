@@ -1,5 +1,5 @@
 #include <QApplication>
-#include "opengl/glwidget.h"
+#include "rendering/glwidget.h"
 #include "mainwindow.h"
 #include "mvpmodel.h"
 #include "mvppresenter.h"
@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
 	presenter.set_view(&view);
 	QOpenGLContext c;
 
-	QOpenGLFunctions_3_3_Core* funcs = 0;
-	funcs = c.versionFunctions<QOpenGLFunctions_3_3_Core>();
+	// Check if OpenGL 3.3 core context could be created, if not exit with Error.
+	QOpenGLFunctions_3_3_Core* funcs = c.versionFunctions<QOpenGLFunctions_3_3_Core>();
 	if (! funcs)
 	{
 		QMessageBox::critical(0, "Error", "Error creating opengl context for version 3.3. The reason for this might be outdated graphics drivers or that your gpu is too old. Closing application.");

@@ -2,14 +2,17 @@
 #include <linalg.hpp>
 #include <qopenglshaderprogram.h>
 
+/**
+ * \brief Stores the settings of the paintbrush, used by the rendering
+ */
 class Paintbrush
 {
 public:
 	enum paintmode
 	{
 		length = 0,
-		tangent,
-		bitangent
+		curl,
+		twist
 	};
 
 	Paintbrush();

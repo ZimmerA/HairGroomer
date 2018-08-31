@@ -3,18 +3,18 @@
 #include <vector>
 #include "glMesh.h"
 #include "./modelData.h"
-#include <qopenglshaderprogram.h>
 #include <memory> // unique pointer
 
 /**
- * \brief The model used by the opengl contexts
+ * \brief The model used by the OpenGL contexts
  */
 class GlModel
 {
 public:
 	GlModel();
-	void draw(QOpenGLShaderProgram* shader);
-	void draw_points(QOpenGLShaderProgram* shader);
+	void draw();
+	void draw_points();
+
 	// Takes modeldata and creates the according glMeshes
 	void setup_model(ModelData* model_data);
 	void cleanup_model();

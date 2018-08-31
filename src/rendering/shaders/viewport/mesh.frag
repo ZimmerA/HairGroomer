@@ -1,3 +1,6 @@
+/*
+* Used for drawing meshes with a diffuse light model
+*/
 #version 330 core
 
 out highp vec4 fragColor;

@@ -1,3 +1,6 @@
+/*
+* Transfers the relevant hair generation data to the geometry shader
+*/
 #version 330 core
 
 in vec3 aVertex;

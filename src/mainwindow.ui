@@ -39,12 +39,6 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionTest"/>
-   </widget>
    <widget class="QMenu" name="menuHair">
     <property name="title">
      <string>Hair</string>
@@ -53,7 +47,6 @@
     <addaction name="actionLoad_Hairstyle"/>
     <addaction name="actionExport_Hairstyle"/>
    </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuHair"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -94,7 +87,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>357</width>
+          <width>347</width>
           <height>550</height>
          </rect>
         </property>
@@ -460,14 +453,6 @@
     </layout>
    </widget>
   </widget>
-  <action name="actionTest">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>New (Ctrl + N)</string>
-   </property>
-  </action>
   <action name="actionExport">
    <property name="enabled">
     <bool>false</bool>
@@ -492,7 +477,7 @@
   <customwidget>
    <class>GlWidget</class>
    <extends>QOpenGLWidget</extends>
-   <header>opengl/glwidget.h</header>
+   <header>rendering/glwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -7,10 +7,8 @@
 GlWidget::GlWidget(QWidget* parent)
 	: QOpenGLWidget(parent)
 {
-	m_core_ = QSurfaceFormat::defaultFormat().profile() == QSurfaceFormat::CoreProfile;
 	setMouseTracking(true);
 	setFocus();
-
 
 	// Find our parent window (which is the view in the mvp design pattern)
 	foreach(QWidget *widget, QApplication::topLevelWidgets())
@@ -74,7 +72,6 @@ void GlWidget::initializeGL()
 	create_drawbuffer();
 	// load all relevant textures
 	load_textures();
-
 	// Create a quad for rendering textures
 	create_quad_vao();
 
@@ -90,8 +87,8 @@ void GlWidget::setup_shaders()
 {
 	// Draws the growth-mesh
 	m_default_shader_ = new QOpenGLShaderProgram;
-	m_default_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/opengl/shaders/viewport/mesh.vert");
-	m_default_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/opengl/shaders/viewport/mesh.frag");
+	m_default_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/rendering/shaders/viewport/mesh.vert");
+	m_default_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/rendering/shaders/viewport/mesh.frag");
 	m_default_shader_->bindAttributeLocation("aVertex", 0);
 	m_default_shader_->bindAttributeLocation("aNormal", 1);
 	m_default_shader_->bindAttributeLocation("aTangent", 2);
@@ -103,8 +100,9 @@ void GlWidget::setup_shaders()
 
 	// Draws the UV map of the loaded growth-mesh
 	m_uv_map_shader_ = new QOpenGLShaderProgram;
-	m_uv_map_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/opengl/shaders/paintwindow/uvmap.vert");
-	m_uv_map_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/opengl/shaders//paintwindow/uvmap.frag");
+	m_uv_map_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/rendering/shaders/paintwindow/uvmap.vert");
+	m_uv_map_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment,
+	                                          "./src/rendering/shaders//paintwindow/uvmap.frag");
 	m_uv_map_shader_->bindAttributeLocation("aVertex", 0);
 	m_uv_map_shader_->bindAttributeLocation("aNormal", 1);
 	m_uv_map_shader_->bindAttributeLocation("aUV", 4);
@@ -113,9 +111,9 @@ void GlWidget::setup_shaders()
 	// used for drawing the framebuffer
 	m_drawbuffer_shader_ = new QOpenGLShaderProgram;
 	m_drawbuffer_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex,
-	                                              "./src/opengl/shaders/paintwindow/drawbuffer.vert");
+	                                              "./src/rendering/shaders/paintwindow/drawbuffer.vert");
 	m_drawbuffer_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment,
-	                                              "./src/opengl/shaders/paintwindow/drawbuffer.frag");
+	                                              "./src/rendering/shaders/paintwindow/drawbuffer.frag");
 	m_drawbuffer_shader_->bindAttributeLocation("aVertex", 0);
 	m_drawbuffer_shader_->bindAttributeLocation("aUV", 1);
 	m_drawbuffer_shader_->link();
@@ -125,9 +123,9 @@ void GlWidget::setup_shaders()
 	// used for drawing the paintbrush
 	m_paintbrush_shader_ = new QOpenGLShaderProgram;
 	m_paintbrush_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex,
-	                                              "./src/opengl/shaders/paintwindow/paintbrush.vert");
+	                                              "./src/rendering/shaders/paintwindow/paintbrush.vert");
 	m_paintbrush_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment,
-	                                              "./src/opengl/shaders/paintwindow/paintbrush.frag");
+	                                              "./src/rendering/shaders/paintwindow/paintbrush.frag");
 	m_paintbrush_shader_->bindAttributeLocation("aVertex", 0);
 	m_paintbrush_shader_->bindAttributeLocation("aUV", 1);
 	m_paintbrush_shader_->link();
@@ -136,9 +134,9 @@ void GlWidget::setup_shaders()
 
 	// used for drawing the hair
 	m_hair_shader_ = new QOpenGLShaderProgram;
-	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/opengl/shaders/hair/hair.vert");
-	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Geometry, "./src/opengl/shaders/hair/hair.geom");
-	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/opengl/shaders/hair/hair.frag");
+	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/rendering/shaders/hair/hair.vert");
+	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Geometry, "./src/rendering/shaders/hair/hair.geom");
+	m_hair_shader_->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/rendering/shaders/hair/hair.frag");
 	m_hair_shader_->bindAttributeLocation("aVertex", 0);
 	m_hair_shader_->bindAttributeLocation("aNormal", 1);
 	m_hair_shader_->bindAttributeLocation("aTangent", 2);
@@ -148,30 +146,16 @@ void GlWidget::setup_shaders()
 	m_hair_shader_->bind();
 	// look for the framebuffer texture in texture location 0
 	m_hair_shader_->setUniformValue("hairMap", 0);
-
-	set_light_position_uniform(0.f,550.f,0.f);
 }
 
 /**
- * \brief Sets up the model view projection uniforms of the standard shader
- * \note we have to use glUniformMatrix4fv here (instead of the QT wrapper function)
- *		 because the QT shader wrapper doesn't have a uniform function that takes a float * as parameter
- *		 and hands it to glUniformMatrix(n)fv which is needed for our math library (linalg)
+ * \brief Sets up the model view projection matrices
  */
 void GlWidget::setup_mvp()
 {
-	m_default_shader_->bind();
 	m_defaultview_matrix_.setIdentity();
-	glUniformMatrix4fv(m_default_shader_->uniformLocation("view"), 1, GL_FALSE,
-	                   reinterpret_cast<GLfloat *>(&m_defaultview_matrix_));
-
 	m_defaultmodel_matrix_.setIdentity();
-	glUniformMatrix4fv(m_default_shader_->uniformLocation("model"), 1, GL_FALSE,
-	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
-
 	m_defaultprojection_matrix_ = mat4::perspective(45.0f, (width() / 2.0f) / float(height()), 0.1f, 1000.0f);
-	glUniformMatrix4fv(m_default_shader_->uniformLocation("projection"), 1, GL_FALSE,
-	                   reinterpret_cast<GLfloat *>(&m_defaultprojection_matrix_));
 }
 
 /**
@@ -197,7 +181,7 @@ void GlWidget::load_textures()
 }
 
 /**
-* \brief Creates and fills the vao/vbo for rendering textures
+* \brief Creates and fills the quad vao/vbo for rendering textures
 */
 void GlWidget::create_quad_vao()
 {
@@ -241,7 +225,7 @@ void GlWidget::paintGL()
 }
 
 /**
- * \brief Renders the left half of the viewport
+ * \brief Renders the left half of the Context
  */
 void GlWidget::render_left_half()
 {
@@ -255,7 +239,12 @@ void GlWidget::render_left_half()
 	m_defaultview_matrix_ = m_camera_.get_view_matrix();
 	mat4 mvp = m_defaultprojection_matrix_ * m_defaultview_matrix_ * m_defaultmodel_matrix_;
 	mat4 vp = m_defaultprojection_matrix_ * m_defaultview_matrix_;
+
 	m_default_shader_->bind();
+	// Set relevant uniforms
+	m_default_shader_->setUniformValue("lightPos", m_light_.m_position.x, m_light_.m_position.y, m_light_.m_position.z);
+	m_default_shader_->setUniformValue("lightColor", m_light_.m_color.x, m_light_.m_color.y, m_light_.m_color.z);
+	m_default_shader_->setUniformValue("lighting", m_should_light_mesh_);
 	glUniformMatrix4fv(m_default_shader_->uniformLocation("model"), 1,GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
 	glUniformMatrix4fv(m_default_shader_->uniformLocation("mvp"), 1,GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
@@ -263,19 +252,31 @@ void GlWidget::render_left_half()
 	if (m_should_render_growthmesh_)
 	{
 		// draw the growth mesh
-		m_growth_mesh_.draw(m_default_shader_);
+		m_growth_mesh_.draw();
 	}
 
 	if (m_should_render_refrencemodel_)
 	{
 		// draw the reference mesh
-		m_reference_model_.draw(m_default_shader_);
+		m_reference_model_.draw();
 		m_default_shader_->release();
 	}
 
 	// draw the hair
 	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue(m_camera_.m_position_.x,m_camera_.m_position_.y, m_camera_.m_position_.z );
+	// Set relevant uniforms
+	m_hair_shader_->setUniformValue("cameraPos", m_camera_.m_position.x, m_camera_.m_position.y,
+	                                m_camera_.m_position.z);
+	m_hair_shader_->setUniformValue("lightPos", m_light_.m_position.x, m_light_.m_position.y, m_light_.m_position.z);
+	m_hair_shader_->setUniformValue("lightColor", m_light_.m_color.x, m_light_.m_color.y, m_light_.m_color.z);
+	m_hair_shader_->setUniformValue("lighting", m_should_light_hair_);
+	m_hair_shader_->setUniformValue("numSegments", m_hair_.m_num_segments);
+	m_hair_shader_->setUniformValue("maxHairLength", m_hair_.m_length);
+	m_hair_shader_->setUniformValue("hairColor", m_hair_.m_hair_color.x, m_hair_.m_hair_color.y,
+	                                m_hair_.m_hair_color.z);
+	m_hair_shader_->setUniformValue("rootColor", m_hair_.m_root_color.x, m_hair_.m_root_color.y,
+	                                m_hair_.m_root_color.z);
+
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("model"), 1, GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("view"), 1, GL_FALSE,
@@ -287,12 +288,12 @@ void GlWidget::render_left_half()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
 
-	m_growth_mesh_.draw_points(m_hair_shader_);
+	m_growth_mesh_.draw_points();
 	m_hair_shader_->release();
 }
 
 /**
- * \brief Renders the right half of the viewport
+ * \brief Renders the right half of the Context
  */
 void GlWidget::render_right_half()
 {
@@ -329,7 +330,7 @@ void GlWidget::render_right_half()
 }
 
 /**
- * \brief Draws the paintbrush at its current position into the framebuffer
+ * \brief Draws the paintbrush at its current position into the painting framebuffer
  */
 void GlWidget::paint_to_frame_buffer()
 {
@@ -343,14 +344,14 @@ void GlWidget::paint_to_frame_buffer()
 }
 
 /**
- * \brief Uses the uv-map shader to draw the uv-map of the growth-mesh in wireframe mode
+ * \brief Uses the uv-map shader to draw the uv-map of the growthmesh in wireframe mode
  */
 void GlWidget::render_uv_map()
 {
 	// Draw the uv map (wireframe)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	m_uv_map_shader_->bind();
-	m_growth_mesh_.draw(m_default_shader_);
+	m_growth_mesh_.draw();
 	m_uv_map_shader_->release();
 	// Disable wireframe
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -373,7 +374,7 @@ void GlWidget::render_drawbuffer()
 
 /**
  * \brief Renders the paintbrush
- * \param painting_to_framebuffer used to determine whether the intensity uniform should be 1 or not and if the color mask should be applied
+ * \param painting_to_framebuffer used to determine if the brush is being drawn in the painting or the default framebuffer
  */
 void GlWidget::render_paintbrush(const bool painting_to_framebuffer)
 {
@@ -383,10 +384,10 @@ void GlWidget::render_paintbrush(const bool painting_to_framebuffer)
 
 	// render the brush
 	m_paintbrush_shader_->bind();
-	m_brush.begin(m_paintbrush_shader_, painting_to_framebuffer);
+	m_brush_.begin(m_paintbrush_shader_, painting_to_framebuffer);
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_quad_vao_);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	m_brush.end();
+	m_brush_.end();
 	m_paintbrush_shader_->release();
 }
 
@@ -398,13 +399,41 @@ void GlWidget::render_paintbrush(const bool painting_to_framebuffer)
 void GlWidget::resizeGL(const int w, const int h)
 {
 	m_defaultprojection_matrix_ = mat4::perspective(45.0f, w / float(h) / 2.0f, 0.1f, 1000.0f);
-
-	m_default_shader_->bind();
-	glUniformMatrix4fv(m_default_shader_->uniformLocation("projection"), 1, GL_FALSE,
-	                   reinterpret_cast<GLfloat *>(&m_defaultprojection_matrix_));
-	m_default_shader_->release();
 }
 
+/**
+ * \brief Takes the content of the painting framebuffer and stores it in an image
+ * \param image the returned image
+ */
+void GlWidget::grab_drawbuffer_content_to_image(QImage& image)
+{
+	makeCurrent();
+	GLint width, height;
+	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+	auto resized = image.scaled(width, height).convertToFormat(QImage::Format_RGBA8888);
+
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, resized.bits());
+	image.swap(resized);
+}
+
+/**
+ * \brief Load a given QImage into the painting framebuffer
+ * \param image The image
+ */
+void GlWidget::set_drawbuffer_content(QImage& image)
+{
+	makeCurrent();
+	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(), 0, GL_RGBA,GL_UNSIGNED_BYTE, image.bits());
+}
+
+/**
+ * \brief Gets called when a mouse button is pressed
+ * \param event The mouse event
+ */
 void GlWidget::mousePressEvent(QMouseEvent* event)
 {
 	// Map mouse position to normalized device coordinates
@@ -430,29 +459,8 @@ void GlWidget::mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void GlWidget::grab_drawbuffer_content_to_image(QImage& image)
-{
-	makeCurrent();
-	GLint width, height;
-	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
-	glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
-	auto resized = image.scaled(width, height).convertToFormat(QImage::Format_RGBA8888);
-
-	glPixelStorei(GL_PACK_ALIGNMENT, 1);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, resized.bits());
-	image.swap(resized);
-}
-
-void GlWidget::set_drawbuffer_content(QImage& image)
-{
-	makeCurrent();
-	glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.width(), image.height(), 0, GL_RGBA,GL_UNSIGNED_BYTE, image.bits());
-}
-
 /**
- * \brief Sets the position of the paintbrush at mouse position if the mouse is in the uv-map window
+ * \brief Gets called when the mouse is moved
  * \param event The mouse event sent by QT
  */
 void GlWidget::mouseMoveEvent(QMouseEvent* event)
@@ -464,13 +472,14 @@ void GlWidget::mouseMoveEvent(QMouseEvent* event)
 	// mouse is still inside the drawing window
 	if (mouse_pos_x >= 0.0f)
 	{
-		m_brush.set_position(mouse_pos_x * 2.0f, - (mouse_pos_y + 1));
+		m_brush_.set_position(mouse_pos_x * 2.0f, - (mouse_pos_y + 1));
 		// query call of paintgl
 		update();
 	}
 
 	// If the first mouse click was in the viewport, update camera as well
 	if (m_has_mouse_started_in_viewport_)
+	{
 		if (event->buttons() & Qt::LeftButton)
 		{
 			const int delta_x = event->x() - m_last_mouse_pos_.x();
@@ -484,11 +493,18 @@ void GlWidget::mouseMoveEvent(QMouseEvent* event)
 			{
 				m_camera_.move_pivot_point(delta_x, delta_y);
 			}
+			
+			// query call of paintgl
 			update();
 			m_last_mouse_pos_ = event->pos();
 		}
+	}
 }
 
+/**
+ * \brief Gets called on mouse button release
+ * \param event The Mouse event
+ */
 void GlWidget::mouseReleaseEvent(QMouseEvent* event)
 {
 	switch (event->button())
@@ -504,9 +520,21 @@ void GlWidget::mouseReleaseEvent(QMouseEvent* event)
 	}
 }
 
+/**
+ * \brief Gets called when the mousewheel is scrolled
+ * \param event The scroll event
+ */
+void GlWidget::wheelEvent(QWheelEvent* event)
+{
+	const auto num_degrees = event->angleDelta() / 8;
+	auto num_steps = num_degrees / 15;
+	m_camera_.handle_mouse_wheel(num_steps.y());
+
+	update();
+}
 
 /**
- * \brief The keyboard inside of the gl widget
+ * \brief Gets called on key press
  */
 void GlWidget::keyPressEvent(QKeyEvent* event)
 {
@@ -516,7 +544,7 @@ void GlWidget::keyPressEvent(QKeyEvent* event)
 }
 
 /**
- * \brief The keyboard inside of the gl widget
+ * \brief Gets called on key release
  */
 void GlWidget::keyReleaseEvent(QKeyEvent* event)
 {
@@ -525,25 +553,15 @@ void GlWidget::keyReleaseEvent(QKeyEvent* event)
 	update();
 }
 
-void GlWidget::wheelEvent(QWheelEvent* event)
-{
-	const QPoint numDegrees = event->angleDelta() / 8;
-	QPoint num_steps = numDegrees / 15;
-	m_camera_.handle_mouse_wheel(num_steps.y());
-
-	update();
-}
-
-
 void GlWidget::process_input()
 {
 	if (m_keys_[Qt::Key_R])
 		reset_drawbuffer();
 
 	if (m_keys_[Qt::Key_Shift])
-		m_brush.set_opposite_mode(true);
+		m_brush_.set_opposite_mode(true);
 	else
-		m_brush.set_opposite_mode(false);
+		m_brush_.set_opposite_mode(false);
 
 	if (m_keys_[Qt::Key_Q])
 		m_camera_.reset_position();
@@ -574,67 +592,62 @@ void GlWidget::set_should_render_growthmesh(const bool visible)
 	m_should_render_growthmesh_ = visible;
 }
 
+void GlWidget::set_should_light_hair(const bool enabled)
+{
+	m_should_light_hair_ = enabled;
+}
+
+void GlWidget::set_should_light_mesh(const bool enabled)
+{
+	m_should_light_mesh_ = enabled;
+}
+
 void GlWidget::set_should_render_referencemodel(const bool visible)
 {
 	m_should_render_refrencemodel_ = visible;
 }
 
-void GlWidget::set_hair_length_uniform(const float length)
+void GlWidget::set_hair_length(const float length)
 {
-	makeCurrent();
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("maxHairLength", length);
+	m_hair_.m_length = length;
 }
 
-void GlWidget::set_hair_num_segments_uniform(const int segment_count)
+void GlWidget::set_hair_num_segments(const int segment_count)
 {
-	makeCurrent();
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("numSegments", segment_count);
+	m_hair_.m_num_segments = segment_count;
 }
 
-void GlWidget::set_hair_color_unfirom(const int r, const int g, const int b)
+void GlWidget::set_hair_color(const int r, const int g, const int b)
 {
-	makeCurrent();
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("hairColor", r / 255.0f, g / 255.0f, b / 255.0f);
+	m_hair_.m_hair_color = vec3(r / 255.0f, g / 255.0f, b / 255.0f);
 }
 
-void GlWidget::set_hair_root_color_uniform(const int r, const int g, const int b)
+void GlWidget::set_hair_root_color(const int r, const int g, const int b)
 {
-	makeCurrent();
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("rootColor", r / 255.0f, g / 255.0f, b / 255.0f);
+	m_hair_.m_root_color = vec3(r / 255.0f, g / 255.0f, b / 255.0f);
 }
 
-void GlWidget::set_light_hair_uniform(const bool enabled)
+void GlWidget::set_light_color(const int r, const int g, const int b)
 {
-	makeCurrent();
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("lighting", enabled);
+	m_light_.m_color = vec3(r / 255.0f, g / 255.0f, b / 255.0f);
 }
 
-void GlWidget::set_light_mesh_uniform(const bool enabled)
+void GlWidget::set_light_position(const float x, const float y, const float z)
 {
-	makeCurrent();
-	m_default_shader_->bind();
-	m_default_shader_->setUniformValue("lighting", enabled);
+	m_light_.m_position = vec3(x, y, z);
 }
 
-void GlWidget::set_light_color_uniform(const int r, const int g, const int b)
+void GlWidget::set_brush_size(const float size)
 {
-	makeCurrent();
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("lightColor", r / 255.0f, g / 255.0f, b / 255.0f);
-	m_default_shader_->bind();
-	m_default_shader_->setUniformValue("lightColor", r / 255.0f, g / 255.0f, b / 255.0f);;
+	m_brush_.set_brush_size(size);
 }
 
-void GlWidget::set_light_position_uniform(const float x, const float y, const float z)
+void GlWidget::set_brush_intensity(const float intensity)
 {
-	makeCurrent();
-	m_default_shader_->bind();
-	m_default_shader_->setUniformValue("lightPos",x,y,z);
-	m_hair_shader_->bind();
-	m_hair_shader_->setUniformValue("lightPos",x,y,z);
+	m_brush_.set_brush_intensity(intensity);
+}
+
+void GlWidget::set_brush_mode(const Paintbrush::paintmode mode)
+{
+	m_brush_.set_paintmode(mode);
 }

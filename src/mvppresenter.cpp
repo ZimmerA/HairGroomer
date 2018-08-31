@@ -7,7 +7,7 @@ MvpPresenter::MvpPresenter(): m_model_(nullptr), m_view_(nullptr)
 }
 
 /**
- * \brief Loads the default values into the UI elements
+ * \brief Loads the default values stored in the model into the UI elements
  */
 void MvpPresenter::load_default_values() const
 {

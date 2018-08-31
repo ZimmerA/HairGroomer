@@ -1,3 +1,6 @@
+/*
+* Used for drawing the paintbrush with the set intensity
+*/
 #version 330 core
 
 out highp vec4 fragColor;

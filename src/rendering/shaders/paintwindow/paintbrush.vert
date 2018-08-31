@@ -1,3 +1,6 @@
+/*
+* Used for drawing the paintbrush with the set intensity
+*/
 #version 330 core
 in vec2 aVertex;
 in vec2 aUV;

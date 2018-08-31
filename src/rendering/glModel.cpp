@@ -1,27 +1,27 @@
 #include "glModel.h"
-#include <cassert>
 
 GlModel::GlModel()
 = default;
 
-
 /**
  * \brief Iterates over each mesh of the model and draws it
- * \param shader The shader program used to draw the model
  */
-void GlModel::draw(QOpenGLShaderProgram* shader)
+void GlModel::draw()
 {
 	for (auto& mesh : m_meshes_)
 	{
-		mesh->draw(shader);
+		mesh->draw();
 	}
 }
 
-void GlModel::draw_points(QOpenGLShaderProgram* shader)
+/**
+ * \brief Iterates over each mesh of the model and draws it in un-indexed point mode
+ */
+void GlModel::draw_points()
 {
 	for (auto& mesh : m_meshes_)
 	{
-		mesh->draw_points(shader);
+		mesh->draw_points();
 	}
 }
 // 

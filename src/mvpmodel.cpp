@@ -9,14 +9,17 @@ MvpModel::MvpModel()
 	default_settings();
 }
 
+/**
+ * \brief Loads the growthmesh and the reference model from the disk
+ */
 void MvpModel::load_models()
 {
-	m_reference_model_ = new ModelData("./res/eva3.fbx");
-	m_growth_mesh_ = new ModelData("./res/test.fbx");
+	m_reference_model_ = new ModelData("./res/referencemodel.fbx");
+	m_growth_mesh_ = new ModelData("./res/growthmesh.fbx");
 }
 
 /**
- * \brief Stores the default settings of the ui control elements
+ * \brief Sets the default settings of the ui control elements
  */
 void MvpModel::default_settings()
 {
@@ -26,8 +29,8 @@ void MvpModel::default_settings()
 	// Hair
 	m_hairlength_default = 3.00;
 	m_hairsegment_count_default = 4;
-	m_hair_color_default.setRgb(255,255,255);
-	m_hair_root_color_default.setRgb(0,0,0);
+	m_hair_color_default.setRgb(255, 255, 255);
+	m_hair_root_color_default.setRgb(0, 0, 0);
 
 	// Brush
 	m_brushmode_default = Paintbrush::paintmode::length;
@@ -37,7 +40,7 @@ void MvpModel::default_settings()
 	// Light
 	m_light_hair_default = true;
 	m_light_mesh_default = true;
-	m_light_color_default.setRgb(255,255,255);
+	m_light_color_default.setRgb(255, 255, 255);
 
 	// Meshes
 	m_growthmesh_show_default = false;
@@ -53,7 +56,7 @@ bool MvpModel::export_hair_to_disk(const QString& filename)
 {
 	QFile file(filename);
 
-	if(!file.open(QIODevice::WriteOnly))
+	if (!file.open(QIODevice::WriteOnly))
 		return false;
 
 	QTextStream hair_file(&file);
@@ -314,6 +317,7 @@ bool MvpModel::export_hair_to_disk(const QString& filename)
  */
 bool MvpModel::export_hairstyle_to_disk(const QImage& image, const QString& filename)
 {
+	// Mirror on y axis because OpenGL flips it
 	return image.mirrored().save(filename);
 }
 
@@ -327,11 +331,11 @@ QImage MvpModel::load_hairstyle_from_disk(const QString& filename)
 	QImage hairstyle;
 
 	const bool sucess = hairstyle.load(filename);
-	
-	if(!sucess)
-		return QImage(); // return a null image
 
-	// Flip the image for opengl and set the correct format
+	if (!sucess)
+		return QImage(); // return a "null image"
+
+	// Mirror the Y-Axis for opengl and set the correct format
 	hairstyle = hairstyle.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
 	return hairstyle;

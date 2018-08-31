@@ -1,9 +1,13 @@
 #ifndef MVPPRESENTER_H
 #define MVPPRESENTER_H
+
 #include "mvpmodel.h"
-#include <qfile.h>
+// Forward declare MainWindow
 class MainWindow;
 
+/**
+ * \brief Serves as the connection between MvpModel and MainWindow(the view)
+ */
 class MvpPresenter
 {
 public:

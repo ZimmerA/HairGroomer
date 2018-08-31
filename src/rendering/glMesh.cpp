@@ -6,6 +6,9 @@ GlMesh::GlMesh()
 {
 }
 
+/**
+ * \brief Destroy all the buffers used by the model
+ */
 void GlMesh::destroy_buffers()
 {
 	m_vao_.destroy();
@@ -13,6 +16,10 @@ void GlMesh::destroy_buffers()
 	m_ibo_.destroy();
 }
 
+/**
+ * \brief Creates the Relevant buffers, fills them with the mesh_data and sets the attribute pointers
+ * \param mesh_data The data of the mesh
+ */
 void GlMesh::setup_buffers(MeshData* mesh_data)
 {
 	m_indicie_amount_ = static_cast<unsigned int>(mesh_data->m_indices.size());
@@ -50,14 +57,20 @@ void GlMesh::setup_buffers(MeshData* mesh_data)
 	f->glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
 }
 
-void GlMesh::draw(QOpenGLShaderProgram* shader)
+/**
+ * \brief Draws the indexed mesh
+ */
+void GlMesh::draw()
 {
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	f->glDrawElements(GL_TRIANGLES, m_indicie_amount_, GL_UNSIGNED_INT, nullptr);
 }
 
-void GlMesh::draw_points(QOpenGLShaderProgram* shader)
+/**
+ * \brief Draws un-indexed mesh in point mode
+ */
+void GlMesh::draw_points()
 {
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);

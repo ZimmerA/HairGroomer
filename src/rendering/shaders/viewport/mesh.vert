@@ -1,3 +1,6 @@
+/*
+* Used for drawing meshes with a diffuse light model
+*/
 #version 330 core
 
 in vec3 aVertex;
@@ -14,7 +17,6 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat4 mvp;
-
 
 void main()
 {

@@ -14,6 +14,7 @@ ModelData::ModelData(const char* path)
 void ModelData::load_model(const string& path)
 {
 	Assimp::Importer import;
+	// Triangluate the model, flip the texture coordinates so we don't have to flip them in the shader or flip the picture, calculate tangent space if not present
 	const auto scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -27,7 +28,7 @@ void ModelData::load_model(const string& path)
 }
 
 /**
- * \brief Recursively iterate over every node in the model
+ * \brief Recursively iterate over every node in the model and process each mesh in the node
  * \param node The according Assimp node
  * \param scene The according Assimp scene
  */
@@ -37,23 +38,21 @@ void ModelData::process_node(aiNode* node, const aiScene* scene)
 	for (unsigned int i = 0; i < node->mNumMeshes; i++)
 	{
 		const auto mesh = scene->mMeshes[node->mMeshes[i]];
-		m_meshes.push_back(process_mesh(mesh, scene));
+		m_meshes.push_back(process_mesh(mesh));
 	}
 	// then do the same for each of its children
 	for (unsigned int i = 0; i < node->mNumChildren; i++)
 	{
-		process_node(node->mChildren[i], scene);
+		process_node(node->mChildren[i],scene);
 	}
 }
-
 
 /**
  * \brief Processes a mesh of a node
  * \param mesh The according Assimp mesh
- * \param scene The according Assimp scene
  * \return A MeshData object which holds the indices and vertices of the mesh
  */
-MeshData ModelData::process_mesh(aiMesh* mesh, const aiScene* scene)
+MeshData ModelData::process_mesh(aiMesh* mesh)
 {
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;

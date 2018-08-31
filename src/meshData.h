@@ -6,6 +6,9 @@
 
 using namespace std;
 
+/**
+ * \brief Structure for storing vertex Data
+ */
 struct Vertex
 {
 	vec3 m_position;
@@ -15,9 +18,8 @@ struct Vertex
 	vec2 m_uv;
 };
 
-/*
-*	Holds the data of loaded Meshes to be used by opengl or else
-*	The data can later be loaded by e.g glMeshes
+/**
+* \brief Holds the data of loaded Meshes to be used by e.g OpenGL.
 */
 class MeshData
 {

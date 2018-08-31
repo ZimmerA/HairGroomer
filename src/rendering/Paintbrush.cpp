@@ -44,11 +44,11 @@ void Paintbrush::set_paintmode(const paintmode p)
 			m_colormask_[0] = m_colormask_[1] = m_colormask_[2] = false;
 			m_colormask_[0] = true;
 			break;
-		case tangent:
+		case curl:
 			m_colormask_[0] = m_colormask_[1] = m_colormask_[2] = false;
 			m_colormask_[1] = true;
 			break;
-		case bitangent:
+		case twist:
 			m_colormask_[0] = m_colormask_[1] = m_colormask_[2] = false;
 			m_colormask_[2] = true;
 			break;
@@ -67,8 +67,6 @@ void Paintbrush::begin(QOpenGLShaderProgram* shader, const bool painting_to_fram
 	m_transform_.translate(m_brush_position_.x, m_brush_position_.y);
 	m_transform_.scale(m_brush_size_);
 	auto f = QOpenGLContext::currentContext()->functions();
-
-	//TODO: wrapper class for shaders that stores uniformlocations instead of looking them up every tick
 	f->glUniformMatrix4fv(shader->uniformLocation("model"), 1, GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_transform_));
 

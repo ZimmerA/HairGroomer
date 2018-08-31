@@ -1,6 +1,9 @@
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
+#include "Paintbrush.h"
+#include "./rendering/orbitcamera.h"
+
 #include <linalg.hpp>
 #include <mainwindow.h>
 #include "glModel.h"
@@ -10,13 +13,31 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QOpenGLTexture>
-#include "Paintbrush.h"
-#include "./opengl/orbitcamera.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 /**
- * \brief The widget that renders the opengl context
+ * \brief stores general light information
+ */
+struct Light
+{
+	vec3 m_position = vec3(0.f,550.0f,0.f);
+	vec3 m_color;
+};
+
+/**
+ * \brief Stores general hair information
+ */
+struct Hair
+{
+	vec3 m_root_color;
+	vec3 m_hair_color;
+	float m_length{};
+	int m_num_segments{};
+};
+
+/**
+ * \brief The widget that renders the OpenGL context
  */
 class GlWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
@@ -25,28 +46,28 @@ Q_OBJECT
 public:
 	explicit GlWidget(QWidget* parent = nullptr);
 	virtual ~GlWidget();
-	
-	Paintbrush m_brush;
+
+	// Getters/Setters
 	void set_uv_overlay_visible(bool visible);
-	void set_should_render_growthmesh(bool visibile);
+	void set_should_render_growthmesh(bool visible);
 	void set_should_render_referencemodel(bool visible);
-	void set_hair_length_uniform(float length);
-	void set_hair_num_segments_uniform(int segment_count);
-	void set_hair_color_unfirom(int r, int g, int b);
-	void set_hair_root_color_uniform(int r, int g, int b);
-	void set_light_hair_uniform(bool enabled);
-	void set_light_mesh_uniform(bool enabled);
-	void set_light_color_uniform(int r, int g, int b);
-	void set_light_position_uniform(float x, float y, float z);
-	void set_camera_position_uniform(float x, float y, float z);
+	void set_hair_length(float length);
+	void set_hair_num_segments(int segment_count);
+	void set_hair_color(int r, int g, int b);
+	void set_hair_root_color(int r, int g, int b);
+	void set_should_light_hair(bool enabled);
+	void set_should_light_mesh(bool enabled);
+	void set_light_color(int r, int g, int b);
+	void set_light_position(float x, float y, float z);
+	void set_brush_size(float size);
+	void set_brush_intensity(float intensity);
+	void set_brush_mode(Paintbrush::paintmode mode);
 	void grab_drawbuffer_content_to_image(QImage& image);
 	void set_drawbuffer_content(QImage& image);
-
 public slots:
 	void cleanup();
 
 private:
-	
 	// setup methods
 	void setup_shaders();
 	void setup_mvp();
@@ -62,11 +83,6 @@ private:
 	void render_uv_map();
 	void paint_to_frame_buffer();
 
-	bool m_should_draw_uv_map_{};
-
-	// is core profile active?
-	bool m_core_;
-
 	// Shader programs
 	QOpenGLShaderProgram* m_default_shader_{};
 	QOpenGLShaderProgram* m_uv_map_shader_{};
@@ -74,39 +90,45 @@ private:
 	QOpenGLShaderProgram* m_hair_shader_{};
 	QOpenGLShaderProgram* m_paintbrush_shader_{};
 
-	// mvp matrices used by hair and meshes
-	mat4 m_defaultmodel_matrix_;
-	mat4 m_defaultview_matrix_;
-	mat4 m_defaultprojection_matrix_;
-
 	// Textures
 	QOpenGLTexture * m_paint_brush_texture_{};
 	
-	// Quad vao for rendering textures
+	// Quad for rendering textures
 	QOpenGLVertexArrayObject m_quad_vao_;
 	QOpenGLBuffer m_quad_vbo_;
 
 	// Framebuffer for painting hair
 	QOpenGLFramebufferObject* m_drawbuffer_{};
-	bool m_is_leftmouse_pressed_ = false;
 	void reset_drawbuffer();
 
-	//Viewport camera
-	QPoint m_last_mouse_pos_; // Last mouse position
+	/* Input related*/
+	QPoint m_last_mouse_pos_;
 	bool m_has_mouse_started_in_viewport_{};	// tells us if the mouse is in viewport
-	Orbitcamera m_camera_;
-	
-	// MVP design pattern reference of view
-	MainWindow* m_view_;
-
-	// Growth mesh for hair grooming
-	bool m_should_render_growthmesh_{};
-	GlModel m_growth_mesh_;
-	bool m_should_render_refrencemodel_{};
-	GlModel m_reference_model_;
-
+	bool m_is_leftmouse_pressed_ = false;
 	QMap<int, bool> m_keys_;
 	void process_input();
+
+	/* Scene Elements */
+	Orbitcamera m_camera_;
+	Light m_light_;
+	Hair m_hair_;
+	Paintbrush m_brush_;
+	GlModel m_growth_mesh_;
+	GlModel m_reference_model_;
+
+	bool m_should_light_hair_{};
+	bool m_should_light_mesh_{};
+	bool m_should_draw_uv_map_{};
+	bool m_should_render_refrencemodel_{};
+	bool m_should_render_growthmesh_{};
+
+	// mvp matrices used by hair and meshes
+	mat4 m_defaultmodel_matrix_;
+	mat4 m_defaultview_matrix_;
+	mat4 m_defaultprojection_matrix_;
+
+	// MVP design pattern reference of view
+	MainWindow* m_view_;
 
 protected:
 	void initializeGL() override;

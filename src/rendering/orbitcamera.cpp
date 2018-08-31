@@ -34,7 +34,7 @@ void Orbitcamera::calc_position()
 	
 	vec3 displacement = local_x * x + local_y * y + local_z * z;
 	displacement *= m_distance_;
-	m_position_ = m_lookat_point_ + displacement;
+	m_position = m_lookat_point_ + displacement;
 }
 
 /**
@@ -43,7 +43,7 @@ void Orbitcamera::calc_position()
  */
 mat4 Orbitcamera::get_view_matrix() const
 {
-	return mat4::lookAt(m_position_, m_lookat_point_, vec3(0, 1, 0));
+	return mat4::lookAt(m_position, m_lookat_point_, vec3(0, 1, 0));
 }
 
 /**
@@ -95,6 +95,9 @@ void Orbitcamera::handle_mouse_wheel(float scroll_delta)
 	calc_position();
 }
 
+/**
+ * \brief Set the camera to its starting position
+ */
 void Orbitcamera::reset_position()
 {
 	m_lookat_point_ = default_lookat;

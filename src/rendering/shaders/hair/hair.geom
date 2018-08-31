@@ -1,3 +1,6 @@
+/*
+* Used for generating the hair using a texture and the input data of the growthmesh
+*/
 #version 330 core
 
 layout (points) in;
@@ -117,7 +120,7 @@ void main() {
 	tbn[1] = worldBiTangent;
 	tbn[2] = worldNorm;
 
-	// Hair startpoint
+	// Hair root
 	vertColor = vec4(rootColor,1);
 	vec3 d = vec3(0,0,1);
 	dOut = tbn * d;
