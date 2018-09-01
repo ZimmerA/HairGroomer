@@ -93,6 +93,15 @@
     <ClCompile Include="src\rendering\Paintbrush.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\rendering\renderer.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\scene.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\GLWidget2.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\meshData.h">
@@ -117,6 +126,12 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\Paintbrush.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\renderer.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -162,6 +177,9 @@
     </QtMoc>
     <QtMoc Include="src\rendering\glwidget.h">
       <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="src\rendering\GLWidget2.h">
+      <Filter>Generated Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>

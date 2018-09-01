@@ -130,6 +130,7 @@ private:
 	// MVP design pattern reference of view
 	MainWindow* m_view_;
 
+
 protected:
 	void initializeGL() override;
 	void paintGL() override;

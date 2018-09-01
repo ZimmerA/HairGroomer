@@ -215,40 +215,22 @@ void GlWidget::create_quad_vao()
  */
 void GlWidget::paintGL()
 {
-	process_input();
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	//process_input();
+
 
 	// Left half of context (Mesh)
-	render_left_half();
+	//render_left_half();
 	// Right half of context (UV-map/drawing window)
-	render_right_half();
+	//render_right_half();
+
+
 }
 
 /**
  * \brief Renders the left half of the Context
  */
 void GlWidget::render_left_half()
-{
-	// Split the screen
-	glViewport(0, 0, width() / 2, height());
-	glScissor(0, 0, width() / 2, height());
-	// we don't want the mesh to be a wireframe
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	m_defaultview_matrix_ = m_camera_.get_view_matrix();
-	mat4 mvp = m_defaultprojection_matrix_ * m_defaultview_matrix_ * m_defaultmodel_matrix_;
-	mat4 vp = m_defaultprojection_matrix_ * m_defaultview_matrix_;
-
-	m_default_shader_->bind();
-	// Set relevant uniforms
-	m_default_shader_->setUniformValue("lightPos", m_light_.m_position.x, m_light_.m_position.y, m_light_.m_position.z);
-	m_default_shader_->setUniformValue("lightColor", m_light_.m_color.x, m_light_.m_color.y, m_light_.m_color.z);
-	m_default_shader_->setUniformValue("lighting", m_should_light_mesh_);
-	glUniformMatrix4fv(m_default_shader_->uniformLocation("model"), 1,GL_FALSE,
-	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
-	glUniformMatrix4fv(m_default_shader_->uniformLocation("mvp"), 1,GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
-
+{	
 	if (m_should_render_growthmesh_)
 	{
 		// draw the growth mesh
@@ -281,8 +263,8 @@ void GlWidget::render_left_half()
 	                   reinterpret_cast<GLfloat *>(&m_defaultmodel_matrix_));
 	glUniformMatrix4fv(m_hair_shader_->uniformLocation("view"), 1, GL_FALSE,
 	                   reinterpret_cast<GLfloat *>(&m_defaultview_matrix_));
-	glUniformMatrix4fv(m_hair_shader_->uniformLocation("mvp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
-	glUniformMatrix4fv(m_hair_shader_->uniformLocation("vp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&vp));
+//	glUniformMatrix4fv(m_hair_shader_->uniformLocation("mvp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&mvp));
+//	glUniformMatrix4fv(m_hair_shader_->uniformLocation("vp"), 1, GL_FALSE, reinterpret_cast<GLfloat *>(&vp));
 
 	// Bind framebuffer texture to texunit 0
 	glActiveTexture(GL_TEXTURE0);

@@ -128,9 +128,9 @@ void MainWindow::connect_signals_and_slots()
 	m_hotkey_brushmode_twist_ = new QShortcut(this);
 	m_hotkey_brushmode_twist_->setKey(Qt::Key_T);
 	connect(m_hotkey_brushmode_twist_, SIGNAL(activated()), m_ui_->rb_brushmode_twist, SLOT(toggle()));
-	m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_hair, 0);
-	m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_curl, 1);
-	m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_twist, 2);
+	//m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_hair, 0);
+	//m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_curl, 1);
+	//m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_twist, 2);
 	connect(m_ui_->brushmodeGroup, SIGNAL(buttonToggled(int, bool)), this,SLOT(brush_mode_changed_listener(int, bool)));
 
 	/* HAIR LISTENERS */
@@ -165,8 +165,8 @@ void MainWindow::connect_signals_and_slots()
  */
 void MainWindow::uv_visibility_changed_listener(const bool enabled) const
 {
-	m_ui_->widget_gl->set_uv_overlay_visible(enabled);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_uv_overlay_visible(enabled);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -175,8 +175,8 @@ void MainWindow::uv_visibility_changed_listener(const bool enabled) const
  */
 void MainWindow::light_hair_changed_listener(const bool enabled) const
 {
-	m_ui_->widget_gl->set_should_light_hair(enabled);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_should_light_hair(enabled);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -185,8 +185,8 @@ void MainWindow::light_hair_changed_listener(const bool enabled) const
  */
 void MainWindow::light_mesh_changed_listener(const bool enabled) const
 {
-	m_ui_->widget_gl->set_should_light_mesh(enabled);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_should_light_mesh(enabled);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -210,9 +210,9 @@ void MainWindow::light_color_selected_listener(const QColor& color) const
 	
 	// Set the new color of the button
 	const QString s("background-color: " + color.name() + ";");
-	m_ui_->b_light_color->setStyleSheet(s);
-	m_ui_->widget_gl->set_light_color(color.red(), color.green(), color.blue());
-	m_ui_->widget_gl->update();
+	//m_ui_->b_light_color->setStyleSheet(s);
+	//m_ui_->widget_gl->set_light_color(color.red(), color.green(), color.blue());
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -221,8 +221,8 @@ void MainWindow::light_color_selected_listener(const QColor& color) const
  */
 void MainWindow::hair_segment_count_changed_listener(const int segments) const
 {
-	m_ui_->widget_gl->set_hair_num_segments(segments);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_hair_num_segments(segments);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -231,8 +231,8 @@ void MainWindow::hair_segment_count_changed_listener(const int segments) const
  */
 void MainWindow::hair_length_changed_listener(const double length) const
 {
-	m_ui_->widget_gl->set_hair_length(length);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_hair_length(length);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -266,9 +266,9 @@ void MainWindow::hair_color_selected_listener(const QColor& color) const
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
 
 	const QString s("background-color: " + color.name() + ";");
-	m_ui_->b_hair_color->setStyleSheet(s);
-	m_ui_->widget_gl->set_hair_color(color.red(), color.green(), color.blue());
-	m_ui_->widget_gl->update();
+	//m_ui_->b_hair_color->setStyleSheet(s);
+	//m_ui_->widget_gl->set_hair_color(color.red(), color.green(), color.blue());
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -281,9 +281,9 @@ void MainWindow::hair_root_color_selected_listener(const QColor& color) const
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
 
 	const QString s("background-color: " + color.name() + ";");
-	m_ui_->b_hair_root_color->setStyleSheet(s);
-	m_ui_->widget_gl->set_hair_root_color(color.red(), color.green(), color.blue());
-	m_ui_->widget_gl->update();
+	//m_ui_->b_hair_root_color->setStyleSheet(s);
+	//m_ui_->widget_gl->set_hair_root_color(color.red(), color.green(), color.blue());
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -292,8 +292,8 @@ void MainWindow::hair_root_color_selected_listener(const QColor& color) const
  */
 void MainWindow::brush_intensity_changed_listener(const double intensity) const
 {
-	m_ui_->widget_gl->set_brush_intensity(intensity);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_brush_intensity(intensity);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -302,8 +302,8 @@ void MainWindow::brush_intensity_changed_listener(const double intensity) const
  */
 void MainWindow::brush_size_changed_listener(const double size) const
 {
-	m_ui_->widget_gl->set_brush_size(size);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_brush_size(size);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -315,8 +315,8 @@ void MainWindow::brush_mode_changed_listener(int mode, const bool checked) const
 {
 	if (checked)
 	{
-		m_ui_->widget_gl->set_brush_mode(static_cast<Paintbrush::paintmode>(mode));
-		m_ui_->widget_gl->update();
+		//m_ui_->widget_gl->set_brush_mode(static_cast<Paintbrush::paintmode>(mode));
+		//m_ui_->widget_gl->update();
 	}
 }
 
@@ -326,8 +326,8 @@ void MainWindow::brush_mode_changed_listener(int mode, const bool checked) const
  */
 void MainWindow::growthmesh_show_changed_listener(const bool enabled) const
 {
-	m_ui_->widget_gl->set_should_render_growthmesh(enabled);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_should_render_growthmesh(enabled);
+	//m_ui_->widget_gl->update();
 }
 
 /**
@@ -336,8 +336,8 @@ void MainWindow::growthmesh_show_changed_listener(const bool enabled) const
  */
 void MainWindow::referencemodel_show_changed_listener(const bool enabled) const
 {
-	m_ui_->widget_gl->set_should_render_referencemodel(enabled);
-	m_ui_->widget_gl->update();
+	//m_ui_->widget_gl->set_should_render_referencemodel(enabled);
+	//m_ui_->widget_gl->update();
 }
 
 /* Setters for the UI elements*/

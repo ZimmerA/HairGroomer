@@ -201,6 +201,9 @@
     </QtUic>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\rendering\GLWidget2.cpp" />
+    <ClCompile Include="src\rendering\scene.cpp" />
+    <ClCompile Include="src\rendering\renderer.cpp" />
     <ClCompile Include="src\rendering\orbitcamera.cpp" />
     <ClCompile Include="src\rendering\Paintbrush.cpp" />
     <ClCompile Include="src\rendering\glMesh.cpp" />
@@ -214,6 +217,14 @@
     <ClCompile Include="src\mvppresenter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="src\rendering\GLWidget2.h">
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB</Define>
+      <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\release;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
+      <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG</Define>
+    </QtMoc>
+    <ClInclude Include="src\rendering\scene.h" />
+    <ClInclude Include="src\rendering\renderer.h" />
     <ClInclude Include="src\rendering\orbitcamera.h" />
     <ClInclude Include="src\rendering\Paintbrush.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>

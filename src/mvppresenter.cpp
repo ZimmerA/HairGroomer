@@ -57,7 +57,7 @@ void MvpPresenter::export_hairstyle(const QString& filename) const
 		return;
 
 	QImage image(10, 10, QImage::Format_RGBA8888);
-	get_view()->get_ui()->widget_gl->grab_drawbuffer_content_to_image(image);
+//	get_view()->get_ui()->widget_gl->grab_drawbuffer_content_to_image(image);
 
 	const bool sucess = get_model()->export_hairstyle_to_disk(image, filename);
 
@@ -79,5 +79,5 @@ void MvpPresenter::load_hairstyle(const QString& filename) const
 	if (hairstyle.isNull())
 		get_view()->display_messagebox("Couldn't load file", "");
 
-	get_view()->get_ui()->widget_gl->set_drawbuffer_content(hairstyle);
+//	get_view()->get_ui()->widget_gl->set_drawbuffer_content(hairstyle);
 }
