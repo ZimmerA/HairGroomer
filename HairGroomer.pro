@@ -55,7 +55,11 @@ INCLUDEPATH += $$PWD/libs/linalg \
 
 DISTFILES += \
     frag.frag \
-    vert.vert
+    vert.vert \
+    uvmap.vert \
+    uvmap.frag \
+    drawbuffer.frag \
+    drawbuffer.vert
 
 RESOURCES += \
     assets.qrc
