@@ -1,6 +1,9 @@
 #include "mvppresenter.h"
 #include "mainwindow.h"
+#include "hairData.h"
+
 #include <ui_mainwindow.h>
+#include <QString>
 
 MvpPresenter::MvpPresenter(): m_model_(nullptr), m_view_(nullptr)
 {
@@ -26,7 +29,6 @@ void MvpPresenter::load_default_values() const
 	get_view()->set_light_mesh(get_model()->m_light_mesh_default);
 	get_view()->set_light_color(get_model()->m_light_color_default);
 
-
 	get_view()->set_growthmesh_show(get_model()->m_growthmesh_show_default);
 	get_view()->set_referencemodel_show(get_model()->m_referencemodel_show_default);
 }
@@ -40,8 +42,8 @@ void MvpPresenter::export_hair(const QString& filename) const
 {
 	if (filename.isEmpty())
 		return;
-
-	const bool success = get_model()->export_hair_to_disk(filename);
+	HairData d = m_view_->get_ui()->widget_gl->m_renderer.m_hairdata_cache;
+	const bool success = get_model()->export_hair_to_disk(filename, d);
 
 	if (!success)
 		get_view()->display_messagebox("Unable to open file", "The selected file could not be opened");
@@ -57,7 +59,7 @@ void MvpPresenter::export_hairstyle(const QString& filename) const
 		return;
 
 	QImage image(10, 10, QImage::Format_RGBA8888);
-//	get_view()->get_ui()->widget_gl->grab_drawbuffer_content_to_image(image);
+	get_view()->get_ui()->widget_gl->m_scene.m_drawbuffer.grab_drawbuffer_content_to_image(image);
 
 	const bool sucess = get_model()->export_hairstyle_to_disk(image, filename);
 
@@ -79,5 +81,5 @@ void MvpPresenter::load_hairstyle(const QString& filename) const
 	if (hairstyle.isNull())
 		get_view()->display_messagebox("Couldn't load file", "");
 
-//	get_view()->get_ui()->widget_gl->set_drawbuffer_content(hairstyle);
+	get_view()->get_ui()->widget_gl->m_scene.m_drawbuffer.set_content(hairstyle);
 }

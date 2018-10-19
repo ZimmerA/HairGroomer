@@ -2,7 +2,8 @@
 #define MVPPRESENTER_H
 
 #include "mvpmodel.h"
-// Forward declare MainWindow
+
+class QString;
 class MainWindow;
 
 /**
@@ -18,10 +19,10 @@ public:
 	void load_hairstyle(const QString& filename) const;
 
 	// Getters and Setters
-	void set_model(MvpModel* model) { this->m_model_ = model; }
-	void set_view(MainWindow* view) { this->m_view_ = view; }
-	MvpModel* get_model() const { return m_model_; }
-	MainWindow* get_view() const { return m_view_; }
+	void set_model(MvpModel* model) noexcept{ this->m_model_ = model; }
+	void set_view(MainWindow* view) noexcept{ this->m_view_ = view; }
+	MvpModel* get_model() const noexcept { return m_model_; }
+	MainWindow* get_view() const noexcept{ return m_view_; }
 
 private:
 	MvpModel* m_model_;

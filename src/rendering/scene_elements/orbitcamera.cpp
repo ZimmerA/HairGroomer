@@ -1,10 +1,11 @@
 #include "orbitcamera.h"
-#include <QDebug>
 
 const float default_azimuth = 0.f;
 const float default_elevation = 90.f;
 const vec3 default_lookat = vec3(0,0,0);
-const float default_distance = 350.f;
+const float default_distance = 150.f;
+const float default_sensitivity = 20.0f;
+const float default_scrollspeed = 8;
 
 Orbitcamera::Orbitcamera()
 {
@@ -12,8 +13,8 @@ Orbitcamera::Orbitcamera()
 	m_elevation_ =  default_elevation;
 	m_distance_ = default_distance;
 	m_lookat_point_ = default_lookat;
-	m_sensitivity_ = 20.0f;
-	m_scrollspeed_ = 8;
+	m_sensitivity_ = default_sensitivity;
+	m_scrollspeed_ = default_scrollspeed;
 	calc_position();
 }
 
@@ -28,9 +29,9 @@ void Orbitcamera::calc_position()
 	const vec3 local_z = vec3(0.f, 0.f, 1.0f);
 
 	// Spherical to karthesian coordinates
-	const float x = sinf(LINALG_DEG2RAD* m_azimuth_) * sinf(LINALG_DEG2RAD * m_elevation_);
-	const float y = cosf(LINALG_DEG2RAD * m_elevation_);
-	const float z = cosf(LINALG_DEG2RAD * m_azimuth_) * sinf(LINALG_DEG2RAD * m_elevation_);
+	const float x = sinf(static_cast<float>(LINALG_DEG2RAD)* m_azimuth_) * sinf(static_cast<float>(LINALG_DEG2RAD) * m_elevation_);
+	const float y = cosf(static_cast<float>(LINALG_DEG2RAD) * m_elevation_);
+	const float z = cosf(static_cast<float>(LINALG_DEG2RAD) * m_azimuth_) * sinf(static_cast<float>(LINALG_DEG2RAD) * m_elevation_);
 	
 	vec3 displacement = local_x * x + local_y * y + local_z * z;
 	displacement *= m_distance_;
@@ -56,8 +57,8 @@ void Orbitcamera::handle_mouse_move(const float delta_x, const float delta_y)
 	const float move_x = delta_x * m_sensitivity_;
 	const float move_y = delta_y * m_sensitivity_;
 
-	m_azimuth_ += LINALG_DEG2RAD * move_x;
-	m_elevation_ += LINALG_DEG2RAD * move_y;
+	m_azimuth_ += static_cast<float>(LINALG_DEG2RAD) * move_x;
+	m_elevation_ += static_cast<float>(LINALG_DEG2RAD) * move_y;
 
 	m_azimuth_ = fmodf(m_azimuth_, 360.0f);
 	if(m_elevation_ > 179.0f)

@@ -22,9 +22,9 @@ public:
 	void display_messagebox(const char* title, const char* content);
 
 	// Getters/Setters
-	void set_presenter(MvpPresenter* presenter) { this->m_presenter_ = presenter; }
-	MvpPresenter* get_presenter() const { return m_presenter_; }
-	Ui::MainWindow* get_ui() const { return m_ui_;}
+	void set_presenter(MvpPresenter* presenter) noexcept { this->m_presenter_ = presenter; }
+	MvpPresenter* get_presenter() const noexcept{ return m_presenter_; }
+	Ui::MainWindow* get_ui() const noexcept{ return m_ui_;}
 
 	// Setters for UI elements
 	void set_uv_grid_visibility(bool visible) const;
@@ -42,12 +42,14 @@ public:
 	void set_referencemodel_show(bool active) const;
 
 private slots:
-	void on_actionExport_triggered() const;
+	void on_actionExport_triggered();
 	void on_actionExport_Hairstyle_triggered();
 	void on_actionLoad_Hairstyle_triggered();
+
 	// Listeners for ui control elements
 	// general
 	void uv_visibility_changed_listener(bool enabled) const;
+
 	// hair listeners
 	void hair_segment_count_changed_listener(int segments) const;
 	void hair_length_changed_listener(double length) const;
@@ -55,12 +57,14 @@ private slots:
 	void hair_root_color_clicked_listener();
 	void hair_color_selected_listener(const QColor& color) const;
 	void hair_root_color_selected_listener(const QColor& color) const;
+
 	// brush listeners
 	void brush_intensity_changed_listener(double intensity) const;
 	void brush_size_changed_listener(double size) const;
 	void brush_mode_changed_listener(int mode, bool checked) const;
 	void growthmesh_show_changed_listener(bool enabled) const;
 	void referencemodel_show_changed_listener(bool enabled) const;
+
 	//light listeners
 	void light_hair_changed_listener(bool enabled) const;
 	void light_mesh_changed_listener(bool enabled) const;

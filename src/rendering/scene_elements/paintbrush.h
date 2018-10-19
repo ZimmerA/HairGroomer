@@ -1,6 +1,6 @@
-#pragma once
+#ifndef PAINTBRUSH_H
+#define PAINTBRUSH_H
 #include <linalg.hpp>
-#include <qopenglshaderprogram.h>
 
 /**
  * \brief Stores the settings of the paintbrush, used by the rendering
@@ -14,17 +14,18 @@ public:
 		curl,
 		twist
 	};
-
 	Paintbrush();
 
 	void set_brush_size(float size);
-	void set_brush_intensity(double d);
+	void set_brush_intensity(float d);
 	void set_opposite_mode(bool value);
 	void set_position(float x, float y);
 	void set_paintmode(paintmode p);
-
-	void begin(QOpenGLShaderProgram* shader, bool painting_to_framebuffer);
-	static void end();
+	
+	const mat4& get_transform() const noexcept{ return m_transform_;}
+	float get_intensity() const noexcept {return m_intensity_;}
+	bool get_opposite_mode() const noexcept{return m_opposite_mode_;}
+	bool* get_colormask() noexcept {return m_colormask_;}
 
 private: 
 	float m_brush_size_;
@@ -34,4 +35,5 @@ private:
 	bool m_colormask_[3]{}; // Which color channels to draw to
 	bool m_opposite_mode_ = false; // Are we currently bending in the opposite direction
 };
+#endif
 

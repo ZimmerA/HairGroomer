@@ -455,7 +455,7 @@
   </widget>
   <action name="actionExport">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Export Hairworks</string>
@@ -477,7 +477,7 @@
   <customwidget>
    <class>GLWidget</class>
    <extends>QOpenGLWidget</extends>
-   <header>rendering/GLWidget2.h</header>
+   <header>rendering/glwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

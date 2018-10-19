@@ -66,6 +66,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+    <CodeAnalysisRuleSet>CppCoreCheckRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CodeAnalysisRuleSet>test.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -201,47 +205,49 @@
     </QtUic>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\rendering\GLWidget2.cpp" />
+    <ClCompile Include="src\rendering\scene_elements\glDrawbuffer.cpp" />
     <ClCompile Include="src\rendering\scene.cpp" />
-    <ClCompile Include="src\rendering\renderer.cpp" />
-    <ClCompile Include="src\rendering\orbitcamera.cpp" />
-    <ClCompile Include="src\rendering\Paintbrush.cpp" />
-    <ClCompile Include="src\rendering\glMesh.cpp" />
-    <ClCompile Include="src\rendering\glModel.cpp" />
     <ClCompile Include="src\rendering\glwidget.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\mainwindow.cpp" />
-    <ClCompile Include="src\meshData.cpp" />
-    <ClCompile Include="src\modelData.cpp" />
-    <ClCompile Include="src\mvpmodel.cpp" />
-    <ClCompile Include="src\mvppresenter.cpp" />
+    <ClCompile Include="src\rendering\renderer.cpp" />
+    <ClCompile Include="src\rendering\scene_elements\orbitcamera.cpp" />
+    <ClCompile Include="src\rendering\scene_elements\paintbrush.cpp" />
+    <ClCompile Include="src\rendering\scene_elements\glMesh.cpp" />
+    <ClCompile Include="src\rendering\scene_elements\glModel.cpp" />
+    <ClCompile Include="src\baseapp\main.cpp" />
+    <ClCompile Include="src\baseapp\mainwindow.cpp" />
+    <ClCompile Include="src\baseapp\meshData.cpp" />
+    <ClCompile Include="src\baseapp\modelData.cpp" />
+    <ClCompile Include="src\baseapp\mvpmodel.cpp" />
+    <ClCompile Include="src\baseapp\mvppresenter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="src\rendering\GLWidget2.h">
+    <QtMoc Include="src\rendering\glwidget.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB</Define>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\release;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG</Define>
     </QtMoc>
+    <ClInclude Include="src\baseapp\hairData.h" />
+    <ClInclude Include="src\rendering\scene_elements\hairSettings.h" />
+    <ClInclude Include="src\rendering\scene_elements\light.h" />
+    <ClInclude Include="src\rendering\scene_elements\glDrawbuffer.h" />
     <ClInclude Include="src\rendering\scene.h" />
     <ClInclude Include="src\rendering\renderer.h" />
-    <ClInclude Include="src\rendering\orbitcamera.h" />
-    <ClInclude Include="src\rendering\Paintbrush.h">
+    <ClInclude Include="src\rendering\scene_elements\orbitcamera.h" />
+    <ClInclude Include="src\rendering\scene_elements\paintbrush.h">
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.\src;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\debug;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB</Define>
       <IncludePath Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.\GeneratedFiles\$(ConfigurationName)\.;.\GeneratedFiles;.;.\libs\linalg;.\libs\stbi_image;.\libs\assimp\include;$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtCore;.\release;\include;$(QTDIR)\mkspecs\win32-msvc</IncludePath>
       <Define Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;NDEBUG</Define>
     </ClInclude>
-    <ClInclude Include="src\rendering\glMesh.h" />
-    <ClInclude Include="src\rendering\glModel.h" />
-    <QtMoc Include="src\rendering\glwidget.h">
+    <ClInclude Include="src\rendering\scene_elements\glMesh.h" />
+    <ClInclude Include="src\rendering\scene_elements\glModel.h" />
+    <QtMoc Include="src\baseapp\mainwindow.h">
     </QtMoc>
-    <QtMoc Include="src\mainwindow.h">
-    </QtMoc>
-    <ClInclude Include="src\meshData.h" />
-    <ClInclude Include="src\modelData.h" />
-    <ClInclude Include="src\mvpmodel.h" />
-    <ClInclude Include="src\mvppresenter.h" />
+    <ClInclude Include="src\baseapp\meshData.h" />
+    <ClInclude Include="src\baseapp\modelData.h" />
+    <ClInclude Include="src\baseapp\mvpmodel.h" />
+    <ClInclude Include="src\baseapp\mvppresenter.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -262,7 +268,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="src\mainwindow.ui">
+    <QtUic Include="src\baseapp\mainwindow.ui">
     </QtUic>
   </ItemGroup>
   <ItemGroup>
@@ -284,6 +290,9 @@
     <Import Project="$(QtMsBuild)\qt.targets" />
   </ImportGroup>
   <ImportGroup Label="ExtensionTargets" />
+  <PropertyGroup Condition="'$(Language)'=='C++'">
+    <CAExcludePath>$(QTDIR)\include;.\GeneratedFiles;$(CAExcludePath);.\libs</CAExcludePath>
+  </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>
       <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="msvc2017_64" />

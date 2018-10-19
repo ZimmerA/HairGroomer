@@ -16,6 +16,7 @@ public:
 	void reset_position();
 	void move_pivot_point(float x, float y);
 	vec3 m_position;
+
 private:
 	float m_azimuth_;
 	float m_elevation_;

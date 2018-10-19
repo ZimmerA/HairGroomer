@@ -1,9 +1,11 @@
 #ifndef GLMESH_H
 #define GLMESH_H
 
+#include "baseapp/meshData.h"
+
 #include <qopenglvertexarrayobject.h>
 #include <qopenglbuffer.h>
-#include "./meshData.h"
+
 
 /*
 * Used by the GLWidget to draw meshes
@@ -18,13 +20,14 @@ public:
 	void setup_buffers(MeshData* mesh_data);
 	// Calls destroy on all buffers of the mesh
 	void destroy_buffers();
-
+	
+	unsigned int m_indicie_amount;
+	unsigned int m_vertex_count;
 private:
 	QOpenGLVertexArrayObject m_vao_;
 	QOpenGLBuffer m_vbo_;
 	QOpenGLBuffer m_ibo_;
 
-	unsigned int m_indicie_amount_;
 };
 
 #endif // GLMESH_H

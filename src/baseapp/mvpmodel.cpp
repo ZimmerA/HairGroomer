@@ -1,6 +1,12 @@
 #include "mvpmodel.h"
+#include "rendering/scene_elements/hairSettings.h"
+
+#include <vector>
+
 #include <qimage.h>
 #include <QFileDialog>
+#include <qtextstream.h>
+
 
 MvpModel::MvpModel()
 {
@@ -14,8 +20,9 @@ MvpModel::MvpModel()
  */
 void MvpModel::load_models()
 {
-	m_reference_model_ = new ModelData("./res/referencemodel.fbx");
-	m_growth_mesh_ = new ModelData("./res/growthmesh.fbx");
+		m_growth_mesh_ = std::make_unique<ModelData>("./res/growthmesh.FBX");
+	m_reference_model_ = std::make_unique<ModelData>("./res/referencemodel.fbx");
+
 }
 
 /**
@@ -43,22 +50,75 @@ void MvpModel::default_settings()
 	m_light_color_default.setRgb(255, 255, 255);
 
 	// Meshes
-	m_growthmesh_show_default = false;
+	m_growthmesh_show_default = true;
 	m_referencemodel_show_default = true;
 }
 
 /**
  * \brief Reserved for future versions of the Software
  * \param filename The name of the apx file
+ * \param hairdata The data of the hair
  * \return true if suceeded, false if failed
  */
-bool MvpModel::export_hair_to_disk(const QString& filename)
+bool MvpModel::export_hair_to_disk(const QString& filename, const HairData hairdata)
 {
 	QFile file(filename);
 
 	if (!file.open(QIODevice::WriteOnly))
 		return false;
 
+	const int num_hair = static_cast<int>(hairdata.m_num_hair);
+	const int num_vertices = static_cast<int>(hairdata.m_vertices.size());
+
+	vector<int> face_indices = m_growth_mesh_->get_indices();
+	const int num_indices = static_cast<int>(face_indices.size());
+
+	// face uvs
+	vector<vec2> uvs = m_growth_mesh_->get_face_uvs();
+	const int num_uvs = static_cast<int>(uvs.size());
+
+	// bones
+	const int num_bones = m_growth_mesh_->get_num_bones();
+	vector<int> bone_indices;
+	vector<float> bone_weights;
+
+	for (int i = 0; i < num_hair; i++)
+	{
+		int num_appended = 0;
+		// For every bone per Hair Vertex
+		for (auto& vertex_bone_info : m_growth_mesh_->m_meshes.at(0).m_vertices.at(i).m_bones)
+		{
+			if (num_appended < 4)
+			{
+				const int id = vertex_bone_info.m_id;
+				const float weight = vertex_bone_info.m_weight;
+				bone_weights.push_back(weight);
+				bone_indices.push_back(id);
+				num_appended++;
+			}
+		}
+
+		// Make sure we have 4 bone values per vertex
+		while (bone_indices.size() % 4 != 0 && !bone_indices.empty())
+		{
+			bone_indices.push_back(0);
+			bone_weights.push_back(0);
+		}
+	}
+
+	vector<string> bone_name_strings;
+	vector<int> bone_names;
+	vector<int> bone_parents;
+	for(auto& bone : m_growth_mesh_->m_bone_list_)
+	{
+		bone_name_strings.push_back(bone.m_name);
+		for(auto& letter : bone.m_name)
+		{
+			bone_names.push_back(static_cast<int>(letter));
+		}
+		bone_parents.push_back(bone.m_parent);
+		
+	}
 	QTextStream hair_file(&file);
 
 	hair_file << "<!DOCTYPE NvParameters>\n";
@@ -94,57 +154,206 @@ bool MvpModel::export_hair_to_disk(const QString& filename)
 	hair_file << "</value>\n";
 	hair_file << "<value name=\"\" type=\"Ref\" className=\"HairAssetDescriptor\" version=\"1.1\" checksum=\"\">\n";
 	hair_file << "  <struct name=\"\">\n";
-	hair_file << "    <value name=\"numGuideHairs\" type=\"U32\"></value>\n"; // TODO: Num guidehairs
-	hair_file << "    <value name=\"numVertices\" type=\"U32\"></value>\n"; // TODO: fill Num vertices
-	hair_file << "    <array name=\"vertices\" size=\"\" type=\"Vec3\">\n"; // TODO: size
-	// TODO: add vertices
+	hair_file << "    <value name=\"numGuideHairs\" type=\"U32\">" << num_hair << "</value>\n";
+	hair_file << "    <value name=\"numVertices\" type=\"U32\">" << num_vertices << "</value>\n";
+	// Vertices
+	hair_file << "    <array name=\"vertices\" size=\"" << num_vertices << "\" type=\"Vec3\">\n";
+	hair_file << "        ";
+	for (int i = 0; i < num_vertices; i++)
+	{
+		vec3 vertex = hairdata.m_vertices.at(i);
+
+
+		hair_file << vertex.x << " " << vertex.y << " " << vertex.z;
+		// Don't do anything after the last vertex
+		if (i != num_vertices - 1)
+		{
+			// Set a comma after each vertex
+			hair_file << ",";
+
+			if ((i + 1) % 5 == 0)
+			{
+				// place a newline every 5 vertices
+				hair_file << "\n";
+				hair_file << "        ";
+			}
+			else
+			{
+				// Else just place a space
+				hair_file << " ";
+			}
+		}
+	}
+	hair_file << "\n    </array>\n";
+	// End Indices
+	hair_file << "    <array name=\"endIndices\" size=\"" << hairdata.m_num_hair << "\" type=\"U32\">\n";
+	hair_file << "        ";
+	for (int i = hairdata.m_num_segments; i < hairdata.m_num_hair * (hairdata.m_num_segments + 1); i += hairdata.
+	     m_num_segments + 1)
+	{
+		hair_file << i << " ";
+	}
+	hair_file << "\n    </array>\n";
+	hair_file << "    <value name=\"numFaces\" type=\"U32\">" << m_growth_mesh_->get_num_faces() << "</value>\n";
+	// Face Indices
+	hair_file << "    <array name=\"faceIndices\" size=\"" << num_indices << "\" type=\"U32\">\n";
+	hair_file << "        ";
+	for (int i = 0; i < num_indices; i++)
+	{
+		hair_file << face_indices.at(i);
+		if (i != num_indices)
+		{
+			if ((i + 1) % 15 == 0)
+			{
+				hair_file << "\n";
+				hair_file << "        ";
+			}
+			else
+			{
+				hair_file << " ";
+			}
+		}
+	}
+	hair_file << "\n     </array>\n";
+	// Face uvs
+	hair_file << "    <array name=\"faceUVs\" size=\"" << num_uvs << "\" type=\"Vec2\">\n";
+	hair_file << "        ";
+	for (int i = 0; i < num_uvs; i++)
+	{
+		vec2 uv = uvs.at(i);
+		hair_file << uv.x << " " << uv.y;
+		if (i != num_uvs - 1)
+		{
+			hair_file << ",";
+			if ((i + 1) % 10 == 0)
+			{
+				hair_file << "\n";
+				hair_file << "        ";
+			}
+			else
+			{
+				hair_file << " ";
+			}
+		}
+	}
+	hair_file << "\n    </array>\n";
+
+	hair_file << "    <value name=\"numBones\" type=\"U32\">" << num_bones << "</value>\n";
+	hair_file << "    <array name=\"boneIndices\" size=\"" << num_hair << "\" type=\"Vec4\">\n";
+	hair_file << "        ";
+	for(uint i = 0; i < bone_indices.size(); i++)
+	{
+		hair_file << bone_indices.at(i);
+		if (i < bone_indices.size() - 1)
+		{
+			if((i + 1) % 4 == 0)
+			{
+				hair_file << ", ";
+			}else
+			{
+				hair_file << " ";
+			}
+		}else
+		{
+			hair_file << "\n";
+		}
+		if((i + 1 )% 64 == 0 && i != 0)
+			hair_file << "\n        ";
+	}
+	hair_file << "\n    </array>\n";
+
+	hair_file << "    <array name=\"boneWeights\" size=\"" << num_hair << "\" type=\"Vec4\">\n";
+	hair_file << "        ";
+	for(uint i = 0; i < bone_weights.size(); i++)
+	{
+		hair_file << bone_weights.at(i);
+		if (i < bone_weights.size() - 1)
+		{
+			if((i + 1) % 4 == 0)
+			{
+				hair_file << ", ";
+			}else
+			{
+				hair_file << " ";
+			}
+		}else
+		{
+			hair_file << "\n";
+		}
+		if((i + 1 )% 64 == 0 && i != 0)
+			hair_file << "\n        ";
+	}
+	hair_file << "        ";
+	hair_file << "\n    </array>\n";
+
+	hair_file << "    <array name=\"boneNames\" size=\"" << bone_names.size() <<"\" type=\"U8\">\n";
+	hair_file << "        ";
+	for(uint i = 0; i < bone_names.size(); i++)
+	{
+		hair_file << bone_names.at(i);
+		if (i < bone_names.size() - 1)
+		{
+			hair_file << " ";
+		}else
+		{
+			hair_file << "\n";
+		}
+
+		if((i + 1 )% 32 == 0 && i != 0)
+			hair_file << "\n        ";
+	}
 	hair_file << "    </array>\n";
 
-	hair_file << "    <array name=\"endIndices\" size=\"\" type=\"U32\">\n"; // TODO: size
-	// TODO: add endindices
+	hair_file << "    <array name=\"boneNameList\" size=\""<< bone_name_strings.size() << "\" type=\"String\">";
+	for(uint i = 0; i < bone_name_strings.size(); i++)
+	{
+		hair_file << "\n      <value type=\"String\">" << bone_name_strings.at(i).data() << "</value>";
+	}
+	hair_file << "\n    </array>\n";
+
+	hair_file << "    <array name=\"bindPoses\" size=\""<< num_bones << "\" type=\"Mat44\">\n";
+	for(int i = 0; i < num_bones; i++)
+	{
+		for(int x = 0; x < 4; x++)
+		{
+			for(int y = 0; y < 4; y ++)
+			{
+				hair_file << m_growth_mesh_->m_bone_list_.at(i).m_global_bindpose[x][y] << " ";
+			}
+		}
+		if(i < num_bones -1)
+		{
+			hair_file << ", ";
+		}
+	}
+
+	hair_file << "\n    </array>\n";
+	hair_file << "    <array name=\"boneParents\" size=\""<< num_bones << "\" type=\"I32\">\n";
+	hair_file << "        ";
+	for(uint i = 0; i < bone_parents.size(); i++)
+	{
+		hair_file << bone_parents.at(i);
+		if (i < bone_parents.size() - 1)
+		{
+			hair_file << " ";
+		}else
+		{
+			hair_file << "\n";
+		}
+
+		if((i + 1 )% 32 == 0 && i != 0)
+			hair_file << "\n        ";
+	}
 	hair_file << "    </array>\n";
 
-	hair_file << "    <value name=\"numFaces\" type=\"U32\"></value>\n"; // TODO: fill numFaces
-	hair_file << "    <array name=\"faceIndices\" size=\"\" type=\"U32\">\n"; // TODO: size
-	// TODO: add faceindices
-	hair_file << "    </array>\n";
-
-	hair_file << "    <array name=\"faceUVs\" size=\"\" type=\"Vec2\">\n"; // TODO: size
-	// TODO: add faceUVs
-	hair_file << "    </array>\n";
-
-	hair_file << "    <value name=\"numBones\" type=\"U32\"></value>\n"; // TODO: fill numBones
-	hair_file << "    <array name=\"boneIndices\" size=\"\" type=\"Vec4\">\n"; // TODO: size
-	// TODO: add boneindices
-	hair_file << "    </array>\n";
-
-	hair_file << "    <array name=\"boneWeights\" size=\"\" type=\"Vec4\">\n"; // TODO: size
-	// TODO: add boneweights
-	hair_file << "    </array>\n";
-
-	hair_file << "    <array name=\"boneNames\" size=\"\" type=\"U8\">\n"; // TODO: size
-	// TODO: add bonenames
-	hair_file << "    </array>\n";
-	hair_file << "    <array name=\"boneNameList\" size=\"\" type=\"String\">\n"; // TODO: size
-	// TODO: add bonenamelist
-	hair_file << "    </array>\n";
-
-	hair_file << "    <array name=\"bindPoses\" size=\"\" type=\"Mat44\">\n"; // TODO: size
-	// TODO: add bindposes
-	hair_file << "    </array>\n";
-	hair_file << "    <array name=\"boneParents\" size=\"\" type=\"I32\">\n"; // TODO: size
-	// TODO: add boneparents
-	hair_file << "    </array>\n";
-
-	hair_file << "    <value name=\"numBoneSpheres\" type=\"U32\"></value>\n"; // TODO: fill numBoneSpheres
+	hair_file << "    <value name=\"numBoneSpheres\" type=\"U32\">0</value>\n"; // TODO: fill numBoneSpheres
 	hair_file <<
-		"    <array name=\"boneSpheres\" size=\"\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3)\">\n";
-	// TODO: size
+		"    <array name=\"boneSpheres\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3)\">\n";
 	//TODO add boneSpheres
-	hair_file << "    </array>\n";
+	hair_file << "\n    </array>\n";
 
-	hair_file << "    <value name=\"numBoneCapsules\" type=\"U32\"></value>\n"; // TODO: fill numBoneCapsules
-	hair_file << "    <array name=\"boneCapsuleIndices\" size=\"\" type=\"U32\">\n"; // TODO size
+	hair_file << "    <value name=\"numBoneCapsules\" type=\"U32\">0</value>\n"; // TODO: fill numBoneCapsules
+	hair_file << "    <array name=\"boneCapsuleIndices\" size=\"0\" type=\"U32\">\n"; // TODO size
 	// TODO add boncapsuleIndices
 	hair_file << "    </array>\n";
 

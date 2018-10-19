@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "rendering/Paintbrush.h"
+#include "rendering/scene_elements/paintbrush.h"
 #include <QString>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -22,13 +22,11 @@ MainWindow::~MainWindow()
 /**
  * \brief Reserved for future versions of the software
  */
-void MainWindow::on_actionExport_triggered() const
+void MainWindow::on_actionExport_triggered()
 {
-	/*
-	 *	const QString file_name = save_file_dialog("Export Hair","Nvidia APX File (*.apx);;All Files (*)" );
-	 *	get_presenter()->export_hair(file_name);
-	 *
-	 */
+	m_ui_->widget_gl->m_renderer.m_should_write_out_hair = true;
+	const QString file_name = save_file_dialog("Export Hair", "Nvidia APX File (*.apx);;All Files (*)");
+	get_presenter()->export_hair(file_name);
 }
 
 /**
@@ -56,8 +54,8 @@ void MainWindow::on_actionLoad_Hairstyle_triggered()
  */
 void MainWindow::display_messagebox(const char* title, const char* content)
 {
-		QMessageBox::information(this, tr(title),
-		                         content);
+	QMessageBox::information(this, tr(title),
+	                         content);
 }
 
 /**
@@ -69,7 +67,7 @@ void MainWindow::display_messagebox(const char* title, const char* content)
 QString MainWindow::save_file_dialog(const char* title, const char* types)
 {
 	return QFileDialog::getSaveFileName(this, tr(title), "",
-	                                          tr(types));
+	                                    tr(types));
 }
 
 /**
@@ -81,7 +79,7 @@ QString MainWindow::save_file_dialog(const char* title, const char* types)
 QString MainWindow::open_file_dialog(const char* title, const char* types)
 {
 	return QFileDialog::getOpenFileName(this, tr(title), "",
-                                          tr(types));
+	                                    tr(types));
 }
 
 /**
@@ -91,72 +89,94 @@ void MainWindow::connect_signals_and_slots()
 {
 	m_hotkey_toggle_uv_ = new QShortcut(this);
 	m_hotkey_toggle_uv_->setKey(Qt::Key_D);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_toggle_uv_, SIGNAL(activated()), m_ui_->cb_show_uv, SLOT(toggle()));
+#pragma warning(suppress: 26444)
 	connect(m_ui_->cb_show_uv,SIGNAL(toggled(bool)), this, SLOT(uv_visibility_changed_listener(bool)));
 
 	/*BRUSH SETTINGS*/
 	// Brush intensity
 	m_hotkey_brushintensity_reduce_ = new QShortcut(this);
 	m_hotkey_brushintensity_reduce_->setKey(Qt::Key_M);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushintensity_reduce_, SIGNAL(activated()), m_ui_->sb_intensity, SLOT(stepDown()));
 
 	m_hotkey_brushintensity_increase_ = new QShortcut(this);
 	m_hotkey_brushintensity_increase_->setKey(Qt::Key_P);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushintensity_increase_, SIGNAL(activated()), m_ui_->sb_intensity, SLOT(stepUp()));
 
+#pragma warning(suppress: 26444)
 	connect(m_ui_->sb_intensity, SIGNAL(valueChanged(double)), this, SLOT(brush_intensity_changed_listener(double)));
 
 	// Brush size
 	m_hotkey_brushsize_reduce_ = new QShortcut(this);
 	m_hotkey_brushsize_reduce_->setKey(Qt::Key_Minus);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushsize_reduce_, SIGNAL(activated()), m_ui_->sb_size, SLOT(stepDown()));
 
 	m_hotkey_brushsize_increase_ = new QShortcut(this);
 	m_hotkey_brushsize_increase_->setKey(Qt::Key_Plus);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushsize_increase_, SIGNAL(activated()), m_ui_->sb_size, SLOT(stepUp()));
+#pragma warning(suppress: 26444)
 	connect(m_ui_->sb_size, SIGNAL(valueChanged(double)), this, SLOT(brush_size_changed_listener(double)));
 
 	// Brush mode
 	m_hotkey_brushmode_hair_ = new QShortcut(this);
 	m_hotkey_brushmode_hair_->setKey(Qt::Key_L);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushmode_hair_, SIGNAL(activated()), m_ui_->rb_brushmode_hair, SLOT(toggle()));
 
 	m_hotkey_brushmode_curl_ = new QShortcut(this);
 	m_hotkey_brushmode_curl_->setKey(Qt::Key_C);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushmode_curl_, SIGNAL(activated()), m_ui_->rb_brushmode_curl, SLOT(toggle()));
 
 	m_hotkey_brushmode_twist_ = new QShortcut(this);
 	m_hotkey_brushmode_twist_->setKey(Qt::Key_T);
+#pragma warning(suppress: 26444)
 	connect(m_hotkey_brushmode_twist_, SIGNAL(activated()), m_ui_->rb_brushmode_twist, SLOT(toggle()));
-	//m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_hair, 0);
-	//m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_curl, 1);
-	//m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_twist, 2);
+	m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_hair, 0);
+	m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_curl, 1);
+	m_ui_->brushmodeGroup->setId(m_ui_->rb_brushmode_twist, 2);
+#pragma warning(suppress: 26444)
 	connect(m_ui_->brushmodeGroup, SIGNAL(buttonToggled(int, bool)), this,SLOT(brush_mode_changed_listener(int, bool)));
 
 	/* HAIR LISTENERS */
 	// Segment count
+#pragma warning(suppress: 26444)
 	connect(m_ui_->sb_hair_num_segments,SIGNAL(valueChanged(int)), this,
 	        SLOT(hair_segment_count_changed_listener(int)));
 	// Hair length
+#pragma warning(suppress: 26444)
 	connect(m_ui_->sb_hair_length,SIGNAL(valueChanged(double)), this, SLOT(hair_length_changed_listener(double)));
 
 	// Hair + Hair root color
+#pragma warning(suppress: 26444)
 	connect(m_ui_->b_hair_color,SIGNAL(clicked(bool)), this, SLOT(hair_color_clicked_listener()));
+#pragma warning(suppress: 26444)
 	connect(m_ui_->b_hair_root_color, SIGNAL(clicked(bool)), this, SLOT(hair_root_color_clicked_listener()));
 
 	/* Light Settings */
 	// Should light Hair
+#pragma warning(suppress: 26444)
 	connect(m_ui_->cb_light_hair,SIGNAL(toggled(bool)), this, SLOT(light_hair_changed_listener(bool)));
 	// Should light mesh
+#pragma warning(suppress: 26444)
 	connect(m_ui_->cb_light_mesh,SIGNAL(toggled(bool)), this, SLOT(light_mesh_changed_listener(bool)));
 	// Light color
+#pragma warning(suppress: 26444)
 	connect(m_ui_->b_light_color,SIGNAL(clicked(bool)), this, SLOT(light_color_clicked_listener()));
 
 	// Mesh settings
 	// Should show grwothmesh
+#pragma warning(suppress: 26444)
 	connect(m_ui_->cb_growthmesh_show,SIGNAL(toggled(bool)), this, SLOT(growthmesh_show_changed_listener(bool)));
 	// Should show referencemodel
-	connect(m_ui_->cb_referencemodel_show,SIGNAL(toggled(bool)), this, SLOT(referencemodel_show_changed_listener(bool)));
+#pragma warning(suppress: 26444)
+	connect(m_ui_->cb_referencemodel_show,SIGNAL(toggled(bool)), this,
+	        SLOT(referencemodel_show_changed_listener(bool)));
 }
 
 /**
@@ -165,8 +185,8 @@ void MainWindow::connect_signals_and_slots()
  */
 void MainWindow::uv_visibility_changed_listener(const bool enabled) const
 {
-	//m_ui_->widget_gl->set_uv_overlay_visible(enabled);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_renderer.m_should_render_uv_overlay = enabled;
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -175,8 +195,8 @@ void MainWindow::uv_visibility_changed_listener(const bool enabled) const
  */
 void MainWindow::light_hair_changed_listener(const bool enabled) const
 {
-	//m_ui_->widget_gl->set_should_light_hair(enabled);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_renderer.m_should_light_hair = enabled;
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -185,8 +205,8 @@ void MainWindow::light_hair_changed_listener(const bool enabled) const
  */
 void MainWindow::light_mesh_changed_listener(const bool enabled) const
 {
-	//m_ui_->widget_gl->set_should_light_mesh(enabled);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_renderer.m_should_light_meshes = enabled;
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -195,6 +215,7 @@ void MainWindow::light_mesh_changed_listener(const bool enabled) const
 void MainWindow::light_color_clicked_listener()
 {
 	// Connect the listener of the select color button
+#pragma warning(suppress: 26444)
 	connect(&m_color_picker_dialog_, SIGNAL(colorSelected(QColor)), this, SLOT(light_color_selected_listener(QColor)));
 	m_color_picker_dialog_.show();
 }
@@ -207,12 +228,13 @@ void MainWindow::light_color_selected_listener(const QColor& color) const
 {
 	// Disconnect the listener of the select color button
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
-	
+
 	// Set the new color of the button
 	const QString s("background-color: " + color.name() + ";");
-	//m_ui_->b_light_color->setStyleSheet(s);
-	//m_ui_->widget_gl->set_light_color(color.red(), color.green(), color.blue());
-	//m_ui_->widget_gl->update();
+	m_ui_->b_light_color->setStyleSheet(s);
+	m_ui_->widget_gl->m_scene.m_light.m_color = vec3(color.red() / 255.0f, color.green() / 255.0f,
+	                                                 color.blue() / 255.0f);
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -221,8 +243,8 @@ void MainWindow::light_color_selected_listener(const QColor& color) const
  */
 void MainWindow::hair_segment_count_changed_listener(const int segments) const
 {
-	//m_ui_->widget_gl->set_hair_num_segments(segments);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_scene.m_hair.m_num_segments = segments;
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -231,8 +253,8 @@ void MainWindow::hair_segment_count_changed_listener(const int segments) const
  */
 void MainWindow::hair_length_changed_listener(const double length) const
 {
-	//m_ui_->widget_gl->set_hair_length(length);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_scene.m_hair.m_length = length;
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -241,6 +263,7 @@ void MainWindow::hair_length_changed_listener(const double length) const
 void MainWindow::hair_color_clicked_listener()
 {
 	// Connect the listener of the select color button
+#pragma warning(suppress: 26444)
 	connect(&m_color_picker_dialog_, SIGNAL(colorSelected(QColor)), this, SLOT(hair_color_selected_listener(QColor)));
 	m_color_picker_dialog_.show();
 }
@@ -251,6 +274,7 @@ void MainWindow::hair_color_clicked_listener()
 void MainWindow::hair_root_color_clicked_listener()
 {
 	// Connect the listener of the select color button
+#pragma warning(suppress: 26444)
 	connect(&m_color_picker_dialog_, SIGNAL(colorSelected(QColor)), this,
 	        SLOT(hair_root_color_selected_listener(QColor)));
 	m_color_picker_dialog_.show();
@@ -266,9 +290,10 @@ void MainWindow::hair_color_selected_listener(const QColor& color) const
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
 
 	const QString s("background-color: " + color.name() + ";");
-	//m_ui_->b_hair_color->setStyleSheet(s);
-	//m_ui_->widget_gl->set_hair_color(color.red(), color.green(), color.blue());
-	//m_ui_->widget_gl->update();
+	m_ui_->b_hair_color->setStyleSheet(s);
+	m_ui_->widget_gl->m_scene.m_hair.m_hair_color = vec3(color.red() / 255.0f, color.green() / 255.0f,
+	                                                     color.blue() / 255.0f);
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -281,9 +306,10 @@ void MainWindow::hair_root_color_selected_listener(const QColor& color) const
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
 
 	const QString s("background-color: " + color.name() + ";");
-	//m_ui_->b_hair_root_color->setStyleSheet(s);
-	//m_ui_->widget_gl->set_hair_root_color(color.red(), color.green(), color.blue());
-	//m_ui_->widget_gl->update();
+	m_ui_->b_hair_root_color->setStyleSheet(s);
+	m_ui_->widget_gl->m_scene.m_hair.m_root_color = vec3(color.red() / 255.0f, color.green() / 255.0f,
+	                                                     color.blue() / 255.0f);
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -292,8 +318,8 @@ void MainWindow::hair_root_color_selected_listener(const QColor& color) const
  */
 void MainWindow::brush_intensity_changed_listener(const double intensity) const
 {
-	//m_ui_->widget_gl->set_brush_intensity(intensity);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_scene.m_brush.set_brush_intensity(intensity);
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -302,8 +328,8 @@ void MainWindow::brush_intensity_changed_listener(const double intensity) const
  */
 void MainWindow::brush_size_changed_listener(const double size) const
 {
-	//m_ui_->widget_gl->set_brush_size(size);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_scene.m_brush.set_brush_size(size);
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -315,8 +341,8 @@ void MainWindow::brush_mode_changed_listener(int mode, const bool checked) const
 {
 	if (checked)
 	{
-		//m_ui_->widget_gl->set_brush_mode(static_cast<Paintbrush::paintmode>(mode));
-		//m_ui_->widget_gl->update();
+		m_ui_->widget_gl->m_scene.m_brush.set_paintmode(static_cast<Paintbrush::paintmode>(mode));
+		m_ui_->widget_gl->update();
 	}
 }
 
@@ -326,8 +352,8 @@ void MainWindow::brush_mode_changed_listener(int mode, const bool checked) const
  */
 void MainWindow::growthmesh_show_changed_listener(const bool enabled) const
 {
-	//m_ui_->widget_gl->set_should_render_growthmesh(enabled);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_renderer.m_should_render_growthmesh = enabled;
+	m_ui_->widget_gl->update();
 }
 
 /**
@@ -336,8 +362,8 @@ void MainWindow::growthmesh_show_changed_listener(const bool enabled) const
  */
 void MainWindow::referencemodel_show_changed_listener(const bool enabled) const
 {
-	//m_ui_->widget_gl->set_should_render_referencemodel(enabled);
-	//m_ui_->widget_gl->update();
+	m_ui_->widget_gl->m_renderer.m_should_render_refrencemodel = enabled;
+	m_ui_->widget_gl->update();
 }
 
 /* Setters for the UI elements*/
@@ -370,17 +396,17 @@ void MainWindow::set_brush_mode(const Paintbrush::paintmode mode) const
 {
 	switch (mode)
 	{
-		case Paintbrush::paintmode::length:
-			m_ui_->rb_brushmode_hair->click();
-			break;
-		case Paintbrush::paintmode::curl:
-			m_ui_->rb_brushmode_curl->click();
-			break;
-		case Paintbrush::paintmode::twist:
-			m_ui_->rb_brushmode_twist->click();
-			break;
-		default:
-			break;
+	case Paintbrush::paintmode::length:
+		m_ui_->rb_brushmode_hair->click();
+		break;
+	case Paintbrush::paintmode::curl:
+		m_ui_->rb_brushmode_curl->click();
+		break;
+	case Paintbrush::paintmode::twist:
+		m_ui_->rb_brushmode_twist->click();
+		break;
+	default:
+		break;
 	}
 }
 

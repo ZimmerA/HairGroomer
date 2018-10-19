@@ -35,10 +35,10 @@ void GlModel::setup_model(ModelData* model_data)
 	for (auto& mesh : model_data->m_meshes)
 	{
 		// Create a unique Pointer to a glMesh and setup the buffers
-		std::unique_ptr<GlMesh> temp_mesh(new GlMesh);
+		std::unique_ptr<GlMesh> temp_mesh = std::make_unique<GlMesh>();
 		temp_mesh->setup_buffers(&mesh);
 
-		// Move it into the pointer cause we cant create copies of unique pointers
+		// Move it into the vector cause we cant create copies of unique pointers
 		m_meshes_.push_back(std::move(temp_mesh));
 	}
 }
@@ -54,4 +54,14 @@ void GlModel::cleanup_model()
 		mesh->destroy_buffers();
 	}
 	m_meshes_.clear();
+}
+
+unsigned int GlModel::get_vertice_amount()
+{
+	unsigned int amount = 0;
+	for(auto& mesh : m_meshes_)
+	{
+		amount += mesh->m_vertex_count;
+	}
+	return amount;
 }

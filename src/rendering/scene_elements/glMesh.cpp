@@ -1,13 +1,16 @@
 #include "glMesh.h"
+
 #include <qopenglfunctions.h>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
 
 GlMesh::GlMesh()
-	: m_ibo_(QOpenGLBuffer::IndexBuffer), m_indicie_amount_(0)
+	: m_ibo_(QOpenGLBuffer::IndexBuffer), m_indicie_amount(0)
 {
 }
 
 /**
- * \brief Destroy all the buffers used by the model
+ * \brief Destroy all the buffers used by the mesh
  */
 void GlMesh::destroy_buffers()
 {
@@ -22,7 +25,7 @@ void GlMesh::destroy_buffers()
  */
 void GlMesh::setup_buffers(MeshData* mesh_data)
 {
-	m_indicie_amount_ = static_cast<unsigned int>(mesh_data->m_indices.size());
+	m_indicie_amount = static_cast<unsigned int>(mesh_data->m_indices.size());
 	m_vao_.create();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	m_vbo_.create();
@@ -34,6 +37,7 @@ void GlMesh::setup_buffers(MeshData* mesh_data)
 	m_ibo_.bind();
 	m_ibo_.allocate(&mesh_data->m_indices[0], static_cast<int>(mesh_data->m_indices.size() * sizeof(unsigned int)));
 
+	m_vertex_count = static_cast<int>(mesh_data->m_vertices.size());
 	// Setup attrib pointers
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	f->glEnableVertexAttribArray(0);
@@ -62,9 +66,10 @@ void GlMesh::setup_buffers(MeshData* mesh_data)
  */
 void GlMesh::draw()
 {
+
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
-	f->glDrawElements(GL_TRIANGLES, m_indicie_amount_, GL_UNSIGNED_INT, nullptr);
+	f->glDrawElements(GL_TRIANGLES, m_indicie_amount, GL_UNSIGNED_INT, nullptr);
 }
 
 /**
@@ -74,5 +79,5 @@ void GlMesh::draw_points()
 {
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
-	f->glDrawArrays(GL_POINTS, 0, m_indicie_amount_);
+	f->glDrawArrays(GL_POINTS, 0, m_vertex_count);
 }
