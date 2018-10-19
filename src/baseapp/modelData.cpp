@@ -23,49 +23,40 @@ ModelData::ModelData(const char* path)
  * \brief Returns the amount of faces the model has
  * \return The amount of faces
  */
-int ModelData::get_num_faces()
+int ModelData::get_num_faces(uint index)
 {
-	int faces = 0;
-	
-	for(auto const& mesh : m_meshes)
-	{
-		faces += mesh.m_num_faces;
-	}
 
-	return faces;
+	return m_meshes.at(index).m_num_faces;
+
 }
 
 /**
  * \brief Returns the indices of every mesh in the model
  * \return A int vector holding the indices
  */
-vector<int> ModelData::get_indices()
+vector<int> ModelData::get_indices(uint index)
 {
 	vector<int> indices;
-	for(auto const& mesh : m_meshes)
+
+	for(auto const& index : m_meshes.at(index).m_indices)
 	{
-		for(auto const& index : mesh.m_indices)
-		{
-			indices.push_back(index);
-		}
+		indices.push_back(index);
 	}
 
 	return indices;
 }
 
 /**
- * \brief Returns the texture coordinates of every index of every mesh in the model
+ * \brief Returns the texture coordinates of every index of the mesh of the given index
  * \return A vec2 vector holding the texture coordinates
  */
-vector<vec2> ModelData::get_face_uvs()
+vector<vec2> ModelData::get_face_uvs(uint index)
 {
 	vector<vec2> texcoords;
-	for(auto const& mesh : m_meshes)
+
+	for(auto const& indice : m_meshes.at(index).m_indices)
 	{
-	for(auto const& index : mesh.m_indices)
-		{
-			texcoords.push_back(mesh.m_vertices.at(index).m_uv);
-		}
+		texcoords.push_back(m_meshes.at(index).m_vertices.at(indice).m_uv);
 	}
 	return texcoords;
 }
@@ -112,7 +103,7 @@ void ModelData::complete_skeleton(const aiNode * node, const aiScene * scene, co
 			mat4 local_bindpose;
 			assimp_to_linalg_matrix(node->mTransformation,local_bindpose);
 
-			m_bone_list_.at(bone_index).m_global_bindpose = local_bindpose ;
+			m_bone_list_.at(bone_index).m_global_bindpose = m_bone_list_.at(parent_index).m_global_bindpose *  local_bindpose ;
 		}
 
 		m_bone_list_.at(bone_index).m_parent = parent_index;

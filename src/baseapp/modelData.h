@@ -30,9 +30,9 @@ class ModelData
 public:
 	explicit ModelData(const char* path);
 
-	int get_num_faces();
-	vector<int> get_indices();
-	vector<vec2> get_face_uvs();
+	int get_num_faces(uint index);
+	vector<int> get_indices(uint index);
+	vector<vec2> get_face_uvs(uint index);
 	int get_num_bones() const {return static_cast<int>(m_bone_map_.size());}
 
 	// MeshData for every sub mesh of the model

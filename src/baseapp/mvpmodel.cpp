@@ -20,7 +20,7 @@ MvpModel::MvpModel()
  */
 void MvpModel::load_models()
 {
-		m_growth_mesh_ = std::make_unique<ModelData>("./res/growthmesh.FBX");
+		m_growth_mesh_ = std::make_unique<ModelData>("./res/samba.FBX");
 	m_reference_model_ = std::make_unique<ModelData>("./res/referencemodel.fbx");
 
 }
@@ -67,14 +67,16 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 	if (!file.open(QIODevice::WriteOnly))
 		return false;
 
+	uint test_index = 1;
+
 	const int num_hair = static_cast<int>(hairdata.m_num_hair);
 	const int num_vertices = static_cast<int>(hairdata.m_vertices.size());
 
-	vector<int> face_indices = m_growth_mesh_->get_indices();
+	vector<int> face_indices = m_growth_mesh_->get_indices(test_index);
 	const int num_indices = static_cast<int>(face_indices.size());
 
 	// face uvs
-	vector<vec2> uvs = m_growth_mesh_->get_face_uvs();
+	vector<vec2> uvs = m_growth_mesh_->get_face_uvs(test_index);
 	const int num_uvs = static_cast<int>(uvs.size());
 
 	// bones
@@ -85,8 +87,9 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 	for (int i = 0; i < num_hair; i++)
 	{
 		int num_appended = 0;
+
 		// For every bone per Hair Vertex
-		for (auto& vertex_bone_info : m_growth_mesh_->m_meshes.at(0).m_vertices.at(i).m_bones)
+		for (auto& vertex_bone_info : m_growth_mesh_->m_meshes.at(test_index).m_vertices.at(i).m_bones)
 		{
 			if (num_appended < 4)
 			{
@@ -194,7 +197,7 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 		hair_file << i << " ";
 	}
 	hair_file << "\n    </array>\n";
-	hair_file << "    <value name=\"numFaces\" type=\"U32\">" << m_growth_mesh_->get_num_faces() << "</value>\n";
+	hair_file << "    <value name=\"numFaces\" type=\"U32\">" << m_growth_mesh_->get_num_faces(test_index) << "</value>\n";
 	// Face Indices
 	hair_file << "    <array name=\"faceIndices\" size=\"" << num_indices << "\" type=\"U32\">\n";
 	hair_file << "        ";

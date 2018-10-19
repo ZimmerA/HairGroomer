@@ -19,10 +19,11 @@ void GlModel::draw()
  */
 void GlModel::draw_points()
 {
-	for (auto& mesh : m_meshes_)
-	{
-		mesh->draw_points();
-	}
+	
+	//for (auto& mesh : m_meshes_)
+	//{
+		m_meshes_.at(1)->draw_points();
+	//}
 }
 // 
 /**
