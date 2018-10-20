@@ -24,6 +24,7 @@ public:
 	bool m_should_render_uv_overlay = true;
 	// determines wether transform feedback should be used to write the hair to a buffer
 	bool m_should_write_out_hair = false;
+
 	// Stores the hair data retrived by transform feedback
 	HairData m_hairdata_cache;
 

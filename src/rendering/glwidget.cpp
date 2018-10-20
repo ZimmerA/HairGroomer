@@ -29,6 +29,7 @@ void GLWidget::initializeGL()
 	m_scene.load();
 	m_scene.m_defaultprojection_matrix = mat4::perspective(45.0f, (width() / 2.0f) / float(height()), 0.1f, 1000.0f);
 	// setup models using the vertex data in our mvpModel
+	m_view_->get_presenter()->get_model()->load_models();
 	m_scene.m_growth_mesh.setup_model(m_view_->get_presenter()->get_model()->get_growth_mesh());
 	m_scene.m_reference_model.setup_model(m_view_->get_presenter()->get_model()->get_reference_model());
 

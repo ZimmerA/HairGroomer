@@ -1,7 +1,6 @@
 #include "renderer.h"
 
 #include <linalg.hpp>
-#include <QDebug>
 
 void Renderer::init(const int width, const int height)
 {
@@ -92,6 +91,7 @@ void Renderer::render_scene()
 	GLuint geom_shader_query;
 	if (m_should_write_out_hair)
 	{
+				qDebug() << "test";
 		// Generate query to get number of generated primitves
 		glGenQueries(1, &geom_shader_query);
 		// 1 hair per drawn vertex of the mesh, number of segments + 1 points per hair ( 1 segment = 2 points, 2 segments = 3 points etc.), 3 dimensions per hair(x, y z)
@@ -213,4 +213,5 @@ void Renderer::render_scene()
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 }

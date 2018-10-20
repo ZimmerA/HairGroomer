@@ -7,8 +7,8 @@
 #include <map>
 
 #include <QOpenGLShaderProgram>
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
+#include <fbxsdk/scene/constraint/fbxconstraintutils.h>
+#include <fbxsdk.h>
 
 using namespace std;
 
@@ -41,11 +41,14 @@ public:
 	vector<Bone> m_bone_list_;
 private:
 	void load_model(const string& path);
-	void complete_skeleton(const aiNode* node, const aiScene* scene, int parent_index);
+	void process_node(FbxNode* node, FbxManager* manager);
+	vec3 read_normal(FbxMesh * mesh, int control_point_index, int vertex_counter);
+	MeshData process_mesh(FbxMesh* mesh, FbxNode* node, FbxManager* manager);
+	//void complete_skeleton(const aiNode* node, const aiScene* scene, int parent_index);
 	// Processes Assimp node in the model tree
-	void process_node(aiNode* node, const aiScene* scene);
+	//void process_node(aiNode* node, const aiScene* scene);
 	// Create a meshData object from the Assimp data
-	MeshData process_mesh(aiMesh* assimp_mesh, const aiScene* scene, const aiNode* node);
+	//MeshData process_mesh(aiMesh* assimp_mesh, const aiScene* scene, const aiNode* node);
 
 	string m_directory_;
 	// Maps bone names to the index in the bone_list

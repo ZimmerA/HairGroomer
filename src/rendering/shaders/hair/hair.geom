@@ -83,6 +83,7 @@ float commaSmooth(float value)
 // Calculates a rotation matrix that rotates hair arround the x and y axis (tangent/bitangent)
 mat3 calculateHairBendMatrix(float greenChannel, float blueChanel)
 {
+	
     greenChannel = commaSmooth(greenChannel);
     blueChanel = commaSmooth(blueChanel);
     
@@ -98,7 +99,7 @@ mat3 calculateHairBendMatrix(float greenChannel, float blueChanel)
 }
 
 void main() {
-
+	
     vec2 uv = gs_in[0].texCoord;
     float hair = texture(hairMap,uv).r;
     

@@ -8,10 +8,11 @@
 #include <qtextstream.h>
 
 
+
 MvpModel::MvpModel()
 {
 	// Load the Model data into Memory (No openGL buffers are created yet)
-	load_models();
+	//load_models();
 	default_settings();
 }
 
@@ -20,7 +21,7 @@ MvpModel::MvpModel()
  */
 void MvpModel::load_models()
 {
-		m_growth_mesh_ = std::make_unique<ModelData>("./res/samba.FBX");
+		m_growth_mesh_ = std::make_unique<ModelData>("./res/cube.FBX");
 	m_reference_model_ = std::make_unique<ModelData>("./res/referencemodel.fbx");
 
 }
@@ -69,15 +70,15 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 
 	uint test_index = 1;
 
-	const int num_hair = static_cast<int>(hairdata.m_num_hair);
-	const int num_vertices = static_cast<int>(hairdata.m_vertices.size());
+	const int num_hair = hairdata.m_num_hair;
+	const int num_vertices = hairdata.m_vertices.size();
 
 	vector<int> face_indices = m_growth_mesh_->get_indices(test_index);
-	const int num_indices = static_cast<int>(face_indices.size());
+	const int num_indices = face_indices.size();
 
 	// face uvs
 	vector<vec2> uvs = m_growth_mesh_->get_face_uvs(test_index);
-	const int num_uvs = static_cast<int>(uvs.size());
+	const int num_uvs =uvs.size();
 
 	// bones
 	const int num_bones = m_growth_mesh_->get_num_bones();

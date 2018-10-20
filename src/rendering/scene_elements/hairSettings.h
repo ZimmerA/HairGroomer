@@ -11,7 +11,7 @@ public:
 	vec3 m_root_color;
 	vec3 m_hair_color;
 	float m_length;
-	int m_num_segments;
+	int m_num_segments = 4;
 };
 
 #endif

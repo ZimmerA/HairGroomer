@@ -23,10 +23,40 @@ struct Vertex
 {
 	vec3 m_position;
 	vec3 m_normal;
-	vec3 m_tangent;
+	vec3 m_tangent; 
 	vec3 m_bitangent;
 	vec2 m_uv;
 	std::vector<VertexBoneInfo> m_bones;
+
+	friend bool operator < (const Vertex& v1, const Vertex& v2)
+	{
+		if(v1.m_position < v2.m_position)
+			return true;
+		if(v1.m_position > v2.m_position)
+			return false;
+
+		if(v1.m_normal < v2.m_normal)
+			return true;
+		if(v1.m_normal > v2.m_normal)
+			return false;
+
+		//if(v1.m_tangent < v2.m_tangent)
+		//	return true;
+		//if(v1.m_tangent > v2.m_tangent)
+		//	return false;
+
+		//if(v1.m_bitangent < v2.m_bitangent)
+		//	return true;
+		//if(v1.m_bitangent > v2.m_bitangent)
+		//	return false;
+		//
+		//if(v1.m_uv < v2.m_uv)
+		//	return true;
+		//if(v1.m_uv > v2.m_uv)
+		//	return false;
+
+		return false;
+	}
 };
 
 
