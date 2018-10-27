@@ -102,6 +102,9 @@
     <ClCompile Include="src\rendering\scene_elements\glDrawbuffer.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\baseapp\settings.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\renderer.h">
@@ -146,6 +149,9 @@
     <ClInclude Include="src\baseapp\hairData.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\baseapp\settings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">
@@ -182,6 +188,7 @@
     <None Include="src\rendering\shaders\viewport\mesh.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="C:\Users\zadri\Desktop\Schema.json" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="src\rendering\glwidget.h">

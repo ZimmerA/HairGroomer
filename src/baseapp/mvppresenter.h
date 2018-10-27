@@ -12,11 +12,14 @@ class MainWindow;
 class MvpPresenter
 {
 public:
-	MvpPresenter();
-	void load_default_values() const;
+	MvpPresenter() noexcept;
+	void load_ui_values(const UiSettings& settings) const;
 	void export_hair(const QString& filename) const;
 	void export_hairstyle(const QString& filename) const;
 	void load_hairstyle(const QString& filename) const;
+	void load_fbx_model(const QString& filename) const;
+	void load_project_file(const QString& filename) const;
+	void save_project_file(const QString& filename) const;
 
 	// Getters and Setters
 	void set_model(MvpModel* model) noexcept{ this->m_model_ = model; }

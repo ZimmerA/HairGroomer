@@ -15,10 +15,10 @@ public:
 	explicit GLWidget(QWidget* parent = nullptr);
 	Renderer m_renderer;
 	Scene m_scene;
-
+	void load_glmodel_data();
 private:
 	// MVP design pattern reference of view
-	MainWindow* m_view_;
+	MainWindow* m_view_{};
 
 	/* Input related*/
 	QPoint m_last_mouse_pos_;
@@ -27,6 +27,7 @@ private:
 
 protected:
 	void initializeGL() override;
+
 	void paintGL() override;
 	void process_input();
 	void resizeGL(int w, int h) override;

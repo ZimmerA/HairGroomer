@@ -3,9 +3,8 @@
 
 #include <vector>
 
-#include <linalg.hpp>
-
-using namespace std;
+#define GLM_ENABLE_EXPERIMENTAL
+#include <gtx/hash.hpp>
 
 /**
  * \brief Structure for storing bone info inside a vertex
@@ -21,44 +20,35 @@ struct VertexBoneInfo
  */
 struct Vertex
 {
-	vec3 m_position;
-	vec3 m_normal;
-	vec3 m_tangent; 
-	vec3 m_bitangent;
-	vec2 m_uv;
+	glm::vec3 m_position{0};
+	glm::vec3 m_normal{0};
+	glm::vec3 m_tangent{0};
+	glm::vec3 m_bitangent{0};
+	glm::vec2 m_uv{0};
 	std::vector<VertexBoneInfo> m_bones;
 
-	friend bool operator < (const Vertex& v1, const Vertex& v2)
+	// Used by unordered_map to find identical vertices
+	bool operator==(const Vertex& other) const
 	{
-		if(v1.m_position < v2.m_position)
-			return true;
-		if(v1.m_position > v2.m_position)
-			return false;
-
-		if(v1.m_normal < v2.m_normal)
-			return true;
-		if(v1.m_normal > v2.m_normal)
-			return false;
-
-		//if(v1.m_tangent < v2.m_tangent)
-		//	return true;
-		//if(v1.m_tangent > v2.m_tangent)
-		//	return false;
-
-		//if(v1.m_bitangent < v2.m_bitangent)
-		//	return true;
-		//if(v1.m_bitangent > v2.m_bitangent)
-		//	return false;
-		//
-		//if(v1.m_uv < v2.m_uv)
-		//	return true;
-		//if(v1.m_uv > v2.m_uv)
-		//	return false;
-
-		return false;
+		return m_position == other.m_position && m_normal == other.m_normal && m_uv == other.m_uv && m_tangent == other.
+			m_tangent && m_bitangent == other.m_bitangent;
 	}
 };
 
+// Used by unordered_map to find identical vertices
+namespace std
+{
+	template <>
+	struct hash<Vertex>
+	{
+		size_t operator()(Vertex const& vertex) const
+		{
+			return ((hash<glm::vec3>()(vertex.m_position) ^
+					(hash<glm::vec3>()(vertex.m_normal) << 1)) >> 1) ^
+					(hash<glm::vec2>()(vertex.m_uv) << 1);
+		}
+	};
+}
 
 /**
 * \brief Holds the data of loaded Meshes to be used by e.g OpenGL.
@@ -66,11 +56,15 @@ struct Vertex
 class MeshData
 {
 public:
-	MeshData(vector<Vertex> vertices, vector<unsigned int> indices, int num_faces);
+	MeshData(std::string name,std::vector<Vertex> vertices, std::vector<unsigned int> indices, int num_faces);
+	int get_num_faces() const noexcept;
+	std::vector<unsigned int> get_indices() const noexcept;
+	std::vector<glm::vec2> get_face_uvs();
 
-	vector<Vertex> m_vertices;
-	vector<unsigned int> m_indices;
+	std::vector<Vertex> m_vertices;
+	std::vector<unsigned int> m_indices;
 	int m_num_faces;
+	std::string m_name;
 };
 
-#endif // MESHDATA_H
+#endif //MESHDATA_H

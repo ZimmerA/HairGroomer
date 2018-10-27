@@ -9,7 +9,7 @@ void Scene::load()
 	load_shaders();
 	load_textures();
 	create_quad_vao();
-
+	m_growth_mesh_index = 0;
 	m_drawbuffer.create();
 	m_hair_output_vbo.create();
 	m_hair_output_vbo.setUsagePattern(QOpenGLBuffer::StaticRead);

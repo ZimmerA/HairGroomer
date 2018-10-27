@@ -4,28 +4,10 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 
-GlMesh::GlMesh()
-	: m_ibo_(QOpenGLBuffer::IndexBuffer), m_indicie_amount(0)
+GlMesh::GlMesh(MeshData* mesh_data)
+	: m_indicie_count(0), m_vertex_count(0), m_ibo_(QOpenGLBuffer::IndexBuffer)
 {
-}
-
-/**
- * \brief Destroy all the buffers used by the mesh
- */
-void GlMesh::destroy_buffers()
-{
-	m_vao_.destroy();
-	m_vbo_.destroy();
-	m_ibo_.destroy();
-}
-
-/**
- * \brief Creates the Relevant buffers, fills them with the mesh_data and sets the attribute pointers
- * \param mesh_data The data of the mesh
- */
-void GlMesh::setup_buffers(MeshData* mesh_data)
-{
-	m_indicie_amount = static_cast<unsigned int>(mesh_data->m_indices.size());
+	m_indicie_count = static_cast<unsigned int>(mesh_data->m_indices.size());
 	m_vao_.create();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	m_vbo_.create();
@@ -66,10 +48,9 @@ void GlMesh::setup_buffers(MeshData* mesh_data)
  */
 void GlMesh::draw()
 {
-
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
-	f->glDrawElements(GL_TRIANGLES, m_indicie_amount, GL_UNSIGNED_INT, nullptr);
+	f->glDrawElements(GL_TRIANGLES, m_indicie_count, GL_UNSIGNED_INT, nullptr);
 }
 
 /**

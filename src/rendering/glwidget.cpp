@@ -25,15 +25,15 @@ void GLWidget::initializeGL()
 	m_renderer.init(width(), height());
 	m_renderer.set_measurements(width(), height());
 	m_renderer.set_current_scene(&m_scene);
-
 	m_scene.load();
-	m_scene.m_defaultprojection_matrix = mat4::perspective(45.0f, (width() / 2.0f) / float(height()), 0.1f, 1000.0f);
-	// setup models using the vertex data in our mvpModel
-	m_view_->get_presenter()->get_model()->load_models();
-	m_scene.m_growth_mesh.setup_model(m_view_->get_presenter()->get_model()->get_growth_mesh());
-	m_scene.m_reference_model.setup_model(m_view_->get_presenter()->get_model()->get_reference_model());
+	m_scene.m_defaultprojection_matrix = glm::perspective(glm::radians(45.0f), (width() / 2.0f) / static_cast<float>(height()), 0.1f, 1000.0f);
+}
 
-
+void GLWidget::load_glmodel_data()
+{
+	makeCurrent();
+	m_scene.m_fbx_glmodel.setup_model(m_view_->get_presenter()->get_model()->get_fbx_model());
+	doneCurrent();
 }
 
 /**
@@ -44,7 +44,7 @@ void GLWidget::initializeGL()
 void GLWidget::resizeGL(const int w, const int h)
 {
 	m_renderer.set_measurements(w, h);
-	m_scene.m_defaultprojection_matrix = mat4::perspective(45.0f, w / float(h) / 2.0f, 0.1f, 1000.0f);
+	m_scene.m_defaultprojection_matrix = glm::perspective(glm::radians(45.0f), w / static_cast<float>(h) / 2.0f, 0.1f, 1000.0f);
 }
 
 /**
@@ -69,7 +69,7 @@ void GLWidget::process_input()
 	if (m_keys_[Qt::Key_Q])
 		m_scene.m_camera.reset_position();
 
-		if (m_keys_[Qt::Key_I])
+	if (m_keys_[Qt::Key_I])
 		m_renderer.m_should_write_out_hair = true;
 }
 
@@ -79,14 +79,19 @@ void GLWidget::process_input()
  */
 void GLWidget::mousePressEvent(QMouseEvent* event)
 {
+	if(!event)
+		return;
+
 	// Map mouse position to normalized device coordinates
 	const auto mouse_pos_x = static_cast<float>(event->pos().x()) / width() * 2.0f - 1.0f;
+
 	switch (event->button())
 	{
 	case Qt::LeftButton:
 
 		// Camera
 		m_last_mouse_pos_ = event->pos();
+
 		// Save whether the first click was inside of the model viewport
 		if (mouse_pos_x <= 0.0f)
 		{
@@ -113,6 +118,8 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
  */
 void GLWidget::mouseMoveEvent(QMouseEvent* event)
 {
+	if(!event)
+		return;
 	// Map mouse position to normalized device coordinates
 	const auto mouse_pos_x = static_cast<float>(event->pos().x()) / width() * 2.0f - 1.0f;
 	const auto mouse_pos_y = static_cast<float>(event->pos().y()) / height() * 2.0f - 1.0f;
@@ -155,6 +162,9 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
  */
 void GLWidget::mouseReleaseEvent(QMouseEvent* event)
 {
+	if(!event)
+		return;
+
 	switch (event->button())
 	{
 	case Qt::LeftButton:
@@ -174,8 +184,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event)
  */
 void GLWidget::wheelEvent(QWheelEvent* event)
 {
+
+	if(!event)
+		return;
+
 	const auto num_degrees = event->angleDelta() / 8;
-	auto num_steps = num_degrees / 15;
+	const auto num_steps = num_degrees / 15;
 	m_scene.m_camera.handle_mouse_wheel(num_steps.y());
 	update();
 }
@@ -185,6 +199,9 @@ void GLWidget::wheelEvent(QWheelEvent* event)
  */
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
+	if(!event)
+		return;
+
 	m_keys_[event->key()] = true;
 	QWidget::keyPressEvent(event);
 	update();
@@ -195,6 +212,9 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
  */
 void GLWidget::keyReleaseEvent(QKeyEvent* event)
 {
+	if(!event)
+		return;
+
 	m_keys_[event->key()] = false;
 	QWidget::keyReleaseEvent(event);
 	update();

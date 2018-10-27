@@ -1,97 +1,75 @@
 #include "mvpmodel.h"
-#include "rendering/scene_elements/hairSettings.h"
 
 #include <vector>
+#include <fstream>
 
 #include <qimage.h>
 #include <QFileDialog>
 #include <qtextstream.h>
 
 
-
-MvpModel::MvpModel()
+Project MvpModel::load_project_file_from_disk(const QString& filename) const
 {
-	// Load the Model data into Memory (No openGL buffers are created yet)
-	//load_models();
-	default_settings();
+
+	std::ifstream file(filename.toLocal8Bit().constData());
+	json json_object;
+	file >> json_object;
+
+	Project project;
+	project = json_object;
+
+	return project;
+}
+
+void MvpModel::save_project_file_to_disk(const QString& filename, const Project& proj) const
+{
+	
 }
 
 /**
- * \brief Loads the growthmesh and the reference model from the disk
- */
-void MvpModel::load_models()
-{
-		m_growth_mesh_ = std::make_unique<ModelData>("./res/cube.FBX");
-	m_reference_model_ = std::make_unique<ModelData>("./res/referencemodel.fbx");
-
-}
-
-/**
- * \brief Sets the default settings of the ui control elements
- */
-void MvpModel::default_settings()
-{
-	// General
-	m_grid_visibility_default = true;
-
-	// Hair
-	m_hairlength_default = 3.00;
-	m_hairsegment_count_default = 4;
-	m_hair_color_default.setRgb(255, 255, 255);
-	m_hair_root_color_default.setRgb(0, 0, 0);
-
-	// Brush
-	m_brushmode_default = Paintbrush::paintmode::length;
-	m_brush_size_default = 0.10;
-	m_brush_intensity_default = 1.0;
-
-	// Light
-	m_light_hair_default = true;
-	m_light_mesh_default = true;
-	m_light_color_default.setRgb(255, 255, 255);
-
-	// Meshes
-	m_growthmesh_show_default = true;
-	m_referencemodel_show_default = true;
-}
-
-/**
- * \brief Reserved for future versions of the Software
+ * \brief Exports the apx Hairfile to the disk
  * \param filename The name of the apx file
  * \param hairdata The data of the hair
- * \return true if suceeded, false if failed
  */
-bool MvpModel::export_hair_to_disk(const QString& filename, const HairData hairdata)
+void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hairdata) const
 {
 	QFile file(filename);
 
-	if (!file.open(QIODevice::WriteOnly))
-		return false;
+	const int growthmesh_index = hairdata.m_growthmesh_index;
 
-	uint test_index = 1;
+	if (growthmesh_index >= m_fbx_model_->m_meshes.size())
+		throw std::runtime_error("The selected growthmesh could not be found.");
 
 	const int num_hair = hairdata.m_num_hair;
-	const int num_vertices = hairdata.m_vertices.size();
+	const int num_hair_vertices = hairdata.m_vertices.size();
 
-	vector<int> face_indices = m_growth_mesh_->get_indices(test_index);
+	if (num_hair != m_fbx_model_->m_meshes.at(growthmesh_index).m_vertices.size())
+		throw std::runtime_error("The number of hair doesn't match the number of mesh vertices of the growthmesh.");
+
+	const int num_faces = m_fbx_model_->m_meshes.at(growthmesh_index).get_num_faces();
+
+	std::vector<unsigned int> face_indices = m_fbx_model_->m_meshes.at(growthmesh_index).get_indices();
 	const int num_indices = face_indices.size();
 
-	// face uvs
-	vector<vec2> uvs = m_growth_mesh_->get_face_uvs(test_index);
-	const int num_uvs =uvs.size();
+	std::vector<glm::vec2> uvs = m_fbx_model_->m_meshes.at(growthmesh_index).get_face_uvs();
+	const int num_uvs = uvs.size();
 
-	// bones
-	const int num_bones = m_growth_mesh_->get_num_bones();
-	vector<int> bone_indices;
-	vector<float> bone_weights;
+	if (num_uvs != num_indices)
+		throw std::runtime_error("The number of uv's doesn't match the number of indices.");
 
+	const int num_bones = m_fbx_model_->get_num_bones();
+	std::vector<int> bone_indices;
+	std::vector<float> bone_weights;
+
+	// Every hair has 4 bone weights and 4 indices
 	for (int i = 0; i < num_hair; i++)
 	{
 		int num_appended = 0;
 
 		// For every bone per Hair Vertex
-		for (auto& vertex_bone_info : m_growth_mesh_->m_meshes.at(test_index).m_vertices.at(i).m_bones)
+		for (auto& vertex_bone_info : m_fbx_model_->m_meshes.at(growthmesh_index).m_vertices.at(i).m_bones)
 		{
+			// max. 4 bones
 			if (num_appended < 4)
 			{
 				const int id = vertex_bone_info.m_id;
@@ -101,28 +79,32 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 				num_appended++;
 			}
 		}
-
 		// Make sure we have 4 bone values per vertex
-		while (bone_indices.size() % 4 != 0 && !bone_indices.empty())
+		while (bone_indices.size() % 4 != 0 || bone_indices.empty())
 		{
 			bone_indices.push_back(0);
 			bone_weights.push_back(0);
 		}
 	}
 
-	vector<string> bone_name_strings;
-	vector<int> bone_names;
-	vector<int> bone_parents;
-	for(auto& bone : m_growth_mesh_->m_bone_list_)
+	std::vector<std::string> bone_name_strings;
+	std::vector<int> bone_names; // chars as u8
+	std::vector<int> bone_parents;
+
+	// add every bone name and parent to a list and convert the name to ints
+	for (auto& bone : m_fbx_model_->m_bone_list)
 	{
 		bone_name_strings.push_back(bone.m_name);
-		for(auto& letter : bone.m_name)
+		for (auto& letter : bone.m_name)
 		{
 			bone_names.push_back(static_cast<int>(letter));
 		}
 		bone_parents.push_back(bone.m_parent);
-		
 	}
+
+	if (!file.open(QIODevice::WriteOnly))
+		throw std::runtime_error("The file you are trying to access could not be opened.");
+
 	QTextStream hair_file(&file);
 
 	hair_file << "<!DOCTYPE NvParameters>\n";
@@ -159,18 +141,18 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 	hair_file << "<value name=\"\" type=\"Ref\" className=\"HairAssetDescriptor\" version=\"1.1\" checksum=\"\">\n";
 	hair_file << "  <struct name=\"\">\n";
 	hair_file << "    <value name=\"numGuideHairs\" type=\"U32\">" << num_hair << "</value>\n";
-	hair_file << "    <value name=\"numVertices\" type=\"U32\">" << num_vertices << "</value>\n";
+	hair_file << "    <value name=\"numVertices\" type=\"U32\">" << num_hair_vertices << "</value>\n";
 	// Vertices
-	hair_file << "    <array name=\"vertices\" size=\"" << num_vertices << "\" type=\"Vec3\">\n";
+	hair_file << "    <array name=\"vertices\" size=\"" << num_hair_vertices << "\" type=\"Vec3\">\n";
 	hair_file << "        ";
-	for (int i = 0; i < num_vertices; i++)
+	for (int i = 0; i < num_hair_vertices; i++)
 	{
-		vec3 vertex = hairdata.m_vertices.at(i);
-
+		const glm::vec3 vertex = hairdata.m_vertices[i];
 
 		hair_file << vertex.x << " " << vertex.y << " " << vertex.z;
+
 		// Don't do anything after the last vertex
-		if (i != num_vertices - 1)
+		if (i != num_hair_vertices - 1)
 		{
 			// Set a comma after each vertex
 			hair_file << ",";
@@ -198,13 +180,13 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 		hair_file << i << " ";
 	}
 	hair_file << "\n    </array>\n";
-	hair_file << "    <value name=\"numFaces\" type=\"U32\">" << m_growth_mesh_->get_num_faces(test_index) << "</value>\n";
+	hair_file << "    <value name=\"numFaces\" type=\"U32\">" << num_faces << "</value>\n";
 	// Face Indices
 	hair_file << "    <array name=\"faceIndices\" size=\"" << num_indices << "\" type=\"U32\">\n";
 	hair_file << "        ";
 	for (int i = 0; i < num_indices; i++)
 	{
-		hair_file << face_indices.at(i);
+		hair_file << face_indices[i];
 		if (i != num_indices)
 		{
 			if ((i + 1) % 15 == 0)
@@ -224,7 +206,7 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 	hair_file << "        ";
 	for (int i = 0; i < num_uvs; i++)
 	{
-		vec2 uv = uvs.at(i);
+		const glm::vec2 uv = uvs[i];
 		hair_file << uv.x << " " << uv.y;
 		if (i != num_uvs - 1)
 		{
@@ -241,111 +223,116 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 		}
 	}
 	hair_file << "\n    </array>\n";
-
 	hair_file << "    <value name=\"numBones\" type=\"U32\">" << num_bones << "</value>\n";
-	hair_file << "    <array name=\"boneIndices\" size=\"" << num_hair << "\" type=\"Vec4\">\n";
+	hair_file << "    <array name=\"boneIndices\" size=\"" << bone_indices.size() << "\" type=\"Vec4\">\n";
 	hair_file << "        ";
-	for(uint i = 0; i < bone_indices.size(); i++)
+	for (int i = 0; i < bone_indices.size(); i++)
 	{
-		hair_file << bone_indices.at(i);
+		hair_file << bone_indices[i];
 		if (i < bone_indices.size() - 1)
 		{
-			if((i + 1) % 4 == 0)
+			if ((i + 1) % 4 == 0)
 			{
 				hair_file << ", ";
-			}else
+			}
+			else
 			{
 				hair_file << " ";
 			}
-		}else
+		}
+		else
 		{
 			hair_file << "\n";
 		}
-		if((i + 1 )% 64 == 0 && i != 0)
+		if ((i + 1) % 64 == 0 && i != 0)
 			hair_file << "\n        ";
 	}
 	hair_file << "\n    </array>\n";
 
-	hair_file << "    <array name=\"boneWeights\" size=\"" << num_hair << "\" type=\"Vec4\">\n";
+	hair_file << "    <array name=\"boneWeights\" size=\"" << bone_weights.size() << "\" type=\"Vec4\">\n";
 	hair_file << "        ";
-	for(uint i = 0; i < bone_weights.size(); i++)
+	for (int i = 0; i < bone_weights.size(); i++)
 	{
-		hair_file << bone_weights.at(i);
+		hair_file << bone_weights[i];
 		if (i < bone_weights.size() - 1)
 		{
-			if((i + 1) % 4 == 0)
+			if ((i + 1) % 4 == 0)
 			{
 				hair_file << ", ";
-			}else
+			}
+			else
 			{
 				hair_file << " ";
 			}
-		}else
+		}
+		else
 		{
 			hair_file << "\n";
 		}
-		if((i + 1 )% 64 == 0 && i != 0)
+		if ((i + 1) % 64 == 0 && i != 0)
 			hair_file << "\n        ";
 	}
 	hair_file << "        ";
 	hair_file << "\n    </array>\n";
 
-	hair_file << "    <array name=\"boneNames\" size=\"" << bone_names.size() <<"\" type=\"U8\">\n";
+	hair_file << "    <array name=\"boneNames\" size=\"" << bone_names.size() << "\" type=\"U8\">\n";
 	hair_file << "        ";
-	for(uint i = 0; i < bone_names.size(); i++)
+	for (int i = 0; i < bone_names.size(); i++)
 	{
-		hair_file << bone_names.at(i);
+		hair_file << bone_names[i];
 		if (i < bone_names.size() - 1)
 		{
 			hair_file << " ";
-		}else
+		}
+		else
 		{
 			hair_file << "\n";
 		}
 
-		if((i + 1 )% 32 == 0 && i != 0)
+		if ((i + 1) % 32 == 0 && i != 0)
 			hair_file << "\n        ";
 	}
 	hair_file << "    </array>\n";
 
-	hair_file << "    <array name=\"boneNameList\" size=\""<< bone_name_strings.size() << "\" type=\"String\">";
-	for(uint i = 0; i < bone_name_strings.size(); i++)
+	hair_file << "    <array name=\"boneNameList\" size=\"" << bone_name_strings.size() << "\" type=\"String\">";
+	for (auto& bone_name_string : bone_name_strings)
 	{
-		hair_file << "\n      <value type=\"String\">" << bone_name_strings.at(i).data() << "</value>";
+		hair_file << "\n      <value type=\"String\">" << bone_name_string.data() << "</value>";
 	}
 	hair_file << "\n    </array>\n";
 
-	hair_file << "    <array name=\"bindPoses\" size=\""<< num_bones << "\" type=\"Mat44\">\n";
-	for(int i = 0; i < num_bones; i++)
+	hair_file << "    <array name=\"bindPoses\" size=\"" << num_bones << "\" type=\"Mat44\">\n";
+	for (int i = 0; i < num_bones; i++)
 	{
-		for(int x = 0; x < 4; x++)
+		for (uint x = 0; x < 4; x++)
 		{
-			for(int y = 0; y < 4; y ++)
+			for (uint y = 0; y < 4; y ++)
 			{
-				hair_file << m_growth_mesh_->m_bone_list_.at(i).m_global_bindpose[x][y] << " ";
+				hair_file << m_fbx_model_->m_bone_list[i].m_global_bindpose[x][y] << " ";
 			}
 		}
-		if(i < num_bones -1)
+		if (i < num_bones - 1)
 		{
 			hair_file << ", ";
 		}
 	}
 
 	hair_file << "\n    </array>\n";
-	hair_file << "    <array name=\"boneParents\" size=\""<< num_bones << "\" type=\"I32\">\n";
+	hair_file << "    <array name=\"boneParents\" size=\"" << bone_parents.size() << "\" type=\"I32\">\n";
 	hair_file << "        ";
-	for(uint i = 0; i < bone_parents.size(); i++)
+	for (int i = 0; i < bone_parents.size(); i++)
 	{
-		hair_file << bone_parents.at(i);
+		hair_file << bone_parents[i];
 		if (i < bone_parents.size() - 1)
 		{
 			hair_file << " ";
-		}else
+		}
+		else
 		{
 			hair_file << "\n";
 		}
 
-		if((i + 1 )% 32 == 0 && i != 0)
+		if ((i + 1) % 32 == 0 && i != 0)
 			hair_file << "\n        ";
 	}
 	hair_file << "    </array>\n";
@@ -361,9 +348,8 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 	// TODO add boncapsuleIndices
 	hair_file << "    </array>\n";
 
-	hair_file << "    <value name=\"numPinConstraints\" type=\"U32\">0</value>\n"; // TODO was ist das und folgende
-	hair_file <<
-		"    <array name=\"pinConstraints\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3),pinStiffness(F32),influenceFallOff(F32),useDynamicPin(Bool),doLra(Bool),useStiffnessPin(Bool),influenceFallOffCurve(Vec4)\"></array>\n";
+	hair_file << "    <value name=\"numPinConstraints\" type=\"U32\">0</value>\n"; // TODO whats this
+	hair_file << "    <array name=\"pinConstraints\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3),pinStiffness(F32),influenceFallOff(F32),useDynamicPin(Bool),doLra(Bool),useStiffnessPin(Bool),influenceFallOffCurve(Vec4)\"></array>\n";
 	hair_file << "    <value name=\"sceneUnit\" type=\"F32\">1</value>\n";
 	hair_file << "    <value name=\"upAxis\" type=\"U32\">1</value>\n";
 	hair_file << "    <value name=\"handedness\" type=\"U32\">1</value>\n";
@@ -517,10 +503,7 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
 	hair_file << "  </struct>\n";
 	hair_file << "</value>\n";
 	hair_file << "</NvParameters>\n";
-
-	return true;
 }
-
 
 /**
  * \brief Saves the given hairstyle to disk
@@ -528,7 +511,7 @@ bool MvpModel::export_hair_to_disk(const QString& filename, const HairData haird
  * \param filename The path where the file should be saved
  * \return True if saving succeeded false if saving failed
  */
-bool MvpModel::export_hairstyle_to_disk(const QImage& image, const QString& filename)
+bool MvpModel::export_hairstyle_to_disk(const QImage& image, const QString& filename) const
 {
 	// Mirror on y axis because OpenGL flips it
 	return image.mirrored().save(filename);
@@ -539,7 +522,7 @@ bool MvpModel::export_hairstyle_to_disk(const QImage& image, const QString& file
  * \param filename The path of the file to be opened
  * \return The requested image if succeeded, a null QImage image if failed
  */
-QImage MvpModel::load_hairstyle_from_disk(const QString& filename)
+QImage MvpModel::load_hairstyle_from_disk(const QString& filename) const
 {
 	QImage hairstyle;
 
@@ -552,4 +535,9 @@ QImage MvpModel::load_hairstyle_from_disk(const QString& filename)
 	hairstyle = hairstyle.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
 	return hairstyle;
+}
+
+void MvpModel::load_fbx_model_from_disk(const QString& filename)
+{
+	m_fbx_model_ = std::make_unique<ModelData>(filename.toLocal8Bit().constData());
 }

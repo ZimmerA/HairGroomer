@@ -2,17 +2,7 @@
 #include <QDebug>
 #include <cassert>
 #include <unordered_map>
-//void assimp_to_linalg_matrix(const aiMatrix4x4& from, mat4& to)
-//{
-//	for (int x = 0; x < 4; x++)
-//	{
-//		for (int y = 0; y < 4; y++)
-//		{
-//			to[x][y] = from[y][x]; // Transpose cause of column/row major difference
-//		}
-//	}
-//}
-
+#include <sstream>
 
 ModelData::ModelData(const char* path)
 {
@@ -20,496 +10,421 @@ ModelData::ModelData(const char* path)
 }
 
 /**
- * \brief Returns the amount of faces the model has
- * \return The amount of faces
+ * \brief Loads the model at the given path using the Fbx Sdk
+ * \param path The path to the model on the harddrive
  */
-int ModelData::get_num_faces(uint index)
+void ModelData::load_model(const std::string& path)
 {
-	return m_meshes.at(index).m_num_faces;
-}
+	FbxPointer<FbxManager> sdk_manager(FbxManager::Create());
+	
+	FbxPointer<FbxIOSettings> io_settings(FbxIOSettings::Create(sdk_manager.get(), IOSROOT));
+	sdk_manager->SetIOSettings(io_settings.get());
 
-/**
- * \brief Returns the indices of every mesh in the model
- * \return A int vector holding the indices
- */
-vector<int> ModelData::get_indices(uint index)
-{
-	vector<int> indices;
+	FbxPointer<FbxImporter> importer(FbxImporter::Create(sdk_manager.get(), ""));
 
-	for (auto const& indice : m_meshes.at(index).m_indices)
+	const bool import_status = importer->Initialize(path.data(), -1, sdk_manager->GetIOSettings());
+	if (!import_status)
 	{
-		indices.push_back(indice);
+		std::stringstream error_stream;
+		error_stream << "Mesh couldn't be imported: " << importer->GetStatus().GetErrorString();
+		throw std::runtime_error(error_stream.str());
 	}
-
-	return indices;
-}
-
-/**
- * \brief Returns the texture coordinates of every index of the mesh of the given index
- * \return A vec2 vector holding the texture coordinates
- */
-vector<vec2> ModelData::get_face_uvs(uint index)
-{
-	vector<vec2> texcoords;
-
-	for (auto const& indice : m_meshes.at(index).m_indices)
-	{
-		texcoords.push_back(m_meshes.at(index).m_vertices.at(indice).m_uv);
-	}
-	return texcoords;
-}
-
-/**
- * \brief Loads the model of the given path using Assimp
- * \param path Path to the model
- */
-void ModelData::load_model(const string& path)
-{
-	FbxManager* lSdkManager = FbxManager::Create();
-
-	FbxIOSettings* ios = FbxIOSettings::Create(lSdkManager, IOSROOT);
-
-	lSdkManager->SetIOSettings(ios);
-
-	FbxImporter* lImporter = FbxImporter::Create(lSdkManager, "");
-	bool lImportStatus = lImporter->Initialize(path.data(), -1, lSdkManager->GetIOSettings());
-	if (!lImportStatus)
-	{
-		qDebug() << "Call to FbxImporter::Initialize() failed.";
-		qDebug() << "Error returned: " << lImporter->GetStatus().GetErrorString();
-		exit(-1);
-	}
-
-	FbxScene* lScene = FbxScene::Create(lSdkManager, "myScene");
+	
+	FbxPointer<FbxScene> scene(FbxScene::Create(sdk_manager.get(), "myScene"));
 
 	// Import the contents of the file into the scene.
-	lImporter->Import(lScene);
-
-
-	// The file has been imported; we can get rid of the importer.
-	lImporter->Destroy();
+	importer->Import(scene.get());
 
 	// File format version numbers to be populated.
-	int lFileMajor, lFileMinor, lFileRevision;
-
+	int file_major, file_minor, file_revision;
 	// Populate the FBX file format version numbers with the import file.
-	lImporter->GetFileVersion(lFileMajor, lFileMinor, lFileRevision);
+	importer->GetFileVersion(file_major, file_minor, file_revision);
 
-	process_node(lScene->GetRootNode(), lSdkManager);
+	// Traverse Nodes to load skeleton and model data
+	process_skeleton_nodes(scene->GetRootNode());
+	process_mesh_nodes(scene->GetRootNode(), sdk_manager.get());
 
-	/*
-	Assimp::Importer import;
-	import.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-	// Triangluate the model, flip the texture coordinates so we don't have to flip them in the shader or flip the picture, calculate tangent space if not present, remove duplicate vertices
-	const auto scene = import.ReadFile(
-		path, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_JoinIdenticalVertices);
-
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+	if(m_meshes.empty())
 	{
-		qDebug() << "ERROR::ASSIMP::" << import.GetErrorString();
-		return;
+		throw std::runtime_error("The loaded model doesn't consist of any meshes.");
 	}
-
-	m_directory_ = path.substr(0, path.find_last_of('/'));
-	// Iterate over every node and load meshes and their bones
-	process_node(scene->mRootNode, scene);
-
-	// Iterate over every node again to find the remaining bones and build up the parent relationship
-	complete_skeleton(scene->mRootNode, scene, -1);
-
-
-	*/
 }
 
-void ModelData::process_node(FbxNode* node, FbxManager* manager)
+void ModelData::process_skeleton_nodes(FbxNode* node)
 {
-	if (node->GetNodeAttribute() == nullptr)
+	for (int i = 0; i < node->GetChildCount(); i++)
 	{
-		qDebug() << "Null Attribute";
+		FbxNode* curr_node = node->GetChild(i);
+		process_skeleton_hierachy_rec(curr_node, -1);
 	}
-	else
+}
+
+void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_index)
+{
+	uint bone_index = 0;
+	if (node->GetNodeAttribute() && node->GetNodeAttribute()->GetAttributeType() && node->GetNodeAttribute()->GetAttributeType() ==FbxNodeAttribute::eSkeleton)
+	{
+		const std::string bone_name = node->GetName();
+
+		// Check if the bone is in the map, if no add it
+		if (m_bone_map_.find(bone_name) == m_bone_map_.end())
+		{
+			bone_index = static_cast<uint>(m_bone_map_.size());
+			Bone bone;
+
+			bone.m_name = bone_name;
+			bone.m_parent = parent_index;
+
+			m_bone_list.push_back(bone);
+			m_bone_map_[bone_name] = bone_index;
+		}
+		else // Bone is already in the map get the index of the bone
+		{
+			bone_index = m_bone_map_[bone_name];
+		}
+	}
+
+	for (int i = 0; i < node->GetChildCount(); i++)
+	{
+		process_skeleton_hierachy_rec(node->GetChild(i), bone_index);
+	}
+}
+
+void ModelData::process_mesh_nodes(FbxNode* node, FbxManager* manager)
+{
+	if (node->GetNodeAttribute() != nullptr)
 	{
 		// Get the node type
-		const FbxNodeAttribute::EType lAttributeType = (node->GetNodeAttribute()->GetAttributeType());
+		const FbxNodeAttribute::EType attribute_type = node->GetNodeAttribute()->GetAttributeType();
 
 		// Mesh
-		if (lAttributeType == FbxNodeAttribute::eMesh)
+		if (attribute_type == FbxNodeAttribute::eMesh)
 		{
-			qDebug() << node->GetName();
 			FbxMesh* mesh = node->GetMesh();
-			m_meshes.push_back(process_mesh(mesh, node, manager));
+			m_meshes.push_back(process_mesh(mesh, manager,node->GetName()));
 		}
 	}
 
 	// Process childnodes
 	for (int i = 0; i < node->GetChildCount(); i++)
 	{
-		process_node(node->GetChild(i), manager);
+		process_mesh_nodes(node->GetChild(i), manager);
 	}
 }
 
-vec3 ModelData::read_normal(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
+MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::string mesh_name)
 {
-	vec3 out_normal(0,0,0);
-	if (mesh->GetElementNormalCount() < 1)
-	{
-		qDebug() << "error";
-	}
-
-	FbxGeometryElementNormal* vertex_normal = mesh->GetElementNormal(0);
-
-	switch (vertex_normal->GetMappingMode())
-	{
-		// Normal is per Control point
-		case FbxGeometryElement::eByControlPoint:
-			switch (vertex_normal->GetReferenceMode())
-			{
-				case FbxGeometryElement::eDirect:
-					{
-						out_normal.x = vertex_normal->GetDirectArray().GetAt(control_point_index).mData[0];
-						out_normal.y = vertex_normal->GetDirectArray().GetAt(control_point_index).mData[1];
-						out_normal.z = vertex_normal->GetDirectArray().GetAt(control_point_index).mData[2];
-					}
-					break;
-				case FbxGeometryElement::eIndexToDirect:
-					{
-						const int normal_index = vertex_normal->GetIndexArray().GetAt(control_point_index);
-						out_normal.x = vertex_normal->GetDirectArray().GetAt(normal_index).mData[0];
-						out_normal.y = vertex_normal->GetDirectArray().GetAt(normal_index).mData[1];
-						out_normal.z = vertex_normal->GetDirectArray().GetAt(normal_index).mData[2];
-					}
-					break;
-				default:
-					qDebug() << "Invalid ref";
-				break;
-			}
-			break;
-		// Normal is per Polygon Vert
-		case FbxGeometryElement::eByPolygonVertex:
-			switch (vertex_normal->GetReferenceMode())
-			{
-				case FbxGeometryElement::eDirect:
-					{
-						out_normal.x = vertex_normal->GetDirectArray().GetAt(vertex_counter).mData[0];
-						out_normal.y = vertex_normal->GetDirectArray().GetAt(vertex_counter).mData[1];
-						out_normal.z = vertex_normal->GetDirectArray().GetAt(vertex_counter).mData[2];
-					}
-					break;
-				case FbxGeometryElement::eIndexToDirect:
-					{
-						const int normal_index = vertex_normal->GetIndexArray().GetAt(vertex_counter);
-						out_normal.x = vertex_normal->GetDirectArray().GetAt(normal_index).mData[0];
-						out_normal.y = vertex_normal->GetDirectArray().GetAt(normal_index).mData[1];
-						out_normal.z = vertex_normal->GetDirectArray().GetAt(normal_index).mData[2];
-					}
-					break;
-				default:
-					qDebug() << "Invalid ref";
-			}
-			break;
-		default:
-			qDebug() << "Invalid ref";
-			break;
-	}
-
-	return out_normal;
-}
-
-MeshData ModelData::process_mesh(FbxMesh* mesh, FbxNode* node, FbxManager* manager)
-{
-
-
 	// Triangulate mesh if needed
 	if (!mesh->IsTriangleMesh())
 	{
 		FbxGeometryConverter converter(manager);
 		mesh = static_cast<FbxMesh*>(converter.Triangulate(mesh, true));
-		assert(mesh != nullptr);
+		if(!mesh)
+		{
+			std::stringstream error_stream;
+			error_stream << "Mesh" << mesh_name << " couldn't be triangulated.";
+		}
 	}
 
+	// Generate Tangent/Binormals if needed
+	if (mesh->GetElementBinormalCount() <= 0 || mesh->GetElementTangentCount() <= 0)
+	{
+		mesh->GenerateTangentsData(0, true);
+	}
+
+	// Preload control points to make skeleton loading easier
+	std::vector<ControlpointInfo> control_points;
+	const unsigned int controlpoint_count = mesh->GetControlPointsCount();
+	for (unsigned int i = 0; i < controlpoint_count; i++)
+	{
+		ControlpointInfo controlpoint;
+		const FbxVector4 position = mesh->mControlPoints[i];
+		controlpoint.m_position.x = position.mData[0];
+		controlpoint.m_position.y = position.mData[1];
+		controlpoint.m_position.z = position.mData[2];
+		control_points.push_back(controlpoint);
+	}
+
+	// Load Vertex Bone info
+	const unsigned int num_deformers = mesh->GetDeformerCount();
+	for (unsigned int deformer_index = 0; deformer_index < num_deformers; deformer_index++)
+	{
+		auto* curr_skin = reinterpret_cast<FbxSkin*>(mesh->GetDeformer(deformer_index, FbxDeformer::eSkin));
+		// Deformer isn't a skin
+		if (!curr_skin)
+		{
+			continue;
+		}
+
+		const unsigned int num_clusters = curr_skin->GetClusterCount();
+		for (unsigned int cluster_index = 0; cluster_index < num_clusters; cluster_index++)
+		{
+			FbxCluster* curr_cluster = curr_skin->GetCluster(cluster_index);
+			std::string bone_name = curr_cluster->GetLink()->GetName();
+			const int bone_id = m_bone_map_[bone_name];
+
+			FbxAMatrix transform_matrix;
+			FbxAMatrix transform_link_matrix;
+			// The transformation of the mesh at binding time
+			transform_matrix = curr_cluster->GetTransformMatrix(transform_matrix);
+			// The transformation of the cluster(joint) at binding time from joint space to world space
+			transform_link_matrix = curr_cluster->GetTransformLinkMatrix(transform_link_matrix);
+			FbxAMatrix global_bindpose = (transform_link_matrix.Inverse() * transform_matrix).Inverse();
+
+			// set the bindpose Matrix in the bone
+			for (int x = 0; x < 4; x++)
+			{
+				for (int y = 0; y < 4; y++)
+				{
+					m_bone_list[bone_id].m_global_bindpose[x][y] = global_bindpose[x][y];
+				}
+			}
+
+			// Get amount of control points this bone affects
+			const unsigned int num_indices = curr_cluster->GetControlPointIndicesCount();
+
+			// Assign the weight and bone id info to the control points
+			for (unsigned int i = 0; i < num_indices; i++)
+			{
+				VertexBoneInfo bone_info{};
+				bone_info.m_id = bone_id;
+				bone_info.m_weight = curr_cluster->GetControlPointWeights()[i];
+				control_points.at(curr_cluster->GetControlPointIndices()[i]).m_bone_info.push_back(bone_info);
+			}
+		}
+	}
+
+	// Load vertices
 	const int num_triangles = mesh->GetPolygonCount();
-	const int vertex_count = mesh->GetControlPointsCount();
-	vector<Vertex> vertices;
-	int generated_vertices = 0;
+	std::vector<Vertex> vertices;
+	std::vector<unsigned int> indices;
+
+	// Hashmap for finding duplicate vertices
+	std::unordered_map<Vertex, uint32_t> unique_vertices = {};
+
+	// Used for reading out normals, uv, tangent, binormal that have a per polygon vertex mapping
+	int index_count = 0;
 
 	// Iterate over every triangle in the mesh
 	for (int triangle = 0; triangle < num_triangles; triangle++)
 	{
-		// Our mesh is triangulated, 3 points per polygon
+		// 3 points per polygon (triangulated)
 		for (int index_in_polygon = 0; index_in_polygon < 3; index_in_polygon++)
 		{
 			Vertex vert;
+
 			const int control_point_index = mesh->GetPolygonVertex(triangle, index_in_polygon);
 
-			const FbxVector4 
-			position = mesh->mControlPoints[control_point_index];
-			vert.m_position = vec3(position.mData[0], position.mData[1], position.mData[2]);
-			vert.m_normal = read_normal(mesh, control_point_index, generated_vertices);
+			const ControlpointInfo control_point = control_points.at(control_point_index);
 
-			vertices.push_back(vert);
-			generated_vertices++;
+			// Get the vertex info
+			vert.m_position = control_point.m_position;
+			vert.m_normal = read_normal(mesh, control_point_index, index_count);
+			vert.m_uv = read_uv(mesh, control_point_index, index_count);
+			vert.m_tangent = read_tangent(mesh, control_point_index, index_count);
+			vert.m_bitangent = read_binormal(mesh, control_point_index, index_count);
+			vert.m_bones = control_point.m_bone_info;
+
+			// Check if this vertex is already in the list of unique verts, if no add it
+			if (unique_vertices.count(vert) == 0)
+			{
+				unique_vertices[vert] = static_cast<uint32_t>(vertices.size());
+				vertices.push_back(vert);
+			}
+
+			// Get the correct index of the vert using the hashmap
+			indices.push_back(unique_vertices[vert]);
+			index_count++;
 		}
 	}
-
-	// Use a map to get unique vertices
-	map<Vertex, int> unique_vertices;
-	for each(Vertex (v) in vertices)
-	{
-		unique_vertices.insert(make_pair(v, unique_vertices.size()));
-	}
-
-	vector<Vertex> unique_list(unique_vertices.size());
-	int bla = 0;
-	for each(pair<Vertex,int> p in unique_vertices)
-	{
-		p.second = bla;
-		unique_list[bla] = p.first;
-		bla++;
-	}
-
-	vector<unsigned int> indices(num_triangles * 3);
-	int i = 0;
-	for each(Vertex v in vertices)
-	{
-		std::map<Vertex, int>::iterator it = unique_vertices.find(v);
-		indices.at(i++) = it->second;
-	}
-	
-	//// Vertices
-	//for (int i = 0; i < vertex_count; i ++)
-	//{
-	//	Vertex vert;
-
-	//	// Position
-	//	vec3 vector;
-	//	vector.x = mesh->GetControlPointAt(i).mData[0];
-	//	vector.y = mesh->GetControlPointAt(i).mData[1];
-	//	vector.z = mesh->GetControlPointAt(i).mData[2];
-	//	vert.m_position = vector;
-
-	//	vertices.push_back(vert);
-	//}
-
-
-	return MeshData(vertices, indices, num_triangles);
+	m_name_list.push_back(mesh_name);
+	return MeshData(mesh_name, vertices, indices, num_triangles);
 }
 
-//void ModelData::complete_skeleton(const aiNode* node, const aiScene* scene, const int parent_index)
-//{
-//	int bone_index = -1;
-//
-//	// Node is a bone, calc and go on with children
-//	if (m_bone_map_.find(node->mName.data) != m_bone_map_.end())
-//	{
-//		bone_index = m_bone_map_[node->mName.data];
-//
-//		if (parent_index == -1)
-//		{
-//			assimp_to_linalg_matrix(node->mTransformation, m_bone_list_.at(bone_index).m_global_bindpose);
-//		}
-//		else
-//		{
-//			mat4 local_bindpose;
-//			assimp_to_linalg_matrix(node->mTransformation, local_bindpose);
-//
-//			m_bone_list_.at(bone_index).m_global_bindpose = m_bone_list_.at(parent_index).m_global_bindpose *
-//				local_bindpose;
-//		}
-//
-//		m_bone_list_.at(bone_index).m_parent = parent_index;
-//	}
-//
-//	// If were at the root node or the current node is a bone, iterate over the children
-//	if (bone_index != -1 || node == scene->mRootNode)
-//	{
-//		for (uint i = 0; i < node->mNumChildren; i++)
-//		{
-//			complete_skeleton(node->mChildren[i], scene, bone_index);
-//		}
-//	}
-//
-//	/*
-//// Then read out the Bone hiearchy
-//string node_name = node->mName.data;
-//
-//if(node_name == "Bone_02")
-//{
-//	qDebug() << node_name.data();
-//	auto  m_GlobalInverseTransform = node->mParent->mTransformation;
-//	//m_GlobalInverseTransform.Inverse();
-//	auto test =  m_GlobalInverseTransform * node->mTransformation; // Korrekte bindpose
-//
-//	for(int x = 0; x < 4; x++)
-//	{
-//		for(int y = 0; y< 4; y++)
-//		{
-//			qDebug() << test[y][x];
-//		}
-//	}
-//}
-//*/
-//	/*
-//	if (m_bone_map_.find(node_name) != m_bone_map_.end()) {
-//		int index = m_bone_map_[node_name];
-//
-//		int parent_index = m_bone_map_[node->mParent->mName];
-//		if(m_bone_map_.)
-//		m_bone_list_.at(index).m_parent = parent_index;
-//
-//	}*/
-//}
-//
-///**
-// * \brief Recursively iterate over every node in the model and process each mesh in the node
-// * \param node The according Assimp node
-// * \param scene The according Assimp scene
-// */
-//void ModelData::process_node(aiNode* node, const aiScene* scene)
-//{
-//	// process all the node's meshes (if any)
-//	for (unsigned int i = 0; i < node->mNumMeshes; i++)
-//	{
-//		const auto mesh = scene->mMeshes[node->mMeshes[i]];
-//		m_meshes.push_back(process_mesh(mesh, scene, node));
-//	}
-//
-//	// then do the same for each of its children
-//	for (unsigned int i = 0; i < node->mNumChildren; i++)
-//	{
-//		process_node(node->mChildren[i], scene);
-//	}
-//}
-//
-///**
-// * \brief Processes a mesh of a node
-// * \param assimp_mesh The according Assimp mesh
-// * \return A MeshData object which holds the indices and vertices of the mesh
-// */
-//MeshData ModelData::process_mesh(aiMesh* assimp_mesh, const aiScene* scene, const aiNode* mesh_node)
-//{
-//	vector<Vertex> vertices;
-//	vector<unsigned int> indices;
-//
-//	for (unsigned int i = 0; i < assimp_mesh->mNumVertices; i++)
-//	{
-//		// Vertex that will be added to the list at the end
-//		Vertex vertex;
-//
-//		// Load Position
-//		vec3 vector;
-//		vector.x = assimp_mesh->mVertices[i].x;
-//		vector.y = assimp_mesh->mVertices[i].y;
-//		vector.z = assimp_mesh->mVertices[i].z;
-//		vertex.m_position = vector;
-//
-//		// Load Normals
-//		vector.x = assimp_mesh->mNormals[i].x;
-//		vector.y = assimp_mesh->mNormals[i].y;
-//		vector.z = assimp_mesh->mNormals[i].z;
-//		vertex.m_normal = vector;
-//
-//		// Does the mesh contain texture coordinates?
-//		if (assimp_mesh->mTextureCoords[0])
-//		{
-//			// add texcoords
-//			vec2 vec;
-//			vec.x = assimp_mesh->mTextureCoords[0][i].x;
-//			vec.y = assimp_mesh->mTextureCoords[0][i].y;
-//			vertex.m_uv = vec;
-//
-//			vertex.m_bitangent = vector;
-//		}
-//		else
-//		{
-//			// default texcoord (0/0)
-//			vertex.m_uv = vec2(0.0f, 0.0f);
-//		}
-//
-//		// Does the mesh contain tangents/bitangents?
-//		if (assimp_mesh->mTangents)
-//		{
-//			// add tangents
-//			vector.x = assimp_mesh->mTangents[i].x;
-//			vector.y = assimp_mesh->mTangents[i].y;
-//			vector.z = assimp_mesh->mTangents[i].z;
-//			vertex.m_tangent = vector;
-//			//add bitangents
-//			vector.x = assimp_mesh->mBitangents[i].x;
-//			vector.y = assimp_mesh->mBitangents[i].y;
-//			vector.z = assimp_mesh->mBitangents[i].z;
-//			vertex.m_bitangent = vector;
-//		}
-//		else
-//		{
-//			// default tangent/bitangent (0,0,0)
-//			vertex.m_tangent = vec3(0, 0, 0);
-//			vertex.m_bitangent = vec3(0, 0, 0);
-//		}
-//		vertices.push_back(vertex);
-//	}
-//
-//	// Process bones of this mesh
-//	for (unsigned int i = 0; i < assimp_mesh->mNumBones; i++)
-//	{
-//		uint bone_index;
-//		string bone_name(assimp_mesh->mBones[i]->mName.data);
-//
-//		// Check if the bone is in the map, if no add it
-//		if (m_bone_map_.find(bone_name) == m_bone_map_.end())
-//		{
-//			bone_index = static_cast<int>(m_bone_map_.size());
-//			Bone bone;
-//			bone.m_name = bone_name;
-//			//assimp_to_linalg_matrix(assimp_mesh->mBones[i]->mOffsetMatrix,bone.m_offset_matrix);
-//			m_bone_list_.push_back(bone);
-//			m_bone_map_[bone_name] = bone_index;
-//		}
-//		else // Bone is already in the map get the index of the bone
-//		{
-//			bone_index = m_bone_map_[bone_name];
-//		}
-//
-//		// Loop over the bones weights
-//		for (uint j = 0; j < assimp_mesh->mBones[i]->mNumWeights; j++)
-//		{
-//			const float bone_weight = assimp_mesh->mBones[i]->mWeights[j].mWeight;
-//			VertexBoneInfo bone_info{};
-//			bone_info.m_weight = bone_weight;
-//			bone_info.m_id = bone_index; // index of the bone in the bone list
-//			vertices.at(assimp_mesh->mBones[i]->mWeights[j].mVertexId).m_bones.push_back(bone_info);
-//		}
-//
-//		// Look for this bone in the hierachy
-//		auto node = scene->mRootNode->FindNode(bone_name.data());
-//		if (node)
-//			node = node->mParent;
-//
-//		// Travel up until we either hit the mesh node or the parent of the mesh node
-//		while (node && node != mesh_node && node != mesh_node->mParent)
-//		{
-//			string parent_bone_name(node->mName.data);
-//
-//			// Bone is not in the list, add it
-//			if (m_bone_map_.find(parent_bone_name) == m_bone_map_.end())
-//			{
-//				bone_index = static_cast<int>(m_bone_map_.size());
-//				Bone bone;
-//				bone.m_name = parent_bone_name;
-//				m_bone_list_.push_back(bone);
-//				m_bone_map_[parent_bone_name] = bone_index;
-//			}
-//
-//			node = node->mParent;
-//		}
-//	}
-//
-//	// process indices
-//	for (unsigned int i = 0; i < assimp_mesh->mNumFaces; i++)
-//	{
-//		const auto face = assimp_mesh->mFaces[i];
-//		for (unsigned int j = 0; j < face.mNumIndices; j++)
-//			indices.push_back(face.mIndices[j]);
-//	}
-//
-//	return MeshData(vertices, indices, assimp_mesh->mNumFaces);
-//}
+glm::vec3 ModelData::read_normal(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
+{
+	glm::vec3 out_normal(0, 0, 0);
+	if (mesh->GetElementNormalCount() >= 1)
+	{
+		FbxGeometryElementNormal* vertex_normal = mesh->GetElementNormal(0);
+		switch (vertex_normal->GetMappingMode())
+		{
+			// Normal is per Control point
+		case FbxGeometryElement::eByControlPoint:
+			switch (vertex_normal->GetReferenceMode())
+			{
+			case FbxGeometryElement::eDirect:
+				{
+					out_normal.x = vertex_normal->GetDirectArray().GetAt(control_point_index).mData[0];
+					out_normal.y = vertex_normal->GetDirectArray().GetAt(control_point_index).mData[1];
+					out_normal.z = vertex_normal->GetDirectArray().GetAt(control_point_index).mData[2];
+				}
+				break;
+			case FbxGeometryElement::eIndexToDirect:
+				{
+					const int normal_index = vertex_normal->GetIndexArray().GetAt(control_point_index);
+					out_normal.x = vertex_normal->GetDirectArray().GetAt(normal_index).mData[0];
+					out_normal.y = vertex_normal->GetDirectArray().GetAt(normal_index).mData[1];
+					out_normal.z = vertex_normal->GetDirectArray().GetAt(normal_index).mData[2];
+				}
+				break;
+			default:
+				qDebug() << "Invalid ref";
+				break;
+			}
+			break;
+			// Normal is per Polygon Vert
+		case FbxGeometryElement::eByPolygonVertex:
+			switch (vertex_normal->GetReferenceMode())
+			{
+			case FbxGeometryElement::eDirect:
+				{
+					out_normal.x = vertex_normal->GetDirectArray().GetAt(vertex_counter).mData[0];
+					out_normal.y = vertex_normal->GetDirectArray().GetAt(vertex_counter).mData[1];
+					out_normal.z = vertex_normal->GetDirectArray().GetAt(vertex_counter).mData[2];
+				}
+				break;
+			case FbxGeometryElement::eIndexToDirect:
+				{
+					const int normal_index = vertex_normal->GetIndexArray().GetAt(vertex_counter);
+					out_normal.x = vertex_normal->GetDirectArray().GetAt(normal_index).mData[0];
+					out_normal.y = vertex_normal->GetDirectArray().GetAt(normal_index).mData[1];
+					out_normal.z = vertex_normal->GetDirectArray().GetAt(normal_index).mData[2];
+				}
+				break;
+			default:
+				qDebug() << "Invalid ref";
+			}
+			break;
+		default:
+			qDebug() << "Invalid ref";
+			break;
+		}
+	}
+	else
+	{
+		qDebug() << "Mesh doesn't have normals.";
+	}
+
+	return out_normal;
+}
+
+glm::vec2 ModelData::read_uv(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
+{
+	glm::vec2 uv(0, 0);
+
+	if (mesh->GetElementUVCount() >= 1)
+	{
+		FbxGeometryElementUV* uv_elemnt = mesh->GetElementUV(0);
+
+		const bool lUseIndex = uv_elemnt->GetReferenceMode() != FbxGeometryElement::eDirect;
+		if (uv_elemnt->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+		{
+			//the UV index depends on the reference mode
+			const int uv_index = lUseIndex
+				                     ? uv_elemnt->GetIndexArray().GetAt(control_point_index)
+				                     : control_point_index;
+
+			const FbxVector2 uv_value = uv_elemnt->GetDirectArray().GetAt(uv_index);
+
+			uv.x = uv_value.mData[0];
+			uv.y = uv_value.mData[1];
+		}
+		else if (uv_elemnt->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+		{
+			//the UV index depends on the reference mode
+			const int uv_index = lUseIndex ? uv_elemnt->GetIndexArray().GetAt(vertex_counter) : vertex_counter;
+
+			const FbxVector2 uv_value = uv_elemnt->GetDirectArray().GetAt(uv_index);
+			uv.x = uv_value.mData[0];
+			uv.y = uv_value.mData[1];
+		}
+	}
+	else
+	{
+		qDebug() << "Mesh doesn't have uv layer.";
+	}
+
+	return uv;
+}
+
+glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
+{
+	glm::vec3 binormal(0, 0, 0);
+
+	if (mesh->GetElementBinormalCount() >= 1)
+	{
+		FbxGeometryElementBinormal* binormal_element = mesh->GetElementBinormal(0);
+
+		const bool uses_index = binormal_element->GetReferenceMode() != FbxGeometryElement::eDirect;
+		if (binormal_element->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+		{
+			//the UV index depends on the reference mode
+			const int binormal_index = uses_index
+				                           ? binormal_element->GetIndexArray().GetAt(control_point_index)
+				                           : control_point_index;
+
+			const FbxVector4 binormal_value = binormal_element->GetDirectArray().GetAt(binormal_index);
+			binormal.x = binormal_value.mData[0];
+			binormal.y = binormal_value.mData[1];
+			binormal.z = binormal_value.mData[2];
+		}
+		else if (binormal_element->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+		{
+			//the UV index depends on the reference mode
+			const int binormal_index =
+				uses_index ? binormal_element->GetIndexArray().GetAt(vertex_counter) : vertex_counter;
+
+			const FbxVector4 binormal_value = binormal_element->GetDirectArray().GetAt(binormal_index);
+			binormal.x = binormal_value.mData[0];
+			binormal.y = binormal_value.mData[1];
+			binormal.z = binormal_value.mData[2];
+		}
+	}
+	else
+	{
+		qDebug() << "Mesh doesn't have binormals.";
+	}
+
+
+	return binormal;
+}
+
+glm::vec3 ModelData::read_tangent(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
+{
+	glm::vec3 tangent(0, 0, 0);
+	if (mesh->GetElementTangentCount() >= 1)
+	{
+		FbxGeometryElementTangent* tangent_element = mesh->GetElementTangent(0);
+
+		const bool uses_index = tangent_element->GetReferenceMode() != FbxGeometryElement::eDirect;
+		if (tangent_element->GetMappingMode() == FbxGeometryElement::eByControlPoint)
+		{
+			//the UV index depends on the reference mode
+			const int tangent_index = uses_index
+				                          ? tangent_element->GetIndexArray().GetAt(control_point_index)
+				                          : control_point_index;
+
+			const FbxVector4 tangent_value = tangent_element->GetDirectArray().GetAt(tangent_index);
+			tangent.x = tangent_value.mData[0];
+			tangent.y = tangent_value.mData[1];
+			tangent.z = tangent_value.mData[2];
+		}
+		else if (tangent_element->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
+		{
+			//the UV index depends on the reference mode
+			const int tangent_index = uses_index
+				                          ? tangent_element->GetIndexArray().GetAt(vertex_counter)
+				                          : vertex_counter;
+			const FbxVector4 tangent_value = tangent_element->GetDirectArray().GetAt(tangent_index);
+			tangent.x = tangent_value.mData[0];
+			tangent.y = tangent_value.mData[1];
+			tangent.z = tangent_value.mData[2];
+		}
+	}
+	else
+	{
+		qDebug() << "Mesh doesn't have tangents";
+	}
+	return tangent;
+}

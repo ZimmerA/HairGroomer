@@ -42,7 +42,7 @@ void GlDrawbuffer::set_content(QImage& image) const
  */
 void GlDrawbuffer::grab_drawbuffer_content_to_image(QImage& image) const
 {
-	GLint width, height;
+	GLint width = 0, height = 0;
 	auto* f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
 	f->glBindTexture(GL_TEXTURE_2D, m_drawbuffer_->texture());
 	f->glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);

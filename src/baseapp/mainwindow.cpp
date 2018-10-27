@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QShortcut>
+#include <sstream>
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget* parent) :
 {
 	m_ui_->setupUi(this);
 	connect_signals_and_slots();
+	m_ui_->statusBar->showMessage("");
 }
 
 MainWindow::~MainWindow()
@@ -19,14 +21,18 @@ MainWindow::~MainWindow()
 	delete m_ui_;
 }
 
-/**
- * \brief Reserved for future versions of the software
- */
+
 void MainWindow::on_actionExport_triggered()
 {
 	m_ui_->widget_gl->m_renderer.m_should_write_out_hair = true;
 	const QString file_name = save_file_dialog("Export Hair", "Nvidia APX File (*.apx);;All Files (*)");
 	get_presenter()->export_hair(file_name);
+}
+
+void MainWindow::on_actionOpen_Fbx_triggered()
+{
+	const QString file_name = open_file_dialog("Import FBX model", "Filmbox (*.FBX)");
+	get_presenter()->load_fbx_model(file_name);
 }
 
 /**
@@ -35,8 +41,41 @@ void MainWindow::on_actionExport_triggered()
 void MainWindow::on_actionExport_Hairstyle_triggered()
 {
 	const QString file_name = save_file_dialog("Export Hairstyle", "PNG (*.png)");
+	
 	get_presenter()->export_hairstyle(file_name);
 }
+
+void MainWindow::on_actionNew_Project_triggered()
+{
+	//const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
+	
+	//get_presenter()->load_project_file(file_name);
+	qDebug() << "new";
+}
+
+void MainWindow::on_actionOpen_Project_triggered()
+{
+	const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
+	
+	get_presenter()->load_project_file(file_name);
+	qDebug() << "open";
+}
+
+void MainWindow::on_actionSave_Project_triggered()
+{
+	//const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
+	
+	//get_presenter()->load_project_file(file_name);
+	qDebug() << "save";
+}
+
+void MainWindow::on_actionSave_Project_as_triggered()
+{
+	//const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
+		qDebug() << "save as";
+	//get_presenter()->load_project_file(file_name);
+}
+
 
 /**
  * \brief Opens a file dialog and tells the presenter to load the selected file (picture) as the current hairstyle
@@ -48,14 +87,38 @@ void MainWindow::on_actionLoad_Hairstyle_triggered()
 }
 
 /**
- * \brief Displays an info mesagebox
+ * \brief Displays an info messagebox
  * \param title The title of the messagebox
  * \param content The text in the body of the messagebox
  */
 void MainWindow::display_messagebox(const char* title, const char* content)
 {
-	QMessageBox::information(this, tr(title),
-	                         content);
+	QMessageBox box;
+	std::stringstream ss;
+	ss << "<p>" << content << "</p>";
+	box.information(this, tr(title),
+	               ss.str().data());
+	box.setFixedSize(500, 400);
+
+}
+
+/**
+ * \brief Displays an error messagebox
+ * \param title The title of the messagebox
+ * \param content The text in the body of the messagebox
+ */
+void MainWindow::display_errorbox(const char* title, const char* content)
+{
+	QMessageBox box;
+	std::stringstream ss;
+	ss << "<p>" << content << "</p>";
+	box.critical(this, tr(title), ss.str().data());
+	box.setFixedSize(1000, 400);
+}
+
+void MainWindow::set_statusbar_text(const std::string& text) const
+{
+	m_ui_->statusBar->showMessage(text.data());
 }
 
 /**
@@ -93,6 +156,9 @@ void MainWindow::connect_signals_and_slots()
 	connect(m_hotkey_toggle_uv_, SIGNAL(activated()), m_ui_->cb_show_uv, SLOT(toggle()));
 #pragma warning(suppress: 26444)
 	connect(m_ui_->cb_show_uv,SIGNAL(toggled(bool)), this, SLOT(uv_visibility_changed_listener(bool)));
+
+#pragma warning(suppress: 26444)
+	connect(m_ui_->cmb_growthmesh_index,SIGNAL(currentIndexChanged(int)), this, SLOT(growthmesh_index_changed_listener(int)));
 
 	/*BRUSH SETTINGS*/
 	// Brush intensity
@@ -190,6 +256,16 @@ void MainWindow::uv_visibility_changed_listener(const bool enabled) const
 }
 
 /**
+ * \brief Listener that gets called when the selected growthmesh is changed
+ * \param index The growthmesh index
+ */
+void MainWindow::growthmesh_index_changed_listener(const int index) const
+{
+	m_ui_->widget_gl->m_scene.m_growth_mesh_index = index;
+	m_ui_->widget_gl->update();
+}
+
+/**
  * \brief Listener that gets called when the hair lighting is turned on or off
  * \param enabled The state of the hair lighting
  */
@@ -224,16 +300,16 @@ void MainWindow::light_color_clicked_listener()
  * \brief Listener that gets called when the user selects a color after opening the color dialog via the light color button
  * \param color The selected color
  */
-void MainWindow::light_color_selected_listener(const QColor& color) const
+void MainWindow::light_color_selected_listener(const QColor& color)
 {
 	// Disconnect the listener of the select color button
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
-
+	m_light_color = QColor(color);
 	// Set the new color of the button
 	const QString s("background-color: " + color.name() + ";");
 	m_ui_->b_light_color->setStyleSheet(s);
-	m_ui_->widget_gl->m_scene.m_light.m_color = vec3(color.red() / 255.0f, color.green() / 255.0f,
-	                                                 color.blue() / 255.0f);
+	m_ui_->widget_gl->m_scene.m_light.m_color = glm::vec3(color.red() / 255.0f, color.green() / 255.0f,
+	                                                      color.blue() / 255.0f);
 	m_ui_->widget_gl->update();
 }
 
@@ -284,15 +360,15 @@ void MainWindow::hair_root_color_clicked_listener()
  * \brief Listener that gets called when the user selects a color after opening the color dialog via the hair color button
  * \param color The selected color
  */
-void MainWindow::hair_color_selected_listener(const QColor& color) const
+void MainWindow::hair_color_selected_listener(const QColor& color)
 {
 	// Disconnect the listener of the select color button
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
-
+	m_hair_color = QColor(color);
 	const QString s("background-color: " + color.name() + ";");
 	m_ui_->b_hair_color->setStyleSheet(s);
-	m_ui_->widget_gl->m_scene.m_hair.m_hair_color = vec3(color.red() / 255.0f, color.green() / 255.0f,
-	                                                     color.blue() / 255.0f);
+	m_ui_->widget_gl->m_scene.m_hair.m_hair_color = glm::vec3(color.red() / 255.0f, color.green() / 255.0f,
+	                                                          color.blue() / 255.0f);
 	m_ui_->widget_gl->update();
 }
 
@@ -300,15 +376,15 @@ void MainWindow::hair_color_selected_listener(const QColor& color) const
  * \brief Listener that gets called when the user selects a color after opening the color dialog via the root color button
  * \param color The selected color
  */
-void MainWindow::hair_root_color_selected_listener(const QColor& color) const
+void MainWindow::hair_root_color_selected_listener(const QColor& color)
 {
 	// Disconnect the listener of the select color button
 	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
-
+	m_hair_root_color = QColor(color);
 	const QString s("background-color: " + color.name() + ";");
 	m_ui_->b_hair_root_color->setStyleSheet(s);
-	m_ui_->widget_gl->m_scene.m_hair.m_root_color = vec3(color.red() / 255.0f, color.green() / 255.0f,
-	                                                     color.blue() / 255.0f);
+	m_ui_->widget_gl->m_scene.m_hair.m_root_color = glm::vec3(color.red() / 255.0f, color.green() / 255.0f,
+	                                                          color.blue() / 255.0f);
 	m_ui_->widget_gl->update();
 }
 
@@ -337,11 +413,12 @@ void MainWindow::brush_size_changed_listener(const double size) const
  * \param mode The id of the radiobutton which determines the brush mode
  * \param checked True if the button is checked
  */
-void MainWindow::brush_mode_changed_listener(int mode, const bool checked) const
+void MainWindow::brush_mode_changed_listener(int mode, const bool checked)
 {
 	if (checked)
 	{
-		m_ui_->widget_gl->m_scene.m_brush.set_paintmode(static_cast<Paintbrush::paintmode>(mode));
+		m_paintmode = static_cast<Paintbrush::paintmode>(mode);
+		m_ui_->widget_gl->m_scene.m_brush.set_paintmode(m_paintmode);
 		m_ui_->widget_gl->update();
 	}
 }
@@ -382,12 +459,12 @@ void MainWindow::set_hair_segment_count(const int segments) const
 	m_ui_->sb_hair_num_segments->setValue(segments);
 }
 
-void MainWindow::set_hair_color(const QColor& color) const
+void MainWindow::set_hair_color(const QColor& color)
 {
 	hair_color_selected_listener(color);
 }
 
-void MainWindow::set_hair_root_color(const QColor& color) const
+void MainWindow::set_hair_root_color(const QColor& color)
 {
 	hair_root_color_selected_listener(color);
 }
@@ -430,7 +507,7 @@ void MainWindow::set_light_mesh(const bool active) const
 	m_ui_->cb_light_mesh->setChecked(active);
 }
 
-void MainWindow::set_light_color(const QColor& color) const
+void MainWindow::set_light_color(const QColor& color)
 {
 	light_color_selected_listener(color);
 }
@@ -443,4 +520,20 @@ void MainWindow::set_growthmesh_show(const bool active) const
 void MainWindow::set_referencemodel_show(const bool active) const
 {
 	m_ui_->cb_referencemodel_show->setChecked(active);
+}
+
+void MainWindow::set_growthmesh_index(const int index) const
+{
+	m_ui_->cmb_growthmesh_index->setCurrentIndex(index);
+}
+
+void MainWindow::set_growthmesh_index_content(std::vector<std::string> content) const
+{
+	m_ui_->cmb_growthmesh_index->clear();
+
+	for(auto& item : content)
+	{
+		m_ui_->cmb_growthmesh_index->addItem(QString(item.data()));
+	}
+
 }

@@ -9,10 +9,8 @@
 #include "scene_elements/hairSettings.h"
 
 #include <QOpenGLTexture>
-#include <linalg.hpp>
+#include <glm.hpp>
 #include <qglobal.h>
-
-
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -21,10 +19,11 @@ class Scene
 public:
 	void load();
 	void resize_hair_feedback_buffer(int size);
+
 	// mvp matrices used by hair and meshes
-	mat4 m_defaultmodel_matrix;
-	mat4 m_defaultview_matrix;
-	mat4 m_defaultprojection_matrix;
+	glm::mat4 m_defaultmodel_matrix{1};
+	glm::mat4 m_defaultview_matrix{1};
+	glm::mat4 m_defaultprojection_matrix{1};
 
 	// Shader programs
 	std::unique_ptr<QOpenGLShaderProgram> m_default_shader;
@@ -49,14 +48,15 @@ public:
 	Light m_light;
 	HairSettings m_hair;
 	Paintbrush m_brush;
-	GlModel m_growth_mesh;
-	GlModel m_reference_model;
+	GlModel m_fbx_glmodel;
+
+	// index of the growthmesh in the fbx model
+	int m_growth_mesh_index;
 
 private:
 	void load_shaders();
 	void load_textures();
 	void create_quad_vao();
-
 };
 
 #endif

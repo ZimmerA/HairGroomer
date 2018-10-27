@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1215</width>
+    <width>1218</width>
     <height>633</height>
    </rect>
   </property>
@@ -35,7 +35,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1215</width>
+     <width>1218</width>
      <height>21</height>
     </rect>
    </property>
@@ -47,9 +47,20 @@
     <addaction name="actionLoad_Hairstyle"/>
     <addaction name="actionExport_Hairstyle"/>
    </widget>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionNew_Project"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Project"/>
+    <addaction name="actionSave_Project_as"/>
+    <addaction name="actionOpen_Fbx"/>
+   </widget>
+   <addaction name="menuFile"/>
    <addaction name="menuHair"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockWidget_4">
    <property name="minimumSize">
     <size>
@@ -87,8 +98,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>347</width>
-          <height>550</height>
+          <width>337</width>
+          <height>552</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -113,7 +124,7 @@
             <item row="0" column="0">
              <widget class="QCheckBox" name="cb_show_uv">
               <property name="text">
-               <string>Show Texture coordinate overlay</string>
+               <string>Show UV overlay</string>
               </property>
               <property name="shortcut">
                <string>Ctrl+S</string>
@@ -122,6 +133,16 @@
                <bool>false</bool>
               </property>
              </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="lb_growthmesh_index">
+              <property name="text">
+               <string>Growthmesh</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="cmb_growthmesh_index"/>
             </item>
            </layout>
           </widget>
@@ -453,6 +474,17 @@
     </layout>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="statusTip">
+    <string/>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+  </widget>
   <action name="actionExport">
    <property name="enabled">
     <bool>true</bool>
@@ -469,6 +501,31 @@
   <action name="actionExport_Hairstyle">
    <property name="text">
     <string>Export Hairstyle</string>
+   </property>
+  </action>
+  <action name="actionOpen_Fbx">
+   <property name="text">
+    <string>Open Fbx Model</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionSave_Project">
+   <property name="text">
+    <string>Save Project</string>
+   </property>
+  </action>
+  <action name="actionSave_Project_as">
+   <property name="text">
+    <string>Save Project as</string>
+   </property>
+  </action>
+  <action name="actionNew_Project">
+   <property name="text">
+    <string>New Project</string>
    </property>
   </action>
  </widget>

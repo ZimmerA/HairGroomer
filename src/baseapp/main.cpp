@@ -17,8 +17,10 @@ int main(int argc, char* argv[])
 	fmt.setDepthBufferSize(24);
 	fmt.setVersion(3, 3);
 	fmt.setProfile(QSurfaceFormat::CoreProfile);
+
 	// set swap interval to 0 to increase window resize performance
 	fmt.setSwapInterval(0);
+
 	QSurfaceFormat::setDefaultFormat(fmt);
 
 	// Setup MVP Pattern
@@ -40,8 +42,9 @@ int main(int argc, char* argv[])
 	}
 
 	view.show();
+	UiSettings defaultsettings;
 	// Load the default values of the ui control elements
-	presenter.load_default_values();
+	presenter.load_ui_values(defaultsettings);
 	const auto result = QApplication::exec();
 	return result;
 }

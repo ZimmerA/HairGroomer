@@ -5,21 +5,29 @@
 
 #include <vector>
 #include <map>
+#include <memory>
 
 #include <QOpenGLShaderProgram>
-#include <fbxsdk/scene/constraint/fbxconstraintutils.h>
 #include <fbxsdk.h>
 
-using namespace std;
 
 /**
  * \brief Holds the info of a bone
  */
 struct Bone
 {
-	mat4 m_global_bindpose;
-	string m_name;
+	glm::mat4 m_global_bindpose{1};
+	std::string m_name;
 	int m_parent = -1;
+};
+
+/**
+ * \brief Helper struct used when loading meshes
+ */
+struct ControlpointInfo
+{
+	glm::vec3 m_position{};
+	std::vector<VertexBoneInfo> m_bone_info;
 };
 
 /**
@@ -29,31 +37,69 @@ class ModelData
 {
 public:
 	explicit ModelData(const char* path);
-
-	int get_num_faces(uint index);
-	vector<int> get_indices(uint index);
-	vector<vec2> get_face_uvs(uint index);
-	int get_num_bones() const {return static_cast<int>(m_bone_map_.size());}
+	size_t get_num_bones() const noexcept { return m_bone_map_.size(); }
 
 	// MeshData for every sub mesh of the model
-	vector<MeshData> m_meshes;
-		// Contains the Bones
-	vector<Bone> m_bone_list_;
+	std::vector<MeshData> m_meshes;
+	std::vector<std::string> m_name_list;
+	// Contains the Bones
+	std::vector<Bone> m_bone_list;
+
 private:
-	void load_model(const string& path);
-	void process_node(FbxNode* node, FbxManager* manager);
-	vec3 read_normal(FbxMesh * mesh, int control_point_index, int vertex_counter);
-	MeshData process_mesh(FbxMesh* mesh, FbxNode* node, FbxManager* manager);
-	//void complete_skeleton(const aiNode* node, const aiScene* scene, int parent_index);
-	// Processes Assimp node in the model tree
-	//void process_node(aiNode* node, const aiScene* scene);
-	// Create a meshData object from the Assimp data
-	//MeshData process_mesh(aiMesh* assimp_mesh, const aiScene* scene, const aiNode* node);
+	void load_model(const std::string& path);
+	void process_skeleton_nodes(FbxNode* node);
+	void process_skeleton_hierachy_rec(FbxNode* node, int parent_index);
+	void process_mesh_nodes(FbxNode* node, FbxManager* manager);
+	
+	MeshData process_mesh(FbxMesh* mesh, FbxManager* manager, std::string mesh_name);
+	static glm::vec3 read_normal(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec2 read_uv(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec3 read_binormal(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec3 read_tangent(FbxMesh* mesh, int control_point_index, int vertex_counter);
 
-	string m_directory_;
+	std::string m_directory_;
 	// Maps bone names to the index in the bone_list
-	map<string, uint> m_bone_map_;
-
+	std::map<std::string, uint> m_bone_map_;
 };
+
+/**
+ * \brief std::unique_ptr wrapper for Fbx pointers to wrap the Create/Destroy mechanism of the fbx sdk
+ * \tparam T The pointer type
+ */
+template <typename T>
+class FbxPointer : public std::unique_ptr<T, void (*)(T*)>
+{
+public:
+	explicit FbxPointer(T* ptr = nullptr);
+
+	FbxPointer(FbxPointer&& other) noexcept;
+
+	FbxPointer& operator=(FbxPointer&& other) noexcept;
+
+private:
+	static void destroy(T* ptr);
+};
+
+template <typename T>
+FbxPointer<T>::FbxPointer(T* ptr): std::unique_ptr<T, void (*)(T*)>(ptr, &FbxPointer::destroy)
+{
+} 
+template <typename T>
+FbxPointer<T>::FbxPointer(FbxPointer&& other) noexcept: std::unique_ptr(std::move(other))
+{
+}
+
+template <typename T>
+FbxPointer<T>& FbxPointer<T>::operator=(FbxPointer&& other) noexcept
+{
+	std::unique_ptr<T>::operator=(std::move(other));
+	return *this;
+}
+
+template <typename T>
+void FbxPointer<T>::destroy(T* ptr)
+{
+	if (ptr) ptr->Destroy();
+}
 
 #endif // MODEL_H

@@ -6,28 +6,28 @@
 #include <qopenglvertexarrayobject.h>
 #include <qopenglbuffer.h>
 
-
 /*
 * Used by the GLWidget to draw meshes
 */
 class GlMesh
 {
 public:
-	GlMesh();
+	explicit GlMesh(MeshData* mesh_data);
+
 	void draw();
 	void draw_points();
-	// Creates buffers and fills them with the mesh data
-	void setup_buffers(MeshData* mesh_data);
-	// Calls destroy on all buffers of the mesh
-	void destroy_buffers();
 	
-	unsigned int m_indicie_amount;
+	unsigned int m_indicie_count;
 	unsigned int m_vertex_count;
+
+	// don't allow copy or assignment
+	GlMesh(const GlMesh&) = delete;
+	GlMesh& operator =(const GlMesh&) = delete;
+
 private:
 	QOpenGLVertexArrayObject m_vao_;
 	QOpenGLBuffer m_vbo_;
 	QOpenGLBuffer m_ibo_;
-
 };
 
 #endif // GLMESH_H
