@@ -224,7 +224,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	}
 	hair_file << "\n    </array>\n";
 	hair_file << "    <value name=\"numBones\" type=\"U32\">" << num_bones << "</value>\n";
-	hair_file << "    <array name=\"boneIndices\" size=\"" << bone_indices.size() << "\" type=\"Vec4\">\n";
+	hair_file << "    <array name=\"boneIndices\" size=\"" << num_hair << "\" type=\"Vec4\">\n";
 	hair_file << "        ";
 	for (int i = 0; i < bone_indices.size(); i++)
 	{
@@ -249,7 +249,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	}
 	hair_file << "\n    </array>\n";
 
-	hair_file << "    <array name=\"boneWeights\" size=\"" << bone_weights.size() << "\" type=\"Vec4\">\n";
+	hair_file << "    <array name=\"boneWeights\" size=\"" << num_hair << "\" type=\"Vec4\">\n";
 	hair_file << "        ";
 	for (int i = 0; i < bone_weights.size(); i++)
 	{
