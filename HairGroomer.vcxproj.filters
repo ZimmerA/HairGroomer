@@ -60,78 +60,96 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mainwindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\meshData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\modelData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mvpmodel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\mvppresenter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\glMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\glModel.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\rendering\renderer.cpp">
+      <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\glwidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\orbitcamera.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\Paintbrush.cpp">
-      <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\renderer.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\scene.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\GLWidget2.cpp">
+    <ClCompile Include="src\baseapp\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\meshData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\modelData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\mvpmodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\mvppresenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\scene_elements\glMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\scene_elements\glModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\scene_elements\orbitcamera.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\scene_elements\paintbrush.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\scene_elements\glDrawbuffer.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\settings.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\meshData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\modelData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mvpmodel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\mvppresenter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\glMesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\glModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\orbitcamera.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\Paintbrush.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\rendering\renderer.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\scene.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\baseapp\meshData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\baseapp\modelData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\baseapp\mvpmodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\baseapp\mvppresenter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\glMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\glModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\orbitcamera.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\paintbrush.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\light.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\glDrawbuffer.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\scene_elements\hairSettings.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\baseapp\hairData.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\baseapp\settings.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -170,20 +188,18 @@
     <None Include="src\rendering\shaders\viewport\mesh.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="C:\Users\zadri\Desktop\Schema.json" />
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="src\mainwindow.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
     <QtMoc Include="src\rendering\glwidget.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="src\rendering\GLWidget2.h">
       <Filter>Generated Files</Filter>
     </QtMoc>
+    <QtMoc Include="src\baseapp\mainwindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="src\mainwindow.ui">
+    <QtUic Include="src\baseapp\mainwindow.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>

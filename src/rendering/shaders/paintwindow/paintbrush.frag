@@ -11,5 +11,5 @@ uniform float intensity;
 
 void main()
 {
-    fragColor = texture2D(screenTexture,UV) * vec4(vec3(intensity),1.0);
+    fragColor = texture(screenTexture,UV) * vec4(vec3(intensity),1.0);
 }

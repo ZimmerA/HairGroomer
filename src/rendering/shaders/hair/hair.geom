@@ -4,7 +4,7 @@
 #version 330 core
 
 layout (points) in;
-layout (line_strip, max_vertices = 70) out;
+layout (line_strip, max_vertices = 50) out;
 
 in VS_OUT {
     vec2 texCoord;
@@ -16,8 +16,9 @@ in VS_OUT {
 } gs_in[];
 
 out vec4 vertColor;
-out vec3 dOut;
+out vec3 dOut; // direction
 out vec3 worldPosOut;
+
 uniform mat4 model;
 uniform mat4 vp;
 
@@ -82,6 +83,7 @@ float commaSmooth(float value)
 // Calculates a rotation matrix that rotates hair arround the x and y axis (tangent/bitangent)
 mat3 calculateHairBendMatrix(float greenChannel, float blueChanel)
 {
+	
     greenChannel = commaSmooth(greenChannel);
     blueChanel = commaSmooth(blueChanel);
     
@@ -97,16 +99,11 @@ mat3 calculateHairBendMatrix(float greenChannel, float blueChanel)
 }
 
 void main() {
-
+	
     vec2 uv = gs_in[0].texCoord;
     float hair = texture(hairMap,uv).r;
-
-	if(hair < 0.01)
-    	return;
-    mat3 mHairRot = calculateHairBendMatrix(texture(hairMap,uv).g,texture(hairMap,uv).b);
-
+    
     // Generate Hair
-
 	vec3 worldPos = gs_in[0].worldPos;
 	vec3 worldNorm = gs_in[0].normal;
 
@@ -126,20 +123,40 @@ void main() {
 	dOut = tbn * d;
 	worldPosOut = worldPos;
 	gl_Position = vp * vec4(worldPos,1.0);
-
 	EmitVertex();
 
-	// Hair segments
-	for(int i = 0; i < numSegments ; i++)
+	// No actual hair, we still need to generate a hair with the length 0 for hairworks to work properly
+	if(hair < 0.01)
 	{
-		vertColor = vec4(hairColor,1);
-		d = mHairRot*  d;
-		dOut = tbn * d;
-		worldPos = worldPos + maxHairLength / numSegments * tbn * d;
-		worldPosOut = worldPos;
-		gl_Position = vp * vec4(worldPos,1.0);
-		EmitVertex(); 
+		// Hair segments
+		for(int i = 0; i < numSegments ; i++)
+		{
+			vertColor = vec4(hairColor,1);
+			d = d;
+			dOut = tbn * d;
+			worldPos = worldPos;
+			worldPosOut = worldPos;
+			gl_Position = vp * vec4(worldPos,1.0);
+			EmitVertex(); 
+		}
+
+	}else // actual hair 
+	{
+		mat3 mHairRot = calculateHairBendMatrix(texture(hairMap,uv).g,texture(hairMap,uv).b);
+		
+		// Hair segments
+		for(int i = 0; i < numSegments ; i++)
+		{
+			vertColor = vec4(hairColor,1);
+			d = mHairRot*  d;
+			dOut = tbn * d;
+			worldPos = worldPos + maxHairLength / numSegments * tbn * d;
+			worldPosOut = worldPos;
+			gl_Position = vp * vec4(worldPos,1.0);
+			EmitVertex(); 
+		}
 	}
+
 	EndPrimitive();
     
 } 
