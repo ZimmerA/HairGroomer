@@ -26,7 +26,9 @@ void GLWidget::initializeGL()
 	m_renderer.set_measurements(width(), height());
 	m_renderer.set_current_scene(&m_scene);
 	m_scene.load();
-	m_scene.m_defaultprojection_matrix = glm::perspective(glm::radians(45.0f), (width() / 2.0f) / static_cast<float>(height()), 0.1f, 1000.0f);
+	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f),
+	                                                      (width() / 2.0f) / static_cast<float>(height()), 0.1f,
+	                                                      1000.0f);
 }
 
 void GLWidget::load_glmodel_data()
@@ -44,7 +46,8 @@ void GLWidget::load_glmodel_data()
 void GLWidget::resizeGL(const int w, const int h)
 {
 	m_renderer.set_measurements(w, h);
-	m_scene.m_defaultprojection_matrix = glm::perspective(glm::radians(45.0f), w / static_cast<float>(h) / 2.0f, 0.1f, 1000.0f);
+	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f), w / static_cast<float>(h) / 2.0f, 0.1f,
+	                                                      1000.0f);
 }
 
 /**
@@ -79,7 +82,7 @@ void GLWidget::process_input()
  */
 void GLWidget::mousePressEvent(QMouseEvent* event)
 {
-	if(!event)
+	if (!event)
 		return;
 
 	// Map mouse position to normalized device coordinates
@@ -118,7 +121,7 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
  */
 void GLWidget::mouseMoveEvent(QMouseEvent* event)
 {
-	if(!event)
+	if (!event)
 		return;
 	// Map mouse position to normalized device coordinates
 	const auto mouse_pos_x = static_cast<float>(event->pos().x()) / width() * 2.0f - 1.0f;
@@ -162,7 +165,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
  */
 void GLWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-	if(!event)
+	if (!event)
 		return;
 
 	switch (event->button())
@@ -184,8 +187,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event)
  */
 void GLWidget::wheelEvent(QWheelEvent* event)
 {
-
-	if(!event)
+	if (!event)
 		return;
 
 	const auto num_degrees = event->angleDelta() / 8;
@@ -199,7 +201,7 @@ void GLWidget::wheelEvent(QWheelEvent* event)
  */
 void GLWidget::keyPressEvent(QKeyEvent* event)
 {
-	if(!event)
+	if (!event)
 		return;
 
 	m_keys_[event->key()] = true;
@@ -212,7 +214,7 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
  */
 void GLWidget::keyReleaseEvent(QKeyEvent* event)
 {
-	if(!event)
+	if (!event)
 		return;
 
 	m_keys_[event->key()] = false;

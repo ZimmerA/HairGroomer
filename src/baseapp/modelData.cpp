@@ -1,10 +1,9 @@
 #include "modelData.h"
 #include <QDebug>
-#include <cassert>
 #include <unordered_map>
 #include <sstream>
 
-ModelData::ModelData(const char* path)
+ModelData::ModelData(const QString& path)
 {
 	load_model(path);
 }
@@ -13,7 +12,7 @@ ModelData::ModelData(const char* path)
  * \brief Loads the model at the given path using the Fbx Sdk
  * \param path The path to the model on the harddrive
  */
-void ModelData::load_model(const std::string& path)
+void ModelData::load_model(const QString& path)
 {
 	FbxPointer<FbxManager> sdk_manager(FbxManager::Create());
 	
@@ -22,13 +21,15 @@ void ModelData::load_model(const std::string& path)
 
 	FbxPointer<FbxImporter> importer(FbxImporter::Create(sdk_manager.get(), ""));
 
-	const bool import_status = importer->Initialize(path.data(), -1, sdk_manager->GetIOSettings());
+	const bool import_status = importer->Initialize(path.toLocal8Bit().constData(), -1, sdk_manager->GetIOSettings());
 	if (!import_status)
 	{
 		std::stringstream error_stream;
 		error_stream << "Mesh couldn't be imported: " << importer->GetStatus().GetErrorString();
 		throw std::runtime_error(error_stream.str());
 	}
+
+	m_name = path.mid(path.lastIndexOf('/')+1);
 	
 	FbxPointer<FbxScene> scene(FbxScene::Create(sdk_manager.get(), "myScene"));
 

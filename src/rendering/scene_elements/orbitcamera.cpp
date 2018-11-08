@@ -2,9 +2,9 @@
 #include <gtc/matrix_transform.hpp>
 
 const float default_azimuth = 0.f;
-const float default_elevation = 90.f;
+const float default_elevation = 50.f;
 const glm::vec3 default_lookat{0,0,0};
-const float default_distance = 150.f;
+const float default_distance = 550.f;
 const float default_sensitivity = 20.0f;
 const float default_scrollspeed = 8;
 

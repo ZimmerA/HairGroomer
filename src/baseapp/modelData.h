@@ -36,7 +36,7 @@ struct ControlpointInfo
 class ModelData
 {
 public:
-	explicit ModelData(const char* path);
+	explicit ModelData(const QString& path);
 	size_t get_num_bones() const noexcept { return m_bone_map_.size(); }
 
 	// MeshData for every sub mesh of the model
@@ -44,9 +44,10 @@ public:
 	std::vector<std::string> m_name_list;
 	// Contains the Bones
 	std::vector<Bone> m_bone_list;
+	QString m_name;
 
 private:
-	void load_model(const std::string& path);
+	void load_model(const QString& path);
 	void process_skeleton_nodes(FbxNode* node);
 	void process_skeleton_hierachy_rec(FbxNode* node, int parent_index);
 	void process_mesh_nodes(FbxNode* node, FbxManager* manager);
@@ -57,7 +58,7 @@ private:
 	static glm::vec3 read_binormal(FbxMesh* mesh, int control_point_index, int vertex_counter);
 	static glm::vec3 read_tangent(FbxMesh* mesh, int control_point_index, int vertex_counter);
 
-	std::string m_directory_;
+
 	// Maps bone names to the index in the bone_list
 	std::map<std::string, uint> m_bone_map_;
 };

@@ -2,36 +2,39 @@
 
 #include <vector>
 #include <fstream>
+#include <iomanip>      // std::setw
 
 #include <qimage.h>
 #include <QFileDialog>
 #include <qtextstream.h>
 
-
-Project MvpModel::load_project_file_from_disk(const QString& filename) const
+ProjectSettings MvpModel::load_project_file_from_disk(const QString& filename) const
 {
 
 	std::ifstream file(filename.toLocal8Bit().constData());
 	json json_object;
 	file >> json_object;
 
-	Project project;
+	ProjectSettings project;
 	project = json_object;
 
 	return project;
 }
 
-void MvpModel::save_project_file_to_disk(const QString& filename, const Project& proj) const
+void MvpModel::save_project_file_to_disk(const QString& filename, const ProjectSettings& proj) const
 {
-	
+	std::ofstream o(filename.toLocal8Bit().constData());
+	const json j = proj;
+	o << std::setw(4) << j << std::endl; 
 }
 
 /**
  * \brief Exports the apx Hairfile to the disk
  * \param filename The name of the apx file
  * \param hairdata The data of the hair
+ * \param up_axis_index 0 = y, 1 = z
  */
-void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hairdata) const
+void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hairdata, const int up_axis_index) const
 {
 	QFile file(filename);
 
@@ -308,7 +311,17 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 		{
 			for (uint y = 0; y < 4; y ++)
 			{
-				hair_file << m_fbx_model_->m_bone_list[i].m_global_bindpose[x][y] << " ";
+				glm::mat4 final_bone = m_fbx_model_->m_bone_list[i].m_global_bindpose;
+
+				// Up axis is Z, rotate the skeleton upwards
+				if(up_axis_index == 1)
+				{
+					glm::mat4 rotation_matrix(1);
+					rotation_matrix = rotate(rotation_matrix, glm::radians(-90.f), glm::vec3(1.0,0,0));
+					final_bone =rotation_matrix* final_bone;
+				}
+
+				hair_file << final_bone[x][y] << " ";
 			}
 		}
 		if (i < num_bones - 1)
@@ -539,5 +552,10 @@ QImage MvpModel::load_hairstyle_from_disk(const QString& filename) const
 
 void MvpModel::load_fbx_model_from_disk(const QString& filename)
 {
-	m_fbx_model_ = std::make_unique<ModelData>(filename.toLocal8Bit().constData());
+	m_fbx_model_ = std::make_unique<ModelData>(filename);
+}
+
+void MvpModel::reset_fbx_model()
+{
+	m_fbx_model_.reset();
 }

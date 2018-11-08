@@ -16,6 +16,13 @@ void Renderer::init(const int width, const int height)
 
 void Renderer::render_scene()
 {
+	if(m_current_scene_->m_should_reset)
+	{
+		m_current_scene_->m_drawbuffer.reset();
+		m_current_scene_->m_fbx_glmodel.cleanup_model();
+		m_current_scene_->m_should_reset = false;
+	}
+
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 	// Render left half of the context (viewport)
@@ -25,9 +32,9 @@ void Renderer::render_scene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 view_matrix = m_current_scene_->m_camera.get_view_matrix();
-	glm::mat4 mvp = m_current_scene_->m_defaultprojection_matrix * view_matrix * m_current_scene_->
-		m_defaultmodel_matrix;
-	glm::mat4 vp = m_current_scene_->m_defaultprojection_matrix * view_matrix;
+	glm::mat4 mvp = m_current_scene_->m_projection_matrix * view_matrix * m_current_scene_->
+		m_model_matrix;
+	glm::mat4 vp = m_current_scene_->m_projection_matrix * view_matrix;
 
 	m_current_scene_->m_default_shader->bind();
 	m_current_scene_->m_default_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x,
@@ -38,7 +45,7 @@ void Renderer::render_scene()
 	                                                    m_current_scene_->m_light.m_color.z);
 	m_current_scene_->m_default_shader->setUniformValue("lighting", m_should_light_meshes);
 	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("model"), 1,GL_FALSE,
-	                   value_ptr(m_current_scene_->m_defaultmodel_matrix));
+	                   value_ptr(m_current_scene_->m_model_matrix));
 	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("mvp"), 1,GL_FALSE,
 	                   value_ptr(mvp));
 
@@ -77,7 +84,7 @@ void Renderer::render_scene()
 	                                                 m_current_scene_->m_hair.m_root_color.y,
 	                                                 m_current_scene_->m_hair.m_root_color.z);
 	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("model"), 1, GL_FALSE,
-	                   value_ptr(m_current_scene_->m_defaultmodel_matrix));
+	                   value_ptr(m_current_scene_->m_model_matrix));
 	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("view"), 1, GL_FALSE,
 	                   value_ptr(view_matrix));
 	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("mvp"), 1, GL_FALSE,
@@ -150,19 +157,34 @@ void Renderer::render_scene()
 	}
 
 	m_current_scene_->m_hair_shader->release();
+	
+	m_current_scene_->m_paintbrush_shader->bind();
+	m_current_scene_->m_grid_vao.bind();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	m_current_scene_->m_paintbrush_shader->setUniformValue("intensity", 1.0f);
+	glm::mat4 matrix(1);
+	matrix = glm::rotate(matrix, glm::radians(90.0f), glm::vec3(1,0,0));
+	matrix = vp * matrix;
+	m_current_scene_->m_floor_grid_texture->bind();
+	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE,
+	                   value_ptr(matrix));
+	glDrawArrays(GL_TRIANGLES, 0 , 6);
+
+	m_current_scene_->m_paintbrush_shader->release();
 
 	// Render right half of the context (drawing window)
 	glViewport(m_width_ / 2, 0, m_width_ / 2, m_height_);
 	glScissor(m_width_ / 2, 0, m_width_, m_height_);
 	glClear(GL_COLOR_BUFFER_BIT);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-	// Disable depth testing cause of alpha blending (were only drawing textures)
+	// Disable depth testing cause of alpha blending (were only drawing textures from here on)
 	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
 
 	// Render drawbuffer texture content to screen
 	m_current_scene_->m_drawbuffer_shader->bind();
+	glBindTexture(GL_TEXTURE_2D, m_current_scene_->m_drawbuffer.get_texture_handle());
 	m_current_scene_->m_quad_vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	m_current_scene_->m_drawbuffer_shader->release();
@@ -187,7 +209,6 @@ void Renderer::render_scene()
 	            m_current_scene_->m_brush.get_intensity());
 	m_current_scene_->m_quad_vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
 	// Render the paintbrush to the drawbuffer if left mouse is pressed
 	if (m_is_drawing)
 	{

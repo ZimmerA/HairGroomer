@@ -18,12 +18,14 @@ class Scene
 {
 public:
 	void load();
+	void reset();
 	void resize_hair_feedback_buffer(int size);
+	void set_up_axis(int i);
 
 	// mvp matrices used by hair and meshes
-	glm::mat4 m_defaultmodel_matrix{1};
-	glm::mat4 m_defaultview_matrix{1};
-	glm::mat4 m_defaultprojection_matrix{1};
+	glm::mat4 m_model_matrix{1};
+	glm::mat4 m_view_matrix{1};
+	glm::mat4 m_projection_matrix{1};
 
 	// Shader programs
 	std::unique_ptr<QOpenGLShaderProgram> m_default_shader;
@@ -39,9 +41,14 @@ public:
 	// Quad for rendering textures
 	QOpenGLVertexArrayObject m_quad_vao;
 	QOpenGLBuffer m_quad_vbo;
-	
+
+	// Quad for rendering the floor grid
+	QOpenGLVertexArrayObject m_grid_vao;
+	QOpenGLBuffer m_grid_vbo;
+
 	// Textures
 	std::unique_ptr<QOpenGLTexture> m_paint_brush_texture;
+	std::unique_ptr<QOpenGLTexture> m_floor_grid_texture;
 
 	/* Scene Elements */
 	Orbitcamera m_camera;
@@ -53,10 +60,13 @@ public:
 	// index of the growthmesh in the fbx model
 	int m_growth_mesh_index;
 
+	bool m_should_reset{false};
+
 private:
 	void load_shaders();
 	void load_textures();
 	void create_quad_vao();
+	void create_floor_grid();
 };
 
 #endif

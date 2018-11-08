@@ -9,10 +9,16 @@ void Scene::load()
 	load_shaders();
 	load_textures();
 	create_quad_vao();
+	create_floor_grid();
 	m_growth_mesh_index = 0;
 	m_drawbuffer.create();
 	m_hair_output_vbo.create();
 	m_hair_output_vbo.setUsagePattern(QOpenGLBuffer::StaticRead);
+}
+
+void Scene::reset()
+{
+	m_should_reset = true;
 }
 
 void Scene::load_shaders()
@@ -93,6 +99,10 @@ void Scene::load_textures()
 	m_paint_brush_texture = std::make_unique<QOpenGLTexture>(QImage("./res/brush.png").mirrored());
 	m_paint_brush_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 	m_paint_brush_texture->setMagnificationFilter(QOpenGLTexture::Linear);
+	m_floor_grid_texture = std::make_unique<QOpenGLTexture>(QImage("./res/Textures/grid_transparent_black.png").mirrored());
+	m_floor_grid_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+	m_floor_grid_texture->setMagnificationFilter(QOpenGLTexture::Linear);
+	m_floor_grid_texture->setWrapMode(QOpenGLTexture::Repeat);
 }
 
 /**
@@ -127,6 +137,38 @@ void Scene::create_quad_vao()
 	m_quad_vao.release();
 }
 
+void Scene::create_floor_grid()
+{
+	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
+
+	float uv_max =16.f;
+	float grid_size_x = 128;
+	float grid_size_y = 128;
+	const float grid_vertices[] = {
+		// positions   // texCoords
+		-grid_size_x/2.0f, grid_size_y/2.0f, 0.0f, uv_max,
+		-grid_size_x/2.0f, -grid_size_y/2.0f, 0.0f, 0.0f,
+		grid_size_x/2.0f, -grid_size_y/2.0f, uv_max, 0.0f,
+
+		-grid_size_x/2.0f, grid_size_y/2.0f, 0.0f, uv_max,
+		grid_size_x/2.0f, -grid_size_y/2.0f, uv_max, 0.0f,
+		grid_size_x/2.0f, grid_size_y/2.0f, uv_max, uv_max
+	};
+
+	m_grid_vao.create();
+	m_grid_vbo.create();
+	QOpenGLVertexArrayObject::Binder vao_binder(&m_grid_vao);
+
+	m_grid_vbo.bind();
+	m_grid_vbo.allocate(grid_vertices, sizeof(grid_vertices));
+	f->glEnableVertexAttribArray(0);
+	f->glEnableVertexAttribArray(1);
+	f->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), nullptr);
+	f->glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat),
+	                         reinterpret_cast<void *>(2 * sizeof(GLfloat)));
+	m_grid_vao.release();
+}
+
 /**
  * \brief Resizes the vbo used for the transform feedback of the hair
  * \param size the new size in bytes
@@ -135,4 +177,12 @@ void Scene::resize_hair_feedback_buffer(const int size)
 {
 	m_hair_output_vbo.bind();
 	m_hair_output_vbo.allocate(nullptr, size);
+}
+
+void Scene::set_up_axis(const int i)
+{
+	m_model_matrix = glm::mat4(1);
+
+	if(i == 1)
+		m_model_matrix = rotate(m_model_matrix, glm::radians(-90.f), glm::vec3(1.0f,0.0f,0.0f));
 }

@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 	view.show();
 	UiSettings defaultsettings;
 	// Load the default values of the ui control elements
-	presenter.load_ui_values(defaultsettings);
+	view.set_ui_settings(defaultsettings);
 	const auto result = QApplication::exec();
 	return result;
 }

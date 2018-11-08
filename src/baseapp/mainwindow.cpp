@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "rendering/scene_elements/paintbrush.h"
+
 #include <QString>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -21,7 +22,6 @@ MainWindow::~MainWindow()
 	delete m_ui_;
 }
 
-
 void MainWindow::on_actionExport_triggered()
 {
 	m_ui_->widget_gl->m_renderer.m_should_write_out_hair = true;
@@ -41,41 +41,56 @@ void MainWindow::on_actionOpen_Fbx_triggered()
 void MainWindow::on_actionExport_Hairstyle_triggered()
 {
 	const QString file_name = save_file_dialog("Export Hairstyle", "PNG (*.png)");
-	
+
 	get_presenter()->export_hairstyle(file_name);
 }
 
+/**
+ * \brief Resets the current project, first asks if the user wants to save the current project
+ */
 void MainWindow::on_actionNew_Project_triggered()
 {
-	//const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
-	
-	//get_presenter()->load_project_file(file_name);
-	qDebug() << "new";
+	if (display_questionbox("Save?", "Do you want to save your current project?"))
+	{
+		on_actionSave_Project_triggered();
+	}
+
+	get_presenter()->new_project();
 }
 
+/**
+ * \brief Opens a file dialog and tells the presenter to open the project at the selected path
+ */
 void MainWindow::on_actionOpen_Project_triggered()
 {
 	const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
-	
-	get_presenter()->load_project_file(file_name);
-	qDebug() << "open";
+	if (!file_name.isEmpty())
+	{
+		if (display_questionbox("Save?", "Do you want to save your current project?"))
+		{
+			on_actionSave_Project_triggered();
+		}
+		get_presenter()->load_project_file(file_name);
+	}
 }
 
+/**
+ * \brief Tries to save the current project to the last opened project, otherwise opens a file dialog to select a location
+ */
 void MainWindow::on_actionSave_Project_triggered()
 {
-	//const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
-	
-	//get_presenter()->load_project_file(file_name);
-	qDebug() << "save";
+	if (!get_presenter()->save_project_file())
+		on_actionSave_Project_as_triggered();
 }
 
+/**
+ * \brief Opens a file dialog and tells the presenter to save the current project to the selected path
+ */
 void MainWindow::on_actionSave_Project_as_triggered()
 {
-	//const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
-		qDebug() << "save as";
-	//get_presenter()->load_project_file(file_name);
+	const QString file_name = save_file_dialog("Save Project", "JSON (*.JSON)");
+	get_presenter()->save_project_file_as(file_name);
 }
-
 
 /**
  * \brief Opens a file dialog and tells the presenter to load the selected file (picture) as the current hairstyle
@@ -97,9 +112,8 @@ void MainWindow::display_messagebox(const char* title, const char* content)
 	std::stringstream ss;
 	ss << "<p>" << content << "</p>";
 	box.information(this, tr(title),
-	               ss.str().data());
+	                ss.str().data());
 	box.setFixedSize(500, 400);
-
 }
 
 /**
@@ -114,6 +128,19 @@ void MainWindow::display_errorbox(const char* title, const char* content)
 	ss << "<p>" << content << "</p>";
 	box.critical(this, tr(title), ss.str().data());
 	box.setFixedSize(1000, 400);
+}
+
+/**
+ * \brief Displays a questionbox with the given title and message and the buttons yes and no
+ * \param title The title of the messagebox
+ * \param question The question inside the mesagebox
+ * \return True if yes was clicked false otherwise
+ */
+bool MainWindow::display_questionbox(const char* title, const char* question)
+{
+	const QMessageBox::StandardButton reply = QMessageBox::question(this, title, question,
+	                                                                QMessageBox::Yes | QMessageBox::No);
+	return reply == QMessageBox::Yes;
 }
 
 void MainWindow::set_statusbar_text(const std::string& text) const
@@ -158,8 +185,11 @@ void MainWindow::connect_signals_and_slots()
 	connect(m_ui_->cb_show_uv,SIGNAL(toggled(bool)), this, SLOT(uv_visibility_changed_listener(bool)));
 
 #pragma warning(suppress: 26444)
-	connect(m_ui_->cmb_growthmesh_index,SIGNAL(currentIndexChanged(int)), this, SLOT(growthmesh_index_changed_listener(int)));
-
+	connect(m_ui_->cmb_growthmesh_index,SIGNAL(currentIndexChanged(int)), this,
+	        SLOT(growthmesh_index_changed_listener(int)));
+#pragma warning(suppress: 26444)
+	connect(m_ui_->cmb_up_axis,SIGNAL(currentIndexChanged(int)), this,
+	        SLOT(up_axis_changed_listener(int)));
 	/*BRUSH SETTINGS*/
 	// Brush intensity
 	m_hotkey_brushintensity_reduce_ = new QShortcut(this);
@@ -262,6 +292,16 @@ void MainWindow::uv_visibility_changed_listener(const bool enabled) const
 void MainWindow::growthmesh_index_changed_listener(const int index) const
 {
 	m_ui_->widget_gl->m_scene.m_growth_mesh_index = index;
+	m_ui_->widget_gl->update();
+}
+
+/**
+ * \brief Listener that gets called when the selected up axis is changed
+ * \param index The selected index (0 = y, 1 = z)
+ */
+void MainWindow::up_axis_changed_listener(const int index) const
+{
+	m_ui_->widget_gl->m_scene.set_up_axis(index);
 	m_ui_->widget_gl->update();
 }
 
@@ -522,6 +562,11 @@ void MainWindow::set_referencemodel_show(const bool active) const
 	m_ui_->cb_referencemodel_show->setChecked(active);
 }
 
+void MainWindow::set_up_axis_index(const int index) const
+{
+	m_ui_->cmb_up_axis->setCurrentIndex(index);
+}
+
 void MainWindow::set_growthmesh_index(const int index) const
 {
 	m_ui_->cmb_growthmesh_index->setCurrentIndex(index);
@@ -531,9 +576,73 @@ void MainWindow::set_growthmesh_index_content(std::vector<std::string> content) 
 {
 	m_ui_->cmb_growthmesh_index->clear();
 
-	for(auto& item : content)
+	for (auto& item : content)
 	{
 		m_ui_->cmb_growthmesh_index->addItem(QString(item.data()));
 	}
+}
 
+void MainWindow::clear_growthmesh_index_content() const
+{
+	m_ui_->cmb_growthmesh_index->clear();
+}
+
+/**
+ * \brief Returns a UiSettings object that holds the current settings
+ * \return The current UiSettings
+ */
+UiSettings MainWindow::get_ui_settings() const
+{
+	UiSettings settings;
+
+	// General settings
+	settings.m_grid_visibility = get_ui()->cb_show_uv->isChecked();
+	settings.m_growth_mesh_index = get_ui()->cmb_growthmesh_index->currentIndex();
+	settings.m_up_axis_index = get_ui()->cmb_up_axis->currentIndex();
+	// Hair settings
+	settings.m_hairlength = get_ui()->sb_hair_length->value();
+	settings.m_hairsegment_count = get_ui()->sb_hair_num_segments->value();
+	settings.m_hair_color = m_hair_color;
+	settings.m_hair_root_color = m_hair_root_color;
+	// Brush settings
+	settings.m_brushmode = m_paintmode;
+	settings.m_brush_size = get_ui()->sb_size->value();
+	settings.m_brush_intensity = get_ui()->sb_intensity->value();
+	// Light settings
+	settings.m_light_hair = get_ui()->cb_light_hair->isChecked();
+	settings.m_light_mesh = get_ui()->cb_light_mesh->isChecked();
+	settings.m_light_color = m_light_color;
+	// Mesh settings
+	settings.m_growthmesh_show = get_ui()->cb_growthmesh_show->isChecked();
+	settings.m_referencemodel_show = get_ui()->cb_referencemodel_show->isChecked();
+
+	return settings;
+}
+
+/**
+ * \brief Loads the given UiSettings into the UI
+ * \param settings The UiSettings to be loaded
+ */
+void MainWindow::set_ui_settings(const UiSettings& settings)
+{
+	// General settings
+	set_uv_grid_visibility(settings.m_grid_visibility);
+	set_growthmesh_index(settings.m_growth_mesh_index);
+	set_up_axis_index(settings.m_up_axis_index);
+	// Hair settings
+	set_hair_length(settings.m_hairlength);
+	set_hair_segment_count(settings.m_hairsegment_count);
+	set_hair_color(settings.m_hair_color);
+	set_hair_root_color(settings.m_hair_root_color);
+	// Brush settings
+	set_brush_mode(settings.m_brushmode);
+	set_brush_size(settings.m_brush_size);
+	set_brush_intensity(settings.m_brush_intensity);
+	// Light settings
+	set_light_hair(settings.m_light_hair);
+	set_light_mesh(settings.m_light_mesh);
+	set_light_color(settings.m_light_color);
+	// Mesh settings
+	set_growthmesh_show(settings.m_growthmesh_show);
+	set_referencemodel_show(settings.m_referencemodel_show);
 }

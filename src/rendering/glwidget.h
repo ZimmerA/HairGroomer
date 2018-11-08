@@ -29,6 +29,7 @@ protected:
 	void initializeGL() override;
 
 	void paintGL() override;
+
 	void process_input();
 	void resizeGL(int w, int h) override;
 
