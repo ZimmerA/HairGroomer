@@ -57,6 +57,8 @@ void MvpModel::save_project_file_to_disk(const QString& filename, const ProjectS
 void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hairdata, const int up_axis_index) const
 {
 	QFile file(filename);
+	if(!m_fbx_model_)
+		throw std::runtime_error("There is no Fbx model loaded.");
 
 	const int growthmesh_index = hairdata.m_growthmesh_index;
 
@@ -80,7 +82,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	if (num_uvs != num_indices)
 		throw std::runtime_error("The number of uv's doesn't match the number of indices.");
 
-	const int num_bones = m_fbx_model_->get_num_bones();
+	const int num_bones = m_fbx_model_->get_num_bones() == 0 ? 1 : m_fbx_model_->get_num_bones();
 	std::vector<int> bone_indices;
 	std::vector<float> bone_weights;
 
@@ -89,40 +91,66 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	{
 		int num_appended = 0;
 
-		// For every bone per Hair Vertex
-		for (auto& vertex_bone_info : m_fbx_model_->m_meshes.at(growthmesh_index).m_vertices.at(i).m_bones)
+		if(m_fbx_model_->get_num_bones() > 0)
 		{
-			// max. 4 bones
-			if (num_appended < 4)
+			// For every bone per Hair Vertex
+			for (auto& vertex_bone_info : m_fbx_model_->m_meshes.at(growthmesh_index).m_vertices.at(i).m_bones)
 			{
-				const int id = vertex_bone_info.m_id;
-				const float weight = vertex_bone_info.m_weight;
-				bone_weights.push_back(weight);
-				bone_indices.push_back(id);
-				num_appended++;
+				// max. 4 bones
+				if (num_appended < 4)
+				{
+					const int id = vertex_bone_info.m_id;
+					const float weight = vertex_bone_info.m_weight;
+					bone_weights.push_back(weight);
+					bone_indices.push_back(id);
+					num_appended++;
+				}
+			}
+			// Make sure we have 4 bone values per vertex
+			while (bone_indices.size() % 4 != 0 || bone_indices.empty())
+			{
+				bone_indices.push_back(0);
+				bone_weights.push_back(0);
+			}			
+		}else
+		{
+			for(int i = 0; i < 4; i++)
+			{
+				if(i == 0)
+					bone_weights.push_back(1);
+				else
+					bone_weights.push_back(0);
+
+				bone_indices.push_back(0);
 			}
 		}
-		// Make sure we have 4 bone values per vertex
-		while (bone_indices.size() % 4 != 0 || bone_indices.empty())
-		{
-			bone_indices.push_back(0);
-			bone_weights.push_back(0);
-		}
+
 	}
 
 	std::vector<std::string> bone_name_strings;
 	std::vector<int> bone_names; // chars as u8
 	std::vector<int> bone_parents;
 
-	// add every bone name and parent to a list and convert the name to ints
-	for (auto& bone : m_fbx_model_->m_bone_list)
+	if(m_fbx_model_->get_num_bones() > 0)
 	{
-		bone_name_strings.push_back(bone.m_name);
-		for (auto& letter : bone.m_name)
+		// add every bone name and parent to a list and convert the name to ints
+		for (auto& bone : m_fbx_model_->m_bone_list)
+		{
+			bone_name_strings.push_back(bone.m_name);
+			for (auto& letter : bone.m_name)
+			{
+				bone_names.push_back(static_cast<int>(letter));
+			}
+			bone_parents.push_back(bone.m_parent);
+		}
+	}else
+	{
+		bone_name_strings.push_back("hairRoot");
+		for(auto& letter : "hairRoot")
 		{
 			bone_names.push_back(static_cast<int>(letter));
 		}
-		bone_parents.push_back(bone.m_parent);
+		bone_parents.push_back(-1);
 	}
 
 	if (!file.open(QIODevice::WriteOnly))
@@ -263,10 +291,6 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 				hair_file << " ";
 			}
 		}
-		else
-		{
-			hair_file << "\n";
-		}
 		if ((i + 1) % 64 == 0 && i != 0)
 			hair_file << "\n        ";
 	}
@@ -288,14 +312,9 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 				hair_file << " ";
 			}
 		}
-		else
-		{
-			hair_file << "\n";
-		}
 		if ((i + 1) % 64 == 0 && i != 0)
 			hair_file << "\n        ";
 	}
-	hair_file << "        ";
 	hair_file << "\n    </array>\n";
 
 	hair_file << "    <array name=\"boneNames\" size=\"" << bone_names.size() << "\" type=\"U8\">\n";
@@ -325,31 +344,36 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	hair_file << "\n    </array>\n";
 
 	hair_file << "    <array name=\"bindPoses\" size=\"" << num_bones << "\" type=\"Mat44\">\n";
-	for (int i = 0; i < num_bones; i++)
+	if(m_fbx_model_->get_num_bones() > 0)
 	{
-		for (uint x = 0; x < 4; x++)
+		for (int i = 0; i < num_bones; i++)
 		{
-			for (uint y = 0; y < 4; y ++)
+			for (uint x = 0; x < 4; x++)
 			{
-				glm::mat4 final_bone = m_fbx_model_->m_bone_list[i].m_global_bindpose;
-
-				// Up axis is Z, rotate the skeleton upwards
-				if (up_axis_index == 1)
+				for (uint y = 0; y < 4; y ++)
 				{
-					glm::mat4 rotation_matrix(1);
-					rotation_matrix = rotate(rotation_matrix, glm::radians(-90.f), glm::vec3(1.0, 0, 0));
-					final_bone = rotation_matrix * final_bone;
-				}
+					glm::mat4 final_bone = m_fbx_model_->m_bone_list[i].m_global_bindpose;
 
-				hair_file << final_bone[x][y] << " ";
+					// Up axis is Z, rotate the skeleton upwards
+					if (up_axis_index == 1)
+					{
+						glm::mat4 rotation_matrix(1);
+						rotation_matrix = rotate(rotation_matrix, glm::radians(-90.f), glm::vec3(1.0, 0, 0));
+						final_bone = rotation_matrix * final_bone;
+					}
+
+					hair_file << final_bone[x][y] << " ";
+				}
+			}
+			if (i < num_bones - 1)
+			{
+				hair_file << ", ";
 			}
 		}
-		if (i < num_bones - 1)
-		{
-			hair_file << ", ";
-		}
+	}else
+	{
+		hair_file << "      1 0 0 0 0 0 -1 0 0 1 0 0 0 0 0 1";
 	}
-
 	hair_file << "\n    </array>\n";
 	hair_file << "    <array name=\"boneParents\" size=\"" << bone_parents.size() << "\" type=\"I32\">\n";
 	hair_file << "        ";
