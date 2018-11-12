@@ -44,7 +44,7 @@ public:
 	std::vector<std::string> m_name_list;
 	// Contains the Bones
 	std::vector<Bone> m_bone_list;
-	QString m_name;
+	QString m_path;
 
 private:
 	void load_model(const QString& path);

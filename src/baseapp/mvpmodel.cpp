@@ -7,10 +7,10 @@
 #include <qimage.h>
 #include <QFileDialog>
 #include <qtextstream.h>
+#include "rendering/glwidget.h"
 
 ProjectSettings MvpModel::load_project_file_from_disk(const QString& filename) const
 {
-
 	std::ifstream file(filename.toLocal8Bit().constData());
 	json json_object;
 	file >> json_object;
@@ -23,9 +23,29 @@ ProjectSettings MvpModel::load_project_file_from_disk(const QString& filename) c
 
 void MvpModel::save_project_file_to_disk(const QString& filename, const ProjectSettings& proj) const
 {
+	// Copy the loaded fbx model into the project directory
+	if (!proj.m_growthmesh_name.empty() && m_fbx_model_)
+	{
+		const QString fbx_destination = m_fbx_model_->m_path;
+		const QString copy_destination = get_directory_from_path(filename).append(proj.m_growthmesh_name.data());
+		// If the fbx file to be copied doesnt exist, cancel
+		if (QFile::exists(fbx_destination))
+		{
+			// If the destination file already exists and it isn't the same as the one to be copied delete it
+			if(QFile::exists(copy_destination) && fbx_destination != copy_destination)
+			{
+				QFile::remove(copy_destination);
+			}
+
+			// If the file doesn't exist now, copy the new one over
+			if(!QFile::exists(copy_destination))
+				QFile::copy(fbx_destination, copy_destination);
+		}
+	}
+
 	std::ofstream o(filename.toLocal8Bit().constData());
 	const json j = proj;
-	o << std::setw(4) << j << std::endl; 
+	o << std::setw(4) << j << std::endl;
 }
 
 /**
@@ -314,11 +334,11 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 				glm::mat4 final_bone = m_fbx_model_->m_bone_list[i].m_global_bindpose;
 
 				// Up axis is Z, rotate the skeleton upwards
-				if(up_axis_index == 1)
+				if (up_axis_index == 1)
 				{
 					glm::mat4 rotation_matrix(1);
-					rotation_matrix = rotate(rotation_matrix, glm::radians(-90.f), glm::vec3(1.0,0,0));
-					final_bone =rotation_matrix* final_bone;
+					rotation_matrix = rotate(rotation_matrix, glm::radians(-90.f), glm::vec3(1.0, 0, 0));
+					final_bone = rotation_matrix * final_bone;
 				}
 
 				hair_file << final_bone[x][y] << " ";
@@ -362,7 +382,8 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	hair_file << "    </array>\n";
 
 	hair_file << "    <value name=\"numPinConstraints\" type=\"U32\">0</value>\n"; // TODO whats this
-	hair_file << "    <array name=\"pinConstraints\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3),pinStiffness(F32),influenceFallOff(F32),useDynamicPin(Bool),doLra(Bool),useStiffnessPin(Bool),influenceFallOffCurve(Vec4)\"></array>\n";
+	hair_file <<
+		"    <array name=\"pinConstraints\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3),pinStiffness(F32),influenceFallOff(F32),useDynamicPin(Bool),doLra(Bool),useStiffnessPin(Bool),influenceFallOffCurve(Vec4)\"></array>\n";
 	hair_file << "    <value name=\"sceneUnit\" type=\"F32\">1</value>\n";
 	hair_file << "    <value name=\"upAxis\" type=\"U32\">1</value>\n";
 	hair_file << "    <value name=\"handedness\" type=\"U32\">1</value>\n";

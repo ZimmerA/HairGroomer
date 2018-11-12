@@ -29,7 +29,7 @@ void ModelData::load_model(const QString& path)
 		throw std::runtime_error(error_stream.str());
 	}
 
-	m_name = path.mid(path.lastIndexOf('/')+1);
+	m_path = path;
 	
 	FbxPointer<FbxScene> scene(FbxScene::Create(sdk_manager.get(), "myScene"));
 

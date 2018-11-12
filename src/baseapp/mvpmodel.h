@@ -32,7 +32,7 @@ public:
 	ModelData* get_fbx_model() const noexcept { return m_fbx_model_.get(); }
 
 	std::string m_loaded_project_path;
-	std::string m_loaded_hairstyle_name;
+	std::string m_loaded_hairstyle_path;
 
 private:
 

@@ -99,7 +99,7 @@ void Scene::load_textures()
 	m_paint_brush_texture = std::make_unique<QOpenGLTexture>(QImage("./res/brush.png").mirrored());
 	m_paint_brush_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 	m_paint_brush_texture->setMagnificationFilter(QOpenGLTexture::Linear);
-	m_floor_grid_texture = std::make_unique<QOpenGLTexture>(QImage("./res/Textures/grid_transparent_black.png").mirrored());
+	m_floor_grid_texture = std::make_unique<QOpenGLTexture>(QImage("./res/Textures/grid_transparent_black_new.png").mirrored());
 	m_floor_grid_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 	m_floor_grid_texture->setMagnificationFilter(QOpenGLTexture::Linear);
 	m_floor_grid_texture->setWrapMode(QOpenGLTexture::Repeat);
@@ -141,7 +141,7 @@ void Scene::create_floor_grid()
 {
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 
-	float uv_max =16.f;
+	int uv_max = 16;
 	float grid_size_x = 128;
 	float grid_size_y = 128;
 	const float grid_vertices[] = {

@@ -26,7 +26,7 @@ void MainWindow::on_actionExport_triggered()
 {
 	m_ui_->widget_gl->m_renderer.m_should_write_out_hair = true;
 	const QString file_name = save_file_dialog("Export Hair", "Nvidia APX File (*.apx);;All Files (*)");
-	get_presenter()->export_hair(file_name);
+	get_presenter()->export_hairworks(file_name);
 }
 
 void MainWindow::on_actionOpen_Fbx_triggered()
