@@ -394,18 +394,13 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	}
 	hair_file << "    </array>\n";
 
-	hair_file << "    <value name=\"numBoneSpheres\" type=\"U32\">0</value>\n"; // TODO: fill numBoneSpheres
-	hair_file <<
-		"    <array name=\"boneSpheres\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3)\">\n";
-	//TODO add boneSpheres
-	hair_file << "\n    </array>\n";
-
-	hair_file << "    <value name=\"numBoneCapsules\" type=\"U32\">0</value>\n"; // TODO: fill numBoneCapsules
-	hair_file << "    <array name=\"boneCapsuleIndices\" size=\"0\" type=\"U32\">\n"; // TODO size
-	// TODO add boncapsuleIndices
+	hair_file << "    <value name=\"numBoneSpheres\" type=\"U32\">0</value>\n";
+	hair_file << "    <array name=\"boneSpheres\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3)\">\n";
 	hair_file << "    </array>\n";
-
-	hair_file << "    <value name=\"numPinConstraints\" type=\"U32\">0</value>\n"; // TODO whats this
+	hair_file << "    <value name=\"numBoneCapsules\" type=\"U32\">0</value>\n";
+	hair_file << "    <array name=\"boneCapsuleIndices\" size=\"0\" type=\"U32\">\n";
+	hair_file << "    </array>\n";
+	hair_file << "    <value name=\"numPinConstraints\" type=\"U32\">0</value>\n";
 	hair_file <<
 		"    <array name=\"pinConstraints\" size=\"0\" type=\"Struct\" structElements=\"boneSphereIndex(I32),boneSphereRadius(F32),boneSphereLocalPos(Vec3),pinStiffness(F32),influenceFallOff(F32),useDynamicPin(Bool),doLra(Bool),useStiffnessPin(Bool),influenceFallOffCurve(Vec4)\"></array>\n";
 	hair_file << "    <value name=\"sceneUnit\" type=\"F32\">1</value>\n";
