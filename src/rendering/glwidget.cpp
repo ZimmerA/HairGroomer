@@ -27,8 +27,8 @@ void GLWidget::initializeGL()
 	m_renderer.set_current_scene(&m_scene);
 	m_scene.load();
 	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f),
-	                                                      (width() / 2.0f) / static_cast<float>(height()), 0.1f,
-	                                                      1000.0f);
+	                                               (width() / 2.0f) / static_cast<float>(height()), 0.1f,
+	                                               1000.0f);
 }
 
 void GLWidget::load_glmodel_data()
@@ -47,7 +47,7 @@ void GLWidget::resizeGL(const int w, const int h)
 {
 	m_renderer.set_measurements(w, h);
 	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f), w / static_cast<float>(h) / 2.0f, 0.1f,
-	                                                      1000.0f);
+	                                               1000.0f);
 }
 
 /**
@@ -90,28 +90,32 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 
 	switch (event->button())
 	{
-	case Qt::LeftButton:
+		case Qt::LeftButton:
 
-		// Camera
-		m_last_mouse_pos_ = event->pos();
+			if (mouse_pos_x > 0.0f)
+			{
+				m_renderer.m_is_drawing = true;
+			}
 
-		// Save whether the first click was inside of the model viewport
-		if (mouse_pos_x <= 0.0f)
-		{
-			m_has_mouse_started_in_viewport_ = true;
-		}
-		else
-		{
-			m_has_mouse_started_in_viewport_ = false;
-			m_renderer.m_is_drawing = true;
-		}
+		case Qt::MiddleButton:
+			// Camera
+			m_last_mouse_pos_ = event->pos();
 
-		// query call of paintgl
-		update();
-		break;
-	default:
-		QOpenGLWidget::mousePressEvent(event);
-		break;
+			// Save whether the first click was inside of the model viewport
+			if (mouse_pos_x <= 0.0f)
+			{
+				m_has_mouse_started_in_viewport_ = true;
+			}
+			else
+			{
+				m_has_mouse_started_in_viewport_ = false;
+			}
+
+			update();
+			break;
+		default:
+			QOpenGLWidget::mousePressEvent(event);
+			break;
 	}
 }
 
@@ -135,23 +139,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 		update();
 	}
 
-	// If the first mouse click was in the viewport, update camera as well
-	if (m_has_mouse_started_in_viewport_)
+	if (m_keys_[Qt::Key_Alt])
 	{
-		if (event->buttons() & Qt::LeftButton)
+		// If the first mouse click was in the viewport, update camera as well
+		if (m_has_mouse_started_in_viewport_)
 		{
 			const int delta_x = event->x() - m_last_mouse_pos_.x();
 			const int delta_y = event->y() - m_last_mouse_pos_.y();
-
-			if (!m_keys_[Qt::Key_Alt])
-			{
-				m_scene.m_camera.handle_mouse_move(delta_x, delta_y);
-			}
-			else
+			if (event->buttons() & Qt::MiddleButton)
 			{
 				m_scene.m_camera.move_pivot_point(delta_x, delta_y);
 			}
-
+			else if (event->buttons() & Qt::LeftButton)
+			{
+				m_scene.m_camera.handle_mouse_move(delta_x, delta_y);
+			}
 			// query call of paintgl
 			update();
 			m_last_mouse_pos_ = event->pos();
