@@ -141,9 +141,9 @@ void Scene::create_floor_grid()
 {
 	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
 
-	int uv_max = 16;
-	float grid_size_x = 128;
-	float grid_size_y = 128;
+	const int uv_max = 16;
+	const float grid_size_x = 128;
+	const float grid_size_y = 128;
 	const float grid_vertices[] = {
 		// positions   // texCoords
 		-grid_size_x/2.0f, grid_size_y/2.0f, 0.0f, uv_max,
