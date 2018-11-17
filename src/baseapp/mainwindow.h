@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 #include <QMainWindow>
 #include <QColorDialog>
+#include <QtWidgets/QShortcut>
 #include "mvppresenter.h"
 
 namespace Ui

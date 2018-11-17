@@ -8,7 +8,7 @@
 #include <memory>
 
 #include <QOpenGLShaderProgram>
-#include <fbxsdk.h>
+//#include <fbxsdk.h>
 
 
 /**
@@ -47,7 +47,7 @@ public:
 	QString m_path;
 
 private:
-	void load_model(const QString& path);
+/*	void load_model(const QString& path);
 	void process_skeleton_nodes(FbxNode* node);
 	void process_skeleton_hierachy_rec(FbxNode* node, int parent_index);
 	void process_mesh_nodes(FbxNode* node, FbxManager* manager);
@@ -56,7 +56,7 @@ private:
 	static glm::vec3 read_normal(FbxMesh* mesh, int control_point_index, int vertex_counter);
 	static glm::vec2 read_uv(FbxMesh* mesh, int control_point_index, int vertex_counter);
 	static glm::vec3 read_binormal(FbxMesh* mesh, int control_point_index, int vertex_counter);
-	static glm::vec3 read_tangent(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec3 read_tangent(FbxMesh* mesh, int control_point_index, int vertex_counter);*/
 
 
 	// Maps bone names to the index in the bone_list
@@ -67,7 +67,7 @@ private:
  * \brief std::unique_ptr wrapper for Fbx pointers to wrap the Create/Destroy mechanism of the fbx sdk
  * \tparam T The pointer type
  */
-template <typename T>
+/*template <typename T>
 class FbxPointer : public std::unique_ptr<T, void (*)(T*)>
 {
 public:
@@ -101,6 +101,6 @@ template <typename T>
 void FbxPointer<T>::destroy(T* ptr)
 {
 	if (ptr) ptr->Destroy();
-}
+}*/
 
 #endif // MODEL_H

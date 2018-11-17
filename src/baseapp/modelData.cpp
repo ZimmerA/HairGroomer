@@ -5,13 +5,14 @@
 
 ModelData::ModelData(const QString& path)
 {
-	load_model(path);
+	//load_model(path);
 }
 
 /**
  * \brief Loads the model at the given path using the Fbx Sdk
  * \param path The path to the model on the harddrive
- */
+ *//*
+
 void ModelData::load_model(const QString& path)
 {
 	FbxPointer<FbxManager> sdk_manager(FbxManager::Create());
@@ -60,7 +61,9 @@ void ModelData::process_skeleton_nodes(FbxNode* node)
 	}
 }
 
-void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_index)
+void ModelData::process_skeleton_hierachy_rec(*/
+/*FbxNode* node, const int parent_index*//*
+)
 {
 	uint bone_index = 0;
 	if (node->GetNodeAttribute() && node->GetNodeAttribute()->GetAttributeType() && node->GetNodeAttribute()->GetAttributeType() ==FbxNodeAttribute::eSkeleton)
@@ -91,7 +94,9 @@ void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_in
 	}
 }
 
-void ModelData::process_mesh_nodes(FbxNode* node, FbxManager* manager)
+void ModelData::process_mesh_nodes(*/
+/*FbxNode* node, FbxManager* manager*//*
+)
 {
 	if (node->GetNodeAttribute() != nullptr)
 	{
@@ -429,3 +434,4 @@ glm::vec3 ModelData::read_tangent(FbxMesh* mesh, const int control_point_index, 
 	}
 	return tangent;
 }
+*/
