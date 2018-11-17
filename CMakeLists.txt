@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(Projekt)
+project(HairGroomer)
 set(CMAKE_CXX_STANDARD 14)
 
 # Find includes in corresponding build directories
@@ -32,11 +32,11 @@ include_directories(${CMAKE_PREFIX_PATH}/include/QtGui)
 file(GLOB_RECURSE SRC ${PROJECT_SOURCE_DIR}/src/*.h* ${PROJECT_SOURCE_DIR}/src/*.c*
                         ${PROJECT_SOURCE_DIR}/libs/*.h* ${PROJECT_SOURCE_DIR}/libs/*.c*)
 
-add_executable(Projekt ${SRC})
+add_executable(HairGroomer ${SRC})
 
 # link dlls
-target_link_libraries(Projekt Qt5::Widgets)
-target_link_libraries(Projekt Qt5::OpenGL)
+target_link_libraries(HairGroomer Qt5::Widgets)
+target_link_libraries(HairGroomer Qt5::OpenGL)
 
 # Copy Shaders and resources to binary directory
 file(COPY ${PROJECT_SOURCE_DIR}/src/rendering/shaders DESTINATION ${CMAKE_BINARY_DIR}/src/rendering/)
@@ -46,6 +46,6 @@ file(COPY ${PROJECT_SOURCE_DIR}/res DESTINATION ${CMAKE_BINARY_DIR}/)
 if(WIN32)
     # Run winddeployqt if it can be found to copy required dlls to binary directory
     find_program(WINDEPLOYQT_EXECUTABLE NAMES windeployqt HINTS ${CMAKE_PREFIX_PATH} ENV QTDIR PATH_SUFFIXES bin)
-    add_custom_command(TARGET Projekt POST_BUILD
-            COMMAND ${WINDEPLOYQT_EXECUTABLE} --list source $<TARGET_FILE:Projekt>)
+    add_custom_command(TARGET HairGroomer POST_BUILD
+            COMMAND ${WINDEPLOYQT_EXECUTABLE} --list source $<TARGET_FILE:HairGroomer>)
 endif()
