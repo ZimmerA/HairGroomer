@@ -27,8 +27,8 @@ void Scene::load_shaders()
 
 	// Draws the growth-mesh
 	m_default_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_default_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/rendering/shaders/viewport/mesh.vert");
-	m_default_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/rendering/shaders/viewport/mesh.frag");
+	m_default_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/viewport/mesh.vert");
+	m_default_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/viewport/mesh.frag");
 	m_default_shader->bindAttributeLocation("aVertex", 0);
 	m_default_shader->bindAttributeLocation("aNormal", 1);
 	m_default_shader->bindAttributeLocation("aTangent", 2);
@@ -38,9 +38,8 @@ void Scene::load_shaders()
 
 	// Draws the UV map of the loaded growth-mesh
 	m_uv_map_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/rendering/shaders/paintwindow/uvmap.vert");
-	m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,
-	                                         "./src/rendering/shaders//paintwindow/uvmap.frag");
+	m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/uvmap.vert");
+	m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/uvmap.frag");
 	m_uv_map_shader->bindAttributeLocation("aVertex", 0);
 	m_uv_map_shader->bindAttributeLocation("aNormal", 1);
 	m_uv_map_shader->bindAttributeLocation("aUV", 4);
@@ -48,10 +47,8 @@ void Scene::load_shaders()
 
 	// used for drawing the framebuffer
 	m_drawbuffer_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,
-	                                             "./src/rendering/shaders/paintwindow/drawbuffer.vert");
-	m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,
-	                                             "./src/rendering/shaders/paintwindow/drawbuffer.frag");
+	m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/drawbuffer.vert");
+	m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/drawbuffer.frag");
 	m_drawbuffer_shader->bindAttributeLocation("aVertex", 0);
 	m_drawbuffer_shader->bindAttributeLocation("aUV", 1);
 	m_drawbuffer_shader->link();
@@ -61,10 +58,8 @@ void Scene::load_shaders()
 
 	// used for drawing the paintbrush
 	m_paintbrush_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,
-	                                             "./src/rendering/shaders/paintwindow/paintbrush.vert");
-	m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,
-	                                             "./src/rendering/shaders/paintwindow/paintbrush.frag");
+	m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/paintbrush.vert");
+	m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/paintbrush.frag");
 	m_paintbrush_shader->bindAttributeLocation("aVertex", 0);
 	m_paintbrush_shader->bindAttributeLocation("aUV", 1);
 	m_paintbrush_shader->link();
@@ -73,9 +68,9 @@ void Scene::load_shaders()
 
 	// used for drawing the hair
 	m_hair_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "./src/rendering/shaders/hair/hair.vert");
-	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Geometry, "./src/rendering/shaders/hair/hair.geom");
-	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "./src/rendering/shaders/hair/hair.frag");
+	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/hair/hair.vert");
+	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Geometry, "res/shaders/hair/hair.geom");
+	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/hair/hair.frag");
 	m_hair_shader->bindAttributeLocation("aVertex", 0);
 	m_hair_shader->bindAttributeLocation("aNormal", 1);
 	m_hair_shader->bindAttributeLocation("aTangent", 2);
@@ -96,10 +91,10 @@ void Scene::load_shaders()
  */
 void Scene::load_textures()
 {
-	m_paint_brush_texture = std::make_unique<QOpenGLTexture>(QImage("./res/brush.png").mirrored());
+	m_paint_brush_texture = std::make_unique<QOpenGLTexture>(QImage("res/brush.png").mirrored());
 	m_paint_brush_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 	m_paint_brush_texture->setMagnificationFilter(QOpenGLTexture::Linear);
-	m_floor_grid_texture = std::make_unique<QOpenGLTexture>(QImage("./res/Textures/grid_transparent_black_new.png").mirrored());
+	m_floor_grid_texture = std::make_unique<QOpenGLTexture>(QImage("res/textures/grid_transparent_black_new.png").mirrored());
 	m_floor_grid_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 	m_floor_grid_texture->setMagnificationFilter(QOpenGLTexture::Linear);
 	m_floor_grid_texture->setWrapMode(QOpenGLTexture::Repeat);
