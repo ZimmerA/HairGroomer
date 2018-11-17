@@ -6,6 +6,7 @@
 void Renderer::init(const int width, const int height)
 {
 	initializeOpenGLFunctions();
+
 	// Enable Scissor test for viewport splitting
 	glEnable(GL_SCISSOR_TEST);
 
@@ -16,7 +17,7 @@ void Renderer::init(const int width, const int height)
 
 void Renderer::render_scene()
 {
-	if(m_current_scene_->m_should_reset)
+	if (m_current_scene_->m_should_reset)
 	{
 		m_current_scene_->m_drawbuffer.reset();
 		m_current_scene_->m_fbx_glmodel.cleanup_model();
@@ -32,8 +33,7 @@ void Renderer::render_scene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 view_matrix = m_current_scene_->m_camera.get_view_matrix();
-	glm::mat4 mvp = m_current_scene_->m_projection_matrix * view_matrix * m_current_scene_->
-		m_model_matrix;
+	glm::mat4 mvp = m_current_scene_->m_projection_matrix * view_matrix * m_current_scene_->m_model_matrix;
 	glm::mat4 vp = m_current_scene_->m_projection_matrix * view_matrix;
 
 	m_current_scene_->m_default_shader->bind();
@@ -134,11 +134,11 @@ void Renderer::render_scene()
 		unsigned int i = 0;
 		int counter = 0;
 
-		while (i < primitives_generated * 2 * 3)
+		while (i < (primitives_generated * 2 * 3))
 		{
 			const glm::vec3 position(feedback[i], feedback[i + 1], feedback[i + 2]);
 			m_hairdata_cache.m_vertices.push_back(position);
-			if (counter < m_current_scene_->m_hair.m_num_segments - 1)
+			if (counter < (m_current_scene_->m_hair.m_num_segments - 1))
 			{
 				i += 2 * 3;
 				counter++;
@@ -147,7 +147,7 @@ void Renderer::render_scene()
 			{
 				i += 1 * 3;
 				counter++;
-				if (counter == m_current_scene_->m_hair.m_num_segments + 1)
+				if (counter == (m_current_scene_->m_hair.m_num_segments + 1))
 				{
 					counter = 0;
 				}

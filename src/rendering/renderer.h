@@ -2,7 +2,7 @@
 #define RENDERER_H
 
 #include "scene.h"
-#include "../baseapp/hairData.h"
+#include "baseapp/hairData.h"
 
 #include <QOpenGLFunctions_3_3_Core>
 

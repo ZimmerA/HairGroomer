@@ -32,13 +32,13 @@ void MvpModel::save_project_file_to_disk(const QString& filename, const ProjectS
 		if (QFile::exists(fbx_destination))
 		{
 			// If the destination file already exists and it isn't the same as the one to be copied delete it
-			if(QFile::exists(copy_destination) && fbx_destination != copy_destination)
+			if (QFile::exists(copy_destination) && fbx_destination != copy_destination)
 			{
 				QFile::remove(copy_destination);
 			}
 
 			// If the file doesn't exist now, copy the new one over
-			if(!QFile::exists(copy_destination))
+			if (!QFile::exists(copy_destination))
 				QFile::copy(fbx_destination, copy_destination);
 		}
 	}
@@ -57,7 +57,7 @@ void MvpModel::save_project_file_to_disk(const QString& filename, const ProjectS
 void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hairdata, const int up_axis_index) const
 {
 	QFile file(filename);
-	if(!m_fbx_model_)
+	if (!m_fbx_model_)
 		throw std::runtime_error("There is no FBX model loaded");
 
 	const int growthmesh_index = hairdata.m_growthmesh_index;
@@ -91,7 +91,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	{
 		int num_appended = 0;
 
-		if(m_fbx_model_->get_num_bones() > 0)
+		if (m_fbx_model_->get_num_bones() > 0)
 		{
 			// For every bone per Hair Vertex
 			for (auto& vertex_bone_info : m_fbx_model_->m_meshes.at(growthmesh_index).m_vertices.at(i).m_bones)
@@ -114,9 +114,9 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 			}			
 		}else
 		{
-			for(int i = 0; i < 4; i++)
+			for (int i = 0; i < 4; i++)
 			{
-				if(i == 0)
+				if (i == 0)
 					bone_weights.push_back(1);
 				else
 					bone_weights.push_back(0);
@@ -131,7 +131,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	std::vector<int> bone_names; // chars as u8
 	std::vector<int> bone_parents;
 
-	if(m_fbx_model_->get_num_bones() > 0)
+	if (m_fbx_model_->get_num_bones() > 0)
 	{
 		// add every bone name and parent to a list and convert the name to ints
 		for (auto& bone : m_fbx_model_->m_bone_list)
@@ -146,7 +146,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	}else
 	{
 		bone_name_strings.push_back("hairRoot");
-		for(auto& letter : "hairRoot")
+		for (auto& letter : "hairRoot")
 		{
 			bone_names.push_back(static_cast<int>(letter));
 		}
@@ -344,7 +344,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	hair_file << "\n    </array>\n";
 
 	hair_file << "    <array name=\"bindPoses\" size=\"" << num_bones << "\" type=\"Mat44\">\n";
-	if(m_fbx_model_->get_num_bones() > 0)
+	if (m_fbx_model_->get_num_bones() > 0)
 	{
 		for (int i = 0; i < num_bones; i++)
 		{

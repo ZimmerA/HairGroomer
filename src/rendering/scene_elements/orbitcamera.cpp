@@ -55,9 +55,9 @@ void Orbitcamera::handle_mouse_move(const float delta_x, const float delta_y)
 	m_elevation_ += glm::radians(move_y);
 
 	m_azimuth_ = fmodf(m_azimuth_, 360.0f);
-	if(m_elevation_ > 179.0f)
+	if (m_elevation_ > 179.0f)
 		m_elevation_ = 179.0f;
-	if(m_elevation_ < 1.0f)
+	if (m_elevation_ < 1.0f)
 		m_elevation_ = 1.0f;
 
 	calc_position();
@@ -85,7 +85,7 @@ void Orbitcamera::move_pivot_point(const float x, const float y)
 void Orbitcamera::handle_mouse_wheel(const float scroll_delta)
 {
 	m_distance_ += scroll_delta * m_scrollspeed_;
-	if(m_distance_ <= 1.0f)
+	if (m_distance_ <= 1.0f)
 		m_distance_ = 1.0f;
 	calc_position();
 }

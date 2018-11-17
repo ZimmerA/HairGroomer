@@ -178,6 +178,6 @@ void Scene::set_up_axis(const int i)
 {
 	m_model_matrix = glm::mat4(1);
 
-	if(i == 1)
+	if (i == 1)
 		m_model_matrix = rotate(m_model_matrix, glm::radians(-90.f), glm::vec3(1.0f,0.0f,0.0f));
 }

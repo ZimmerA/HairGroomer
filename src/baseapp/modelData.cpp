@@ -45,7 +45,7 @@ void ModelData::load_model(const QString& path)
 	process_skeleton_nodes(scene->GetRootNode());
 	process_mesh_nodes(scene->GetRootNode(), sdk_manager.get());
 
-	if(m_meshes.empty())
+	if (m_meshes.empty())
 	{
 		throw std::runtime_error("The loaded model doesn't have any meshes");
 	}
@@ -120,7 +120,7 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 	{
 		FbxGeometryConverter converter(manager);
 		mesh = static_cast<FbxMesh*>(converter.Triangulate(mesh, true));
-		if(!mesh)
+		if (!mesh)
 		{
 			std::stringstream error_stream;
 			error_stream << "Mesh" << mesh_name << " couldn't be triangulated";

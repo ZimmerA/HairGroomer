@@ -174,7 +174,7 @@ void MvpPresenter::load_project_file(const QString& project_file_path) const
  */
 bool MvpPresenter::save_project_file() const
 {
-	if(!get_model()->m_loaded_project_path.empty())
+	if (!get_model()->m_loaded_project_path.empty())
 	{
 		save_project_file_as(get_model()->m_loaded_project_path.data());
 
@@ -190,14 +190,14 @@ bool MvpPresenter::save_project_file() const
  */
 void MvpPresenter::save_project_file_as(const QString& project_file_path) const
 {
-	if(project_file_path.isEmpty())
+	if (project_file_path.isEmpty())
 		return;
 
 	ProjectSettings project;
 	project.m_ui_settings = get_view()->get_ui_settings();
 
 	// If an fbx model is currently loaded, store it's name in the project
-	if(get_model()->get_fbx_model())
+	if (get_model()->get_fbx_model())
 	{
 		project.m_growthmesh_name = get_filename_from_path(get_model()->get_fbx_model()->m_path).toLocal8Bit().data();
 	}
@@ -205,7 +205,7 @@ void MvpPresenter::save_project_file_as(const QString& project_file_path) const
 	QString hair_file_path;
 
 	// If no hairstyle is currently loaded export the hairstyle as Hairstyle.png into the project directory
-	if(get_model()->m_loaded_hairstyle_path.empty())
+	if (get_model()->m_loaded_hairstyle_path.empty())
 	{
 		hair_file_path = get_directory_from_path(project_file_path).append("Hairstyle.png");
 		project.m_hair_style_name = "Hairstyle.png";

@@ -5,7 +5,7 @@
 #include <QMessageBox>
 #include <QOpenGLFunctions_3_3_Core>
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 	QApplication::setStyle("plastique");
