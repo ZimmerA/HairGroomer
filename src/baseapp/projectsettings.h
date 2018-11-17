@@ -3,7 +3,10 @@
 
 #include "rendering/scene_elements/paintbrush.h"
 #include <QColor>
-#include "nlohmann/json.hpp"
+
+#undef snprintf // BAD FBX SDK!
+#include <nlohmann/json.hpp>
+
 using json = nlohmann::json;
 
 struct UiSettings
