@@ -31,13 +31,14 @@ int main(int argc, char* argv[])
 	MainWindow view;
 	view.set_presenter(&presenter);
 	presenter.set_view(&view);
+
 	QOpenGLContext c;
 
 	// Check if OpenGL 3.3 core context could be created, if not exit with Error.
-	auto* funcs = c.versionFunctions<QOpenGLFunctions_3_3_Core>();
-	if (! funcs)
+	auto *funcs = c.versionFunctions<QOpenGLFunctions_3_3_Core>();
+	if (!funcs)
 	{
-		QMessageBox::critical(0, "Error", "Error creating opengl context for version 3.3. The reason for this might be outdated graphics drivers or that your gpu is too old. Closing application.");
+		QMessageBox::critical(nullptr, "Error", "Failed creating OpenGL 3.3 context. This can be caused by an outdated GPU or GPU drivers.");
 		exit(1);
 	}
 

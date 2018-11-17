@@ -130,7 +130,7 @@
             <item row="0" column="0">
              <widget class="QCheckBox" name="cb_show_uv">
               <property name="text">
-               <string>Show UV overlay</string>
+               <string>Show UV Overlay</string>
               </property>
               <property name="checked">
                <bool>false</bool>
@@ -208,7 +208,7 @@
             <item row="1" column="0">
              <widget class="QLabel" name="lb_hair_num_segments">
               <property name="text">
-               <string>Segments per Hair</string>
+               <string>Segments Per Hair</string>
               </property>
              </widget>
             </item>
@@ -477,14 +477,14 @@
             <item row="0" column="0">
              <widget class="QCheckBox" name="cb_referencemodel_show">
               <property name="text">
-               <string>Show reference model</string>
+               <string>Show Reference Model</string>
               </property>
              </widget>
             </item>
             <item row="1" column="0">
              <widget class="QCheckBox" name="cb_growthmesh_show">
               <property name="text">
-               <string>Show growth mesh</string>
+               <string>Show Growth Mesh</string>
               </property>
              </widget>
             </item>
@@ -527,30 +527,30 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Export Hairworks</string>
+    <string>Export Hairworks...</string>
    </property>
   </action>
   <action name="actionLoad_Hairstyle">
    <property name="text">
-    <string>Load Hairstyle</string>
+    <string>Load Hairstyle...</string>
    </property>
   </action>
   <action name="actionExport_Hairstyle">
    <property name="text">
-    <string>Export Hairstyle</string>
+    <string>Export Hairstyle...</string>
    </property>
   </action>
   <action name="actionOpen_Fbx">
    <property name="text">
-    <string>Open Fbx Model</string>
+    <string>Open FBX Model...</string>
    </property>
   </action>
   <action name="actionOpen_Project">
    <property name="text">
-    <string>Open Project</string>
+    <string>Open Project...</string>
    </property>
    <property name="toolTip">
-    <string>Open Project</string>
+    <string>Open Project...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -569,7 +569,7 @@
   </action>
   <action name="actionSave_Project_as">
    <property name="text">
-    <string>Save Project as</string>
+    <string>Save Project As...</string>
    </property>
   </action>
   <action name="actionNew_Project">

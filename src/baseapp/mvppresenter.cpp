@@ -25,14 +25,14 @@ void MvpPresenter::export_hairworks(const QString& hair_file_path) const
 	{
 		const HairData& d = m_view_->get_ui()->widget_gl->m_renderer.m_hairdata_cache;
 		get_model()->export_hair_to_disk(hair_file_path, d, m_view_->get_ui()->cmb_up_axis->currentIndex());
-		get_view()->display_messagebox("Export successful!", "The hair file has successfully been exported");
+		get_view()->display_messagebox("Successfully exported", "The hair file has successfully been exported");
 	}
 	catch (std::runtime_error& e)
 	{
-		get_view()->display_errorbox("Error exporting hairfile", e.what());
+		get_view()->display_errorbox("Failed exporting hairfile", e.what());
 	}catch (...)
 	{
-		get_view()->display_errorbox("Error exporting hairfile", "Unknown error when exporting hairfile.");
+		get_view()->display_errorbox("Failed exporting hairfile", "Unknown error when exporting hairfile");
 	}
 
 	get_view()->set_statusbar_text("Ready");
@@ -54,7 +54,7 @@ void MvpPresenter::export_hairstyle(const QString& hairstyle_file_path) const
 
 	if (!sucess)
 	{
-		get_view()->display_messagebox("Hairstyle could not be saved.", "");		
+		get_view()->display_messagebox("Hairstyle could not be saved", "");		
 	}
 	else
 	{
@@ -91,7 +91,7 @@ void MvpPresenter::load_fbx_model(const QString& fbx_model_file_path) const
 		return;
 
 	get_view()->set_growthmesh_index(0);
-	get_view()->set_statusbar_text("Loading Fbx...");
+	get_view()->set_statusbar_text("Loading FBX...");
 
 	try
 	{
@@ -105,10 +105,10 @@ void MvpPresenter::load_fbx_model(const QString& fbx_model_file_path) const
 	}
 	catch (std::runtime_error& e)
 	{
-		get_view()->display_errorbox("Error loading Model.", e.what());
+		get_view()->display_errorbox("Failed loading FBX model", e.what());
 	}catch (...)
 	{
-		get_view()->display_errorbox("Error loading Model.", "Unknown error when loading model.");
+		get_view()->display_errorbox("Failed loading FBX model", "Unknown error when loading model");
 	}
 
 	get_view()->set_statusbar_text("Ready");
@@ -146,7 +146,7 @@ void MvpPresenter::load_project_file(const QString& project_file_path) const
 		project = get_model()->load_project_file_from_disk(project_file_path);
 	}catch(...)
 	{
-		get_view()->display_errorbox("Error", "The project file you were trying to load is corrupted.");
+		get_view()->display_errorbox("Error", "The project file you were trying to load is corrupted");
 		return;
 	}
 

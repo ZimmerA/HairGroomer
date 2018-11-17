@@ -47,7 +47,7 @@ void ModelData::load_model(const QString& path)
 
 	if(m_meshes.empty())
 	{
-		throw std::runtime_error("The loaded model doesn't consist of any meshes.");
+		throw std::runtime_error("The loaded model doesn't have any meshes");
 	}
 }
 
@@ -123,7 +123,7 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 		if(!mesh)
 		{
 			std::stringstream error_stream;
-			error_stream << "Mesh" << mesh_name << " couldn't be triangulated.";
+			error_stream << "Mesh" << mesh_name << " couldn't be triangulated";
 		}
 	}
 
@@ -304,7 +304,7 @@ glm::vec3 ModelData::read_normal(FbxMesh* mesh, const int control_point_index, c
 	}
 	else
 	{
-		qDebug() << "Mesh doesn't have normals.";
+		qDebug() << "Mesh doesn't have normals";
 	}
 
 	return out_normal;
@@ -343,7 +343,7 @@ glm::vec2 ModelData::read_uv(FbxMesh* mesh, const int control_point_index, const
 	}
 	else
 	{
-		qDebug() << "Mesh doesn't have uv layer.";
+		qDebug() << "Mesh doesn't have uv layer";
 	}
 
 	return uv;
@@ -384,7 +384,7 @@ glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index,
 	}
 	else
 	{
-		qDebug() << "Mesh doesn't have binormals.";
+		qDebug() << "Mesh doesn't have binormals";
 	}
 
 

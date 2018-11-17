@@ -58,18 +58,18 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 {
 	QFile file(filename);
 	if(!m_fbx_model_)
-		throw std::runtime_error("There is no Fbx model loaded.");
+		throw std::runtime_error("There is no FBX model loaded");
 
 	const int growthmesh_index = hairdata.m_growthmesh_index;
 
 	if (growthmesh_index >= m_fbx_model_->m_meshes.size())
-		throw std::runtime_error("The selected growthmesh could not be found.");
+		throw std::runtime_error("The selected growthmesh could not be found");
 
 	const int num_hair = hairdata.m_num_hair;
 	const size_t num_hair_vertices = hairdata.m_vertices.size();
 
 	if (num_hair != m_fbx_model_->m_meshes.at(growthmesh_index).m_vertices.size())
-		throw std::runtime_error("The number of hair doesn't match the number of mesh vertices of the growthmesh.");
+		throw std::runtime_error("The number of hair doesn't match the number of mesh vertices of the growthmesh");
 
 	const int num_faces = m_fbx_model_->m_meshes.at(growthmesh_index).get_num_faces();
 
@@ -80,7 +80,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	const size_t num_uvs = uvs.size();
 
 	if (num_uvs != num_indices)
-		throw std::runtime_error("The number of uv's doesn't match the number of indices.");
+		throw std::runtime_error("The number of uv's doesn't match the number of indices");
 
 	const size_t num_bones = m_fbx_model_->get_num_bones() == 0 ? 1 : m_fbx_model_->get_num_bones();
 	std::vector<int> bone_indices;
@@ -154,7 +154,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 	}
 
 	if (!file.open(QIODevice::WriteOnly))
-		throw std::runtime_error("The file you are trying to access could not be opened.");
+		throw std::runtime_error("The file you are trying to access could not be opened");
 
 	QTextStream hair_file(&file);
 
