@@ -3,7 +3,8 @@
 */
 #version 330 core
 
-out highp vec4 fragColor;
+out vec4 fragColor;
+
 in vec2 UV;
 
 uniform sampler2D screenTexture;
@@ -11,5 +12,5 @@ uniform float intensity;
 
 void main()
 {
-    fragColor = texture(screenTexture,UV) * vec4(vec3(intensity),1.0);
+	fragColor = texture(screenTexture, UV) * vec4(vec3(intensity), 1.0);
 }
