@@ -23,6 +23,7 @@ public:
 	void set_paintmode(paintmode p) noexcept;
 	
 	const glm::mat4& get_transform() const noexcept{ return m_transform_;}
+	float get_size() const noexcept { return m_brush_size_; }
 	float get_intensity() const noexcept {return m_intensity_;}
 	bool get_opposite_mode() const noexcept{return m_opposite_mode_;} 
 	bool* get_colormask() noexcept {return m_colormask_;}

@@ -49,6 +49,12 @@ void Renderer::render_scene()
 	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("mvp"), 1,GL_FALSE,
 	                   value_ptr(mvp));
 
+	const glm::vec2 brush_position = glm::vec2(m_current_scene_->m_brush.get_transform()[3]) * 0.5f + 0.5f;
+	const float brush_size = m_current_scene_->m_brush.get_size();
+
+	m_current_scene_->m_default_shader->setUniformValue("brushCenter", brush_position.x, brush_position.y);
+	m_current_scene_->m_default_shader->setUniformValue("brushSize", brush_size);
+
 	if (m_should_render_growthmesh)
 	{
 		// draw the growth mesh
