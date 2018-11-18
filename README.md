@@ -2,6 +2,28 @@
 # HairGroomer
 
 Hair Groomer is a stand-alone software to generate guide hairs for NVIDIA HairWorks.
+## Controls
+### General Controls
+|Key|  Functionality|
+|--|--|
+|D |Toggle the UV overlay visibility|
+### Brush Controls
+|Key|  Functionality|
+|--|--|
+|M|Reduce the brush intensity|
+|P|Increase the brush intensity |
+|-|Reduce the brush size|
+|+|Increase the brush size|
+|L|Set the brushmode to length (Red)|
+|C|Set the brushmode to curl (Green)|
+|T|Set the brushmode to twist (Blue)|
+|R|Reset the drawing window content (hair)|
+### Camera Controls
+|Key|  Functionality|
+|--|--|
+|Q| Reset the camera in the 3D viewport|
+|Alt + Drag Leftmouse|Rotate the camera around the pivot point|
+|Alt + Drag Middlemouse | Move the pivot point of the camera up and down realitive to the current camera position and rotation|
 
 ## Getting Started (Developers)
 
@@ -44,9 +66,9 @@ Download and install [FBX SDK 2019.0 installer for VS2015](https://www.autodesk.
 After cloning the repository a few things need to be done to get the build working.
 1. Obtain the required git submodules by using `git submodule update --recursive --remote` in the repository
 2. Copy over the lib and include folder from your FBX SDK installation directory (e.g. `C:\Program Files\Autodesk\FBX\FBX SDK\2019.0`) to `HairGroomer/libs/fbxsdk`
-3. Open the HairGroomer solution in Visual Studio and select 'Qt VS Tools -> Qt Project Settings' in the menu bar
+3. Open the HairGroomer solution in Visual Studio and select `Qt VS Tools -> Qt Project Settings` in the menu bar
 4. In the `Properties` tab, select the Qt msvc2017_64 Version you installed earlier and click on `OK`
-5. You should now be able to build and run the Project
+5. You should now be able to build and run the project
 
 ## Attribution
 This software contains Autodesk® FBX® code developed by Autodesk, Inc. Copyright 20XX Autodesk, Inc. All rights, reserved. Such code is provided "as is" and Autodesk, Inc. disclaims any and all warranties, whether express or implied, including without limitation the implied warranties of merchantability, fitness for a particular purpose or non-infringement of third party rights. In no event shall Autodesk, Inc. be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of such code.
