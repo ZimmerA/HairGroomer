@@ -219,7 +219,7 @@ ClientBin/
 *.publishsettings
 orleans.codegen.cs
 
-# Including strong name files can present a security risk 
+# Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)
 #*.snk
 
@@ -311,7 +311,7 @@ __pycache__/
 # OpenCover UI analysis results
 OpenCover/
 
-# Azure Stream Analytics local run output 
+# Azure Stream Analytics local run output
 ASALocalRun/
 
 # MSBuild Binary and Structured Log
@@ -320,7 +320,7 @@ ASALocalRun/
 # NVidia Nsight GPU debugger configuration file
 *.nvuser
 
-# MFractors (Xamarin productivity tool) working folder 
+# MFractors (Xamarin productivity tool) working folder
 .mfractor/
 
 
@@ -367,37 +367,9 @@ target_wrapper.*
 
 # QtCreator CMake
 CMakeLists.txt.user*
-Eva_Dressed_Animated.fbx
-Eva_Dressed_Animated.fbm/diffuseSkin.bmp
-Eva_Dressed_Animated.fbm/eva7eyesmap03d_1007.jpg
-Eva_Dressed_Animated.fbm/eva7lashesmap01_1006.jpg
-Eva_Dressed_Animated.fbm/eva7mouthmapd_1005.jpg
-res/test.fbx
-res/Eva3.fbx
-res/Eva3.fbm/eva7mouthmapd_1005.jpg
-res/Eva3.fbm/eva7lashesmap01_1006.jpg
-res/Eva3.fbm/eva7eyesmap03d_1007.jpg
-res/Eva3.fbm/diffuseSkin.bmp
-res/diffuseSkin.bmp
-res/growthmesh.fbx
-res/referencemodel.fbx
-wfewf.png
-test.ruleset
-test.apx
-res/samba.fbx
-res/referencemodel.fbm/eva7mouthmapd_1005.jpg
-res/referencemodel.fbm/eva7lashesmap01_1006.jpg
-res/referencemodel.fbm/eva7eyesmap03d_1007.jpg
-res/referencemodel.fbm/diffuseSkin.bmp
-res/manja.fbx
-res/human.FBX
-all core rules.ruleset
-55.apx
-res/mite.fbx
-libfbxsdkd.dll
-res/samba - Kopie.fbx
-res/cube.fbx
-samba.fbx
+
+res/*.fbx
+models/
 
 libs/fbxsdk/
 libfbxsdk.dll
