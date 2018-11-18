@@ -28,7 +28,7 @@ public:
 	QColor m_hair_color;
 	QColor m_hair_root_color;
 	QColor m_light_color;
-	Paintbrush::paintmode m_paintmode;
+	PaintBrush::PaintMode m_paintmode;
 
 	// Getters/Setters
 	void set_presenter(MvpPresenter* presenter) noexcept { this->m_presenter_ = presenter; }
@@ -42,7 +42,7 @@ public:
 	void set_hair_segment_count(int segments) const;
 	void set_hair_color(const QColor& color);
 	void set_hair_root_color(const QColor& color);
-	void set_brush_mode(Paintbrush::paintmode mode) const;
+	void set_brush_mode(PaintBrush::PaintMode mode) const;
 	void set_brush_size(double size) const;
 	void set_brush_intensity(double intensity) const;
 	void set_light_hair(bool active) const;

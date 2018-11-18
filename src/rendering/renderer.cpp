@@ -37,17 +37,12 @@ void Renderer::render_scene()
 	glm::mat4 vp = m_current_scene_->m_projection_matrix * view_matrix;
 
 	m_current_scene_->m_default_shader->bind();
-	m_current_scene_->m_default_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x,
-	                                                    m_current_scene_->m_light.m_position.y,
-	                                                    m_current_scene_->m_light.m_position.z);
-	m_current_scene_->m_default_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x,
-	                                                    m_current_scene_->m_light.m_color.y,
-	                                                    m_current_scene_->m_light.m_color.z);
+	m_current_scene_->m_default_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x, m_current_scene_->m_light.m_position.y, m_current_scene_->m_light.m_position.z);
+	m_current_scene_->m_default_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x, m_current_scene_->m_light.m_color.y, m_current_scene_->m_light.m_color.z);
 	m_current_scene_->m_default_shader->setUniformValue("lighting", m_should_light_meshes);
-	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("model"), 1,GL_FALSE,
-	                   value_ptr(m_current_scene_->m_model_matrix));
-	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("mvp"), 1,GL_FALSE,
-	                   value_ptr(mvp));
+
+	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(m_current_scene_->m_model_matrix));
+	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("mvp"), 1, GL_FALSE, value_ptr(mvp));
 
 	const glm::vec2 brush_position = glm::vec2(m_current_scene_->m_brush.get_transform()[3]) * 0.5f + 0.5f;
 	const float brush_size = m_current_scene_->m_brush.get_size();
@@ -57,46 +52,33 @@ void Renderer::render_scene()
 
 	if (m_should_render_growthmesh)
 	{
-		// draw the growth mesh
+		// Draw the growth mesh
 		m_current_scene_->m_fbx_glmodel.draw_at_index(m_current_scene_->m_growth_mesh_index);
 	}
 
 	if (m_should_render_refrencemodel)
 	{
-		// draw the reference mesh
+		// Draw the reference mesh
 		m_current_scene_->m_fbx_glmodel.draw();
 	}
 
 	m_current_scene_->m_default_shader->release();
 
-	// draw the hair
+	// Draw the hair
 	m_current_scene_->m_hair_shader->bind();
-	m_current_scene_->m_hair_shader->setUniformValue("cameraPos", m_current_scene_->m_camera.m_position.x,
-	                                                 m_current_scene_->m_camera.m_position.y,
-	                                                 m_current_scene_->m_camera.m_position.z);
-	m_current_scene_->m_hair_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x,
-	                                                 m_current_scene_->m_light.m_position.y,
-	                                                 m_current_scene_->m_light.m_position.z);
-	m_current_scene_->m_hair_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x,
-	                                                 m_current_scene_->m_light.m_color.y,
-	                                                 m_current_scene_->m_light.m_color.z);
+	m_current_scene_->m_hair_shader->setUniformValue("cameraPos", m_current_scene_->m_camera.m_position.x, m_current_scene_->m_camera.m_position.y, m_current_scene_->m_camera.m_position.z);
+	m_current_scene_->m_hair_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x, m_current_scene_->m_light.m_position.y, m_current_scene_->m_light.m_position.z);
+	m_current_scene_->m_hair_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x, m_current_scene_->m_light.m_color.y, m_current_scene_->m_light.m_color.z);
 	m_current_scene_->m_hair_shader->setUniformValue("lighting", m_should_light_hair);
 	m_current_scene_->m_hair_shader->setUniformValue("numSegments", m_current_scene_->m_hair.m_num_segments);
 	m_current_scene_->m_hair_shader->setUniformValue("maxHairLength", m_current_scene_->m_hair.m_length);
-	m_current_scene_->m_hair_shader->setUniformValue("hairColor", m_current_scene_->m_hair.m_hair_color.x,
-	                                                 m_current_scene_->m_hair.m_hair_color.y,
-	                                                 m_current_scene_->m_hair.m_hair_color.z);
-	m_current_scene_->m_hair_shader->setUniformValue("rootColor", m_current_scene_->m_hair.m_root_color.x,
-	                                                 m_current_scene_->m_hair.m_root_color.y,
-	                                                 m_current_scene_->m_hair.m_root_color.z);
-	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("model"), 1, GL_FALSE,
-	                   value_ptr(m_current_scene_->m_model_matrix));
-	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("view"), 1, GL_FALSE,
-	                   value_ptr(view_matrix));
-	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("mvp"), 1, GL_FALSE,
-	                   value_ptr(mvp));
-	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("vp"), 1, GL_FALSE,
-	                   value_ptr(vp));
+	m_current_scene_->m_hair_shader->setUniformValue("hairColor", m_current_scene_->m_hair.m_hair_color.x, m_current_scene_->m_hair.m_hair_color.y, m_current_scene_->m_hair.m_hair_color.z);
+	m_current_scene_->m_hair_shader->setUniformValue("rootColor", m_current_scene_->m_hair.m_root_color.x, m_current_scene_->m_hair.m_root_color.y, m_current_scene_->m_hair.m_root_color.z);
+
+	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(m_current_scene_->m_model_matrix));
+	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("view"), 1, GL_FALSE, value_ptr(view_matrix));
+	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("mvp"), 1, GL_FALSE, value_ptr(mvp));
+	glUniformMatrix4fv(m_current_scene_->m_hair_shader->uniformLocation("vp"), 1, GL_FALSE, value_ptr(vp));
 
 	// Bind the draw framebuffer texture to texunit 0
 	glActiveTexture(GL_TEXTURE0);
@@ -108,10 +90,10 @@ void Renderer::render_scene()
 	{
 		// Generate query to get number of generated primitves
 		glGenQueries(1, &geom_shader_query);
+
 		// 1 hair per drawn vertex of the mesh, number of segments + 1 points per hair ( 1 segment = 2 points, 2 segments = 3 points etc.), 3 dimensions per hair(x, y z)
-		m_current_scene_->resize_hair_feedback_buffer(
-			m_current_scene_->m_fbx_glmodel.get_vertex_amount() * (m_current_scene_->m_hair.m_num_segments * 2) * 3
-			* sizeof(GLfloat));
+		m_current_scene_->resize_hair_feedback_buffer(m_current_scene_->m_fbx_glmodel.get_vertex_amount() * (m_current_scene_->m_hair.m_num_segments * 2) * 3 * sizeof(GLfloat));
+
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, m_current_scene_->m_hair_output_vbo.bufferId());
 		glBeginQuery(GL_PRIMITIVES_GENERATED, geom_shader_query);
 		glBeginTransformFeedback(GL_LINES);
@@ -174,8 +156,7 @@ void Renderer::render_scene()
 	matrix = glm::rotate(matrix, glm::radians(90.0f), glm::vec3(1,0,0));
 	matrix = vp * matrix;
 	m_current_scene_->m_floor_grid_texture->bind();
-	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE,
-	                   value_ptr(matrix));
+	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(matrix));
 	glDrawArrays(GL_TRIANGLES, 0 , 6);
 
 	m_current_scene_->m_paintbrush_shader->release();
@@ -209,28 +190,27 @@ void Renderer::render_scene()
 	m_current_scene_->m_paint_brush_texture->bind();
 	m_current_scene_->m_paintbrush_shader->bind();
 	//m_current_scene_->m_brush.begin(m_current_scene_->m_paintbrush_shader, false);
-	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE,
-	                   value_ptr(m_current_scene_->m_brush.get_transform()));
-	glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"),
-	            m_current_scene_->m_brush.get_intensity());
+	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(m_current_scene_->m_brush.get_transform()));
+	glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"), m_current_scene_->m_brush.get_intensity());
 	m_current_scene_->m_quad_vao.bind();
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+
 	// Render the paintbrush to the drawbuffer if left mouse is pressed
 	if (m_is_drawing)
 	{
 		m_current_scene_->m_drawbuffer.bind();
+
 		glViewport(0, 0, 800, 600);
 		glScissor(0, 0, 800, 600);
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-		glColorMask(m_current_scene_->m_brush.get_colormask()[0], m_current_scene_->m_brush.get_colormask()[1],
-		            m_current_scene_->m_brush.get_colormask()[2], GL_TRUE);
+		glColorMask(m_current_scene_->m_brush.get_colormask()[0], m_current_scene_->m_brush.get_colormask()[1], m_current_scene_->m_brush.get_colormask()[2], GL_TRUE);
+
 		if (m_current_scene_->m_brush.get_opposite_mode())
-		{
-			glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"),
-			            1.0f - m_current_scene_->m_brush.get_intensity());
-		}
+			glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"), 1.0f - m_current_scene_->m_brush.get_intensity());
+
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glColorMask(GL_TRUE,GL_TRUE, GL_TRUE, GL_TRUE);
+
 		m_current_scene_->m_drawbuffer.release();
 	}
 

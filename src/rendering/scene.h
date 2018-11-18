@@ -54,7 +54,7 @@ public:
 	Orbitcamera m_camera;
 	Light m_light;
 	HairSettings m_hair;
-	Paintbrush m_brush;
+	PaintBrush m_brush;
 	GlModel m_fbx_glmodel;
 
 	// index of the growthmesh in the fbx model

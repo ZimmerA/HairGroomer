@@ -506,7 +506,7 @@ void MainWindow::brush_mode_changed_listener(int mode, const bool checked)
 {
 	if (checked)
 	{
-		m_paintmode = static_cast<Paintbrush::paintmode>(mode);
+		m_paintmode = static_cast<PaintBrush::PaintMode>(mode);
 		m_ui_->widget_gl->m_scene.m_brush.set_paintmode(m_paintmode);
 		m_ui_->widget_gl->update();
 	}
@@ -558,17 +558,17 @@ void MainWindow::set_hair_root_color(const QColor& color)
 	hair_root_color_selected_listener(color);
 }
 
-void MainWindow::set_brush_mode(const Paintbrush::paintmode mode) const
+void MainWindow::set_brush_mode(const PaintBrush::PaintMode mode) const
 {
 	switch (mode)
 	{
-	case Paintbrush::paintmode::length:
+	case PaintBrush::PaintMode::Length:
 		m_ui_->rb_brushmode_hair->click();
 		break;
-	case Paintbrush::paintmode::curl:
+	case PaintBrush::PaintMode::Curl:
 		m_ui_->rb_brushmode_curl->click();
 		break;
-	case Paintbrush::paintmode::twist:
+	case PaintBrush::PaintMode::Twist:
 		m_ui_->rb_brushmode_twist->click();
 		break;
 	default:

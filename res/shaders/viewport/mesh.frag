@@ -22,7 +22,7 @@ void main()
 	{
 		vec3 N = normalize(Normal);
 		vec3 L = normalize(lightPos - FragPos);
-		float diff =  max(dot(N, L), 0.0);
+		float diff = max(dot(N, L), 0.0);
 		vec3 diffuse = diff * lightColor;
 		vec3 result = clamp(diffuse, 0.0, 1.0) * vec3(0.0, 1.0, 1.0);
 

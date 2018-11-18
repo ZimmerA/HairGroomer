@@ -21,7 +21,7 @@ struct UiSettings
 	QColor m_hair_root_color{0, 0, 0};
 
 	// Brush
-	Paintbrush::paintmode m_brushmode{Paintbrush::paintmode::length};
+	PaintBrush::PaintMode m_brushmode{PaintBrush::PaintMode::Length};
 	double m_brush_size{0.10};
 	double m_brush_intensity{1.0};
 
@@ -130,7 +130,7 @@ inline void from_json(const json& j, ProjectSettings& s)
 	b = j.at("hair_settings").at("root_color").at(2).get<int>();
 	s.m_ui_settings.m_hair_root_color = QColor(r, g, b);
 
-	s.m_ui_settings.m_brushmode = static_cast<Paintbrush::paintmode>(j.at("brush_settings").at("paint_mode").get<int>()
+	s.m_ui_settings.m_brushmode = static_cast<PaintBrush::PaintMode>(j.at("brush_settings").at("paint_mode").get<int>()
 	);
 	s.m_ui_settings.m_brush_size = j.at("brush_settings").at("brush_size").get<double>();
 	s.m_ui_settings.m_brush_intensity = j.at("brush_settings").at("brush_intensity").get<double>();
