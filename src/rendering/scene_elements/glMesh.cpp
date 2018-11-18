@@ -22,24 +22,21 @@ GlMesh::GlMesh(MeshData* mesh_data)
 
 	m_vertex_count = static_cast<int>(mesh_data->m_vertices.size());
 	// Setup attrib pointers
-	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
+	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	f->glEnableVertexAttribArray(0);
 	f->glEnableVertexAttribArray(1);
 	f->glEnableVertexAttribArray(2);
 	f->glEnableVertexAttribArray(3);
 	f->glEnableVertexAttribArray(4);
 
-	// position
+	// Position
 	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
-	// normals
-	f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                         reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
-	// tangent
-	f->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                         reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
-	// bitangent
-	f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
-	                         reinterpret_cast<void*>(offsetof(Vertex, m_bitangent)));
+	// Normals
+	f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
+	// Tangent
+	f->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
+	// Bitangent
+	f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_bitangent)));
 	// UV
 	f->glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
 }
@@ -49,7 +46,7 @@ GlMesh::GlMesh(MeshData* mesh_data)
  */
 void GlMesh::draw()
 {
-	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
+	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	f->glDrawElements(GL_TRIANGLES, m_indicie_count, GL_UNSIGNED_INT, nullptr);
 }
@@ -59,7 +56,7 @@ void GlMesh::draw()
  */
 void GlMesh::draw_points()
 {
-	QOpenGLFunctions* f = QOpenGLContext::currentContext()->functions();
+	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	f->glDrawArrays(GL_POINTS, 0, m_vertex_count);
 }
