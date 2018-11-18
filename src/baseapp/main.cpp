@@ -4,6 +4,7 @@
 #include "mvppresenter.h"
 #include <QMessageBox>
 #include <QOpenGLFunctions_3_3_Core>
+#include <QCommandLineParser>
 
 int main(int argc, char *argv[])
 {
@@ -11,8 +12,17 @@ int main(int argc, char *argv[])
 	QApplication::setStyle("plastique");
 	QCoreApplication::setApplicationName("Hair Groomer");
 	QCoreApplication::setOrganizationName("Adrian Zimmer");
-	QCoreApplication::setApplicationVersion(QT_VERSION_STR);
+	QCoreApplication::setApplicationVersion("1.0");
 
+	QCommandLineParser parser;
+    parser.addHelpOption();
+    parser.addVersionOption();
+	const QCommandLineOption fbx_model_option("fbx", QCoreApplication::translate("main", "Load the provided model on application startup"), QCoreApplication::translate("main", "path"));
+    parser.addOption(fbx_model_option);
+
+	// Process the actual command line arguments given by the user
+    parser.process(a);
+	// Opengl version
 	QSurfaceFormat fmt;
 	fmt.setDepthBufferSize(24);
 	fmt.setVersion(3, 3);
@@ -43,9 +53,14 @@ int main(int argc, char *argv[])
 	}
 
 	view.show();
-	UiSettings defaultsettings;
+	const UiSettings defaultsettings;
 	// Load the default values of the ui control elements
 	view.set_ui_settings(defaultsettings);
+	if(!parser.value(fbx_model_option).isEmpty())
+	{
+		presenter.load_fbx_model(parser.value(fbx_model_option));
+	}
+
 	const auto result = QApplication::exec();
 	return result;
 }
