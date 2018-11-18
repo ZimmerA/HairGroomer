@@ -398,3 +398,6 @@ libfbxsdkd.dll
 res/samba - Kopie.fbx
 res/cube.fbx
 samba.fbx
+
+libs/fbxsdk/
+libfbxsdk.dll
