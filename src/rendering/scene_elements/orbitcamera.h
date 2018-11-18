@@ -1,5 +1,6 @@
 #ifndef ORBITCAMERA_H
 #define ORBITCAMERA_H
+
 #include <glm.hpp>
 
 /**
@@ -17,7 +18,6 @@ public:
 	void move_pivot_point(float x, float y);
 	glm::vec3 m_position{};
 
-
 private:
 	float m_azimuth_;
 	float m_elevation_;
@@ -29,4 +29,5 @@ private:
 	glm::vec3 m_lookat_point_{};
 	glm::mat4 m_view_{};
 };
+
 #endif

@@ -6,7 +6,6 @@
 
 #include <QOpenGLFunctions_3_3_Core>
 
-
 class GLWidget;
 
 class Renderer : protected QOpenGLFunctions_3_3_Core
@@ -35,4 +34,3 @@ private:
 };
 
 #endif
-

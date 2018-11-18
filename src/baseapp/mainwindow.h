@@ -1,7 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+
 #include <QMainWindow>
 #include <QColorDialog>
+
 #include "mvppresenter.h"
 
 namespace Ui

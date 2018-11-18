@@ -3,8 +3,8 @@
 
 #include "baseapp/meshData.h"
 
-#include <qopenglvertexarrayobject.h>
-#include <qopenglbuffer.h>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
 
 /*
 * Used by the GLWidget to draw meshes

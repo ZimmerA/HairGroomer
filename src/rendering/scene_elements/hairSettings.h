@@ -1,5 +1,6 @@
 #ifndef HAIR_H
 #define HAIR_H
+
 /**
  * \brief Stores general hair information used for the rendering
  */

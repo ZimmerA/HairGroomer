@@ -1,9 +1,9 @@
+
 #include "glDrawbuffer.h"
 
 #include <qopenglfunctions.h>
 #include <QImage>
 #include <QOpenGLFunctions_3_3_Core>
-
 
 void GlDrawbuffer::create()
 {

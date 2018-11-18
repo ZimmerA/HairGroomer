@@ -1,8 +1,10 @@
+
 #include "mvppresenter.h"
 #include "mainwindow.h"
 #include "hairData.h"
 
 #include <ui_mainwindow.h>
+
 #include <QString>
 #include <QFileDialog>
 

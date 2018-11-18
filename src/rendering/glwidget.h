@@ -6,7 +6,6 @@
 
 #include <QOpenGLWidget>
 
-
 class GLWidget : public QOpenGLWidget
 {
 Q_OBJECT
@@ -16,6 +15,7 @@ public:
 	Renderer m_renderer;
 	Scene m_scene;
 	void load_glmodel_data();
+
 private:
 	// MVP design pattern reference of view
 	MainWindow* m_view_{};

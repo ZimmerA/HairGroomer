@@ -9,8 +9,9 @@
 #include "scene_elements/hairSettings.h"
 
 #include <QOpenGLTexture>
-#include <glm.hpp>
 #include <qglobal.h>
+
+#include <glm.hpp>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 

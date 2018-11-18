@@ -19,4 +19,5 @@ public:
 private:
 	std::unique_ptr<QOpenGLFramebufferObject> m_drawbuffer_;
 };
+
 #endif

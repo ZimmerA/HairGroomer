@@ -1,4 +1,6 @@
+
 #include "orbitcamera.h"
+
 #include <gtc/matrix_transform.hpp>
 
 const float default_azimuth = 0.f;

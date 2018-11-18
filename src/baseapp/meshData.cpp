@@ -1,8 +1,10 @@
+
 #include "meshData.h"
 
 MeshData::MeshData(const std::string name, std::vector<Vertex> vertices, std::vector<unsigned int> indices, const int num_faces) :
 	m_vertices(std::move(vertices)), m_indices(std::move(indices)), m_num_faces(num_faces), m_name(name)
 {
+
 }
 
 /**

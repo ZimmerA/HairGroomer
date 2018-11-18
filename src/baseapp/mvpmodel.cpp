@@ -1,12 +1,14 @@
+
 #include "mvpmodel.h"
 
 #include <vector>
 #include <fstream>
-#include <iomanip>      // std::setw
+#include <iomanip> // std::setw
 
-#include <qimage.h>
+#include <QImage>
 #include <QFileDialog>
-#include <qtextstream.h>
+#include <QTextStream>
+
 #include "rendering/glwidget.h"
 
 ProjectSettings MvpModel::load_project_file_from_disk(const QString& filename) const

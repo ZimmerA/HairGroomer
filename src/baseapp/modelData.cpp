@@ -1,7 +1,10 @@
+
 #include "modelData.h"
-#include <QDebug>
+
 #include <unordered_map>
 #include <sstream>
+
+#include <QDebug>
 
 ModelData::ModelData(const QString& path)
 {

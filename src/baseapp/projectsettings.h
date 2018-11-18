@@ -2,6 +2,7 @@
 #define SETTINGS_H
 
 #include "rendering/scene_elements/paintbrush.h"
+
 #include <QColor>
 
 #undef snprintf // BAD FBX SDK!
