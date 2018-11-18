@@ -149,6 +149,9 @@
     <ClInclude Include="src\baseapp\projectsettings.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\rendering\glattributes.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="debug\moc_predefs.h.cbt">

@@ -5,6 +5,8 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 
+#include "rendering/glattributes.h"
+
 GlMesh::GlMesh(MeshData* mesh_data)
 	: m_indicie_count(0), m_vertex_count(0), m_ibo_(QOpenGLBuffer::IndexBuffer)
 {
@@ -23,22 +25,17 @@ GlMesh::GlMesh(MeshData* mesh_data)
 	m_vertex_count = static_cast<int>(mesh_data->m_vertices.size());
 	// Setup attrib pointers
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-	f->glEnableVertexAttribArray(0);
-	f->glEnableVertexAttribArray(1);
-	f->glEnableVertexAttribArray(2);
-	f->glEnableVertexAttribArray(3);
-	f->glEnableVertexAttribArray(4);
+	f->glEnableVertexAttribArray(ATTRIBUTE_POSITION);
+	f->glEnableVertexAttribArray(ATTRIBUTE_NORMAL);
+	f->glEnableVertexAttribArray(ATTRIBUTE_TANGENT);
+	f->glEnableVertexAttribArray(ATTRIBUTE_BITANGENT);
+	f->glEnableVertexAttribArray(ATTRIBUTE_TEXCOORD);
 
-	// Position
-	f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
-	// Normals
-	f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
-	// Tangent
-	f->glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
-	// Bitangent
-	f->glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_bitangent)));
-	// UV
-	f->glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
+	f->glVertexAttribPointer(ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
+	f->glVertexAttribPointer(ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
+	f->glVertexAttribPointer(ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
+	f->glVertexAttribPointer(ATTRIBUTE_BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_bitangent)));
+	f->glVertexAttribPointer(ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
 }
 
 /**
