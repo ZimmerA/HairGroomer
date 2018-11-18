@@ -23,8 +23,8 @@ Hair Groomer is a stand-alone software to generate guide hairs for NVIDIA HairWo
 |--|--|
 |Q| Reset the camera in the 3D viewport|
 |Alt + Drag Leftmouse|Rotate the camera around the pivot point|
-|Alt + Drag Middlemouse | Move the pivot point of the camera up and down realitive to the current camera position and rotation|
-
+|Alt + Drag Middlemouse| Move the pivot point of the camera up and down realitive to the current camera position and rotation|
+|Mousewheel|Zoom camera in/out|
 ## Getting Started (Developers)
 
 The following instructions will help you get the project up and running for development.
