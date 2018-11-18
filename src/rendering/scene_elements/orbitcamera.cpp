@@ -6,7 +6,7 @@ const float default_elevation = 50.f;
 const glm::vec3 default_lookat{0,0,0};
 const float default_distance = 550.f;
 const float default_sensitivity = 20.0f;
-const float default_scrollspeed = 8;
+const float default_scrollspeed = 15;
 
 Orbitcamera::Orbitcamera() noexcept
 {
@@ -48,8 +48,8 @@ glm::mat4 Orbitcamera::get_view_matrix() const noexcept
  */
 void Orbitcamera::handle_mouse_move(const float delta_x, const float delta_y)
 {
-	const float move_x = delta_x * m_sensitivity_;
-	const float move_y = delta_y * m_sensitivity_;
+	const float move_x = -delta_x * m_sensitivity_;
+	const float move_y = -delta_y * m_sensitivity_;
 
 	m_azimuth_ += glm::radians(move_x);
 	m_elevation_ += glm::radians(move_y);
@@ -73,8 +73,8 @@ void Orbitcamera::move_pivot_point(const float x, const float y)
 	glm::mat4 lookat = get_view_matrix();
 	const glm::vec3 upvec(lookat[0][1], lookat[1][1], lookat[2][1]);
 	const glm::vec3 rightvec(lookat[0][0], lookat[1][0], lookat[2][0]);
-	m_lookat_point_ += upvec * y;
-	m_lookat_point_ += rightvec * x;
+	m_lookat_point_ -= upvec * y;
+	m_lookat_point_ -= rightvec * x;
 	calc_position();
 }
 
@@ -84,7 +84,7 @@ void Orbitcamera::move_pivot_point(const float x, const float y)
  */
 void Orbitcamera::handle_mouse_wheel(const float scroll_delta)
 {
-	m_distance_ += scroll_delta * m_scrollspeed_;
+	m_distance_ -= scroll_delta * m_scrollspeed_;
 	if (m_distance_ <= 1.0f)
 		m_distance_ = 1.0f;
 	calc_position();
