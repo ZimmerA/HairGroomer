@@ -73,8 +73,8 @@ void Orbitcamera::move_pivot_point(const float x, const float y)
 	glm::mat4 lookat = get_view_matrix();
 	const glm::vec3 upvec(lookat[0][1], lookat[1][1], lookat[2][1]);
 	const glm::vec3 rightvec(lookat[0][0], lookat[1][0], lookat[2][0]);
-	m_lookat_point_ -= upvec * y;
-	m_lookat_point_ -= rightvec * x;
+	m_lookat_point_ += upvec * y;
+	m_lookat_point_ += rightvec * x;
 	calc_position();
 }
 
