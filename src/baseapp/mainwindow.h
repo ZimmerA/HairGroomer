@@ -23,6 +23,7 @@ public:
 	void display_errorbox(const char* title, const char* content);
 	bool display_questionbox(const char* title, const char* question);
 	void set_statusbar_text(const std::string& text) const;
+	void set_window_title_prefix(const QString& title_prefix);
 
 	QColor m_hair_color;
 	QColor m_hair_root_color;
@@ -55,13 +56,14 @@ public:
 	void set_growthmesh_index_content(std::vector<std::string> content) const;
 	void clear_growthmesh_index_content() const;
 	void set_ui_settings(const UiSettings& settings);
-
+public slots:
+		void on_actionSave_Project_triggered();
 private slots:
+
 	void on_actionExport_triggered();
 	void on_actionOpen_Fbx_triggered();
 	void on_actionExport_Hairstyle_triggered();
 	void on_actionOpen_Project_triggered();
-	void on_actionSave_Project_triggered();
 	void on_actionSave_Project_as_triggered();
 	void on_actionNew_Project_triggered();
 	void on_actionLoad_Hairstyle_triggered();
@@ -109,6 +111,11 @@ private:
 	// Connect the listeners to the UI Elements and their shortcuts
 	void connect_signals_and_slots();
 
+protected:
+	void dropEvent(QDropEvent* e) override;
+	void dragEnterEvent(QDragEnterEvent* e) override;
+
+private:
 	// Shortcuts for Ui controls
 	QShortcut *m_hotkey_toggle_uv_{};
 	QShortcut *m_hotkey_brushsize_reduce_{};

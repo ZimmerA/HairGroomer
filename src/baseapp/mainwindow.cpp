@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QShortcut>
 #include <sstream>
+#include <QDropEvent>
+#include <QMimeData>
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
@@ -15,6 +17,7 @@ MainWindow::MainWindow(QWidget* parent) :
 	m_ui_->setupUi(this);
 	connect_signals_and_slots();
 	m_ui_->statusBar->showMessage("");
+	setAcceptDrops(true);
 }
 
 MainWindow::~MainWindow()
@@ -40,7 +43,7 @@ void MainWindow::on_actionOpen_Fbx_triggered()
  */
 void MainWindow::on_actionExport_Hairstyle_triggered()
 {
-	const QString file_name = save_file_dialog("Export Hairstyle", "PNG (*.png)");
+	const QString file_name = save_file_dialog("Export Hairstyle", "Hairstyle (*.hairstyle)");
 
 	get_presenter()->export_hairstyle(file_name);
 }
@@ -63,13 +66,9 @@ void MainWindow::on_actionNew_Project_triggered()
  */
 void MainWindow::on_actionOpen_Project_triggered()
 {
-	const QString file_name = open_file_dialog("Open Project", "JSON (*.JSON)");
+	const QString file_name = open_file_dialog("Open Project", "Hair Groomer Project (*.grrproj)");
 	if (!file_name.isEmpty())
 	{
-		if (display_questionbox("Save?", "Do you want to save your current project?"))
-		{
-			on_actionSave_Project_triggered();
-		}
 		get_presenter()->load_project_file(file_name);
 	}
 }
@@ -88,7 +87,7 @@ void MainWindow::on_actionSave_Project_triggered()
  */
 void MainWindow::on_actionSave_Project_as_triggered()
 {
-	const QString file_name = save_file_dialog("Save Project", "JSON (*.JSON)");
+	const QString file_name = save_file_dialog("Save Project", "Hair Groomer Project (*.grrproj)");
 	get_presenter()->save_project_file_as(file_name);
 }
 
@@ -97,7 +96,7 @@ void MainWindow::on_actionSave_Project_as_triggered()
  */
 void MainWindow::on_actionLoad_Hairstyle_triggered()
 {
-	const QString file_name = open_file_dialog("Load Hairstyle", "PNG (*.png)");
+	const QString file_name = open_file_dialog("Load Hairstyle", "Hairstyle (*.hairstyle)");
 	get_presenter()->load_hairstyle(file_name);
 }
 
@@ -130,6 +129,7 @@ void MainWindow::display_errorbox(const char* title, const char* content)
 	box.setFixedSize(1000, 400);
 }
 
+
 /**
  * \brief Displays a questionbox with the given title and message and the buttons yes and no
  * \param title The title of the messagebox
@@ -148,6 +148,10 @@ void MainWindow::set_statusbar_text(const std::string& text) const
 	m_ui_->statusBar->showMessage(text.data());
 }
 
+void MainWindow::set_window_title_prefix(const QString& title_prefix)
+{
+	setWindowTitle("Hair Groomer - " +  title_prefix);
+}
 /**
  * \brief Opens a file dialog to select a file to save to
  * \param title The title of the dialog
@@ -275,6 +279,51 @@ void MainWindow::connect_signals_and_slots()
 	        SLOT(referencemodel_show_changed_listener(bool)));
 }
 
+void MainWindow::dropEvent(QDropEvent* e)
+{
+	const QMimeData* mimedata = e->mimeData();
+	if (mimedata->hasUrls())
+	{
+		QList<QUrl> url_list = mimedata->urls();
+		// Get the first file if multiple have been passed
+		QFileInfo fileinfo(url_list.at(0).toLocalFile());
+
+		const QString file_extension = fileinfo.suffix().toLower();
+		const QString file_path = fileinfo.absoluteFilePath();
+
+		if(file_extension == "fbx")
+		{
+			get_presenter()->load_fbx_model(file_path);
+		}else if(file_extension == "hairstyle")
+		{
+			get_presenter()->load_hairstyle(file_path);	
+		}else if(file_extension == "grrproj")
+		{
+			get_presenter()->load_project_file(file_path);
+		}
+
+		get_ui()->widget_gl->update();
+	}
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* e)
+{
+	const QMimeData* mimedata = e->mimeData();
+
+	if (mimedata->hasUrls())
+	{
+		QStringList accepted_files({"fbx","hairstyle","grrproj"});
+		QList<QUrl> url_list = mimedata->urls();
+
+		// Get the first file if multiple have been passed
+		const QFileInfo fileinfo(url_list.at(0).toLocalFile());
+
+		const QString file_extension = fileinfo.suffix().toLower();
+
+		if(accepted_files.contains(file_extension))
+			e->acceptProposedAction();
+	}
+}
 /**
  * \brief Listener that gets called when the uv grid is turned on or off
  * \param enabled Determines whether the uv grid should be visible

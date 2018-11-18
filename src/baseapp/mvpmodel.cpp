@@ -567,7 +567,7 @@ void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hair
 bool MvpModel::export_hairstyle_to_disk(const QImage& image, const QString& filename) const
 {
 	// Mirror on y axis because OpenGL flips it
-	return image.mirrored().save(filename);
+	return image.mirrored().save(filename,"PNG");
 }
 
 /**

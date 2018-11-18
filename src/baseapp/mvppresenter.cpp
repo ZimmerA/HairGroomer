@@ -128,6 +128,7 @@ void MvpPresenter::new_project() const
 	// Reset the UI to standard settings
 	get_view()->clear_growthmesh_index_content();
 	get_view()->set_ui_settings(UiSettings{});
+	get_view()->set_window_title_prefix("New Project");
 }
 
 /**
@@ -138,6 +139,11 @@ void MvpPresenter::load_project_file(const QString& project_file_path) const
 {
 	if (project_file_path.isEmpty())
 		return;
+
+	if (get_view()->display_questionbox("Save?", "Do you want to save your current project?"))
+	{
+		get_view()->on_actionSave_Project_triggered();
+	}
 
 	ProjectSettings project;
 
@@ -166,6 +172,7 @@ void MvpPresenter::load_project_file(const QString& project_file_path) const
 
 	get_view()->set_ui_settings(project.m_ui_settings);
 	get_model()->m_loaded_project_path = project_file_path.toLocal8Bit().constData();
+	get_view()->set_window_title_prefix(project_file_path);
 }
 
 /**
@@ -207,8 +214,8 @@ void MvpPresenter::save_project_file_as(const QString& project_file_path) const
 	// If no hairstyle is currently loaded export the hairstyle as Hairstyle.png into the project directory
 	if (get_model()->m_loaded_hairstyle_path.empty())
 	{
-		hair_file_path = get_directory_from_path(project_file_path).append("Hairstyle.png");
-		project.m_hair_style_name = "Hairstyle.png";
+		hair_file_path = get_directory_from_path(project_file_path).append("Hairstyle.hairstyle");
+		project.m_hair_style_name = "Hairstyle.hairstyle";
 	}else // Export it to the project directory using the name of the previously opened Hairstyle
 	{
 		hair_file_path = get_directory_from_path(project_file_path).append(get_filename_from_path(get_model()->m_loaded_hairstyle_path.data()));
@@ -218,4 +225,5 @@ void MvpPresenter::save_project_file_as(const QString& project_file_path) const
 	export_hairstyle(hair_file_path);
 	get_model()->save_project_file_to_disk(project_file_path, project);
 	get_model()->m_loaded_project_path = project_file_path.toLocal8Bit().constData();
+	get_view()->set_window_title_prefix(project_file_path);
 }
