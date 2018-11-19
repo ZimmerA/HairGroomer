@@ -10,12 +10,15 @@
 #include <sstream>
 #include <QDropEvent>
 #include <QMimeData>
+#include "mainToolbar.h"
 
 MainWindow::MainWindow(QWidget* parent) :
 	QMainWindow(parent),
 	m_ui_(new Ui::MainWindow)
 {
+
 	m_ui_->setupUi(this);
+	m_ui_->mainToolbar->addWidget(new MainToolbar(this));
 	connect_signals_and_slots();
 	m_ui_->statusBar->showMessage("");
 	setAcceptDrops(true);

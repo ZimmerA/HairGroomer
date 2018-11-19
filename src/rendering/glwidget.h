@@ -2,7 +2,7 @@
 #define GLWIDGET_H
 
 #include "rendering/renderer.h"
-#include "baseapp/mainwindow.h"
+#include "baseapp/views/mainwindow.h"
 
 #include <QOpenGLWidget>
 

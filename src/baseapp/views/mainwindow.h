@@ -4,7 +4,7 @@
 #include <QMainWindow>
 #include <QColorDialog>
 
-#include "mvppresenter.h"
+#include "baseapp/mvppresenter.h"
 
 namespace Ui
 {

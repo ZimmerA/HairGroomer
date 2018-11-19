@@ -1,6 +1,6 @@
 
 #include "mvppresenter.h"
-#include "mainwindow.h"
+#include "views/mainwindow.h"
 #include "hairData.h"
 
 #include <ui_mainwindow.h>

@@ -4,7 +4,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 #include <QCommandLineParser>
 
-#include "mainwindow.h"
+#include "views/mainwindow.h"
 #include "mvpmodel.h"
 #include "mvppresenter.h"
 

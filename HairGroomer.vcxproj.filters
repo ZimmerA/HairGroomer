@@ -72,9 +72,6 @@
     <ClCompile Include="src\baseapp\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\baseapp\mainwindow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\baseapp\meshData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -101,6 +98,12 @@
     </ClCompile>
     <ClCompile Include="src\rendering\scene_elements\glDrawbuffer.cpp">
       <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\views\mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\baseapp\views\mainToolbar.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -193,12 +196,18 @@
     <QtMoc Include="src\rendering\glwidget.h">
       <Filter>Generated Files</Filter>
     </QtMoc>
-    <QtMoc Include="src\baseapp\mainwindow.h">
+    <QtMoc Include="src\baseapp\views\mainwindow.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="src\baseapp\views\mainToolbar.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
   <ItemGroup>
-    <QtUic Include="src\baseapp\mainwindow.ui">
+    <QtUic Include="src\baseapp\views\mainwindow.ui">
+      <Filter>Form Files</Filter>
+    </QtUic>
+    <QtUic Include="src\baseapp\views\mainToolbar.ui">
       <Filter>Form Files</Filter>
     </QtUic>
   </ItemGroup>
