@@ -15,7 +15,8 @@ uniform bool lighting;
 
 uniform vec2 brushCenter;
 uniform float brushSize;
-uniform bool renderBrush;
+uniform bool brushVisible;
+
 void main()
 {
 	if (lighting)
@@ -32,7 +33,7 @@ void main()
 	{
 		fragColor = vec4(0.0, 1.0, 1.0, 1.0);
 	}
-	
-	if(renderBrush)
+
+	if (brushVisible)
 		fragColor.r = 1.0 - min(distance(vec2(UV.x, 1.0 - UV.y), brushCenter) / brushSize, 1.0);
 }
