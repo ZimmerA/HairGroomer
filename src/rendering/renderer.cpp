@@ -52,8 +52,10 @@ void Renderer::render_scene()
 
 	if (m_should_render_growthmesh)
 	{
+		m_current_scene_->m_default_shader->setUniformValue("renderBrush", true);
 		// Draw the growth mesh
 		m_current_scene_->m_fbx_glmodel.draw_at_index(m_current_scene_->m_growth_mesh_index);
+				m_current_scene_->m_default_shader->setUniformValue("renderBrush", false);
 	}
 
 	if (m_should_render_refrencemodel)
