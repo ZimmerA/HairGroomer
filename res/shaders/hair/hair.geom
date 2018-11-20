@@ -143,14 +143,14 @@ void main()
 	else // Actual hair
 	{
 		mat3 mHairRot = calculateHairBendMatrix(texture(hairMap, uv).g, texture(hairMap, uv).b);
-
+		float hairlength = mix(0,maxHairLength,hair);
 		// Hair segments
 		for (int i = 0; i < numSegments; ++i)
 		{
 			vertColor = vec4(hairColor, 1.0);
 			d = mHairRot * d;
 			dOut = tbn * d;
-			worldPos = worldPos + maxHairLength / numSegments * tbn * d;
+			worldPos = worldPos + hairlength / numSegments * tbn * d;
 			worldPosOut = worldPos;
 			gl_Position = vp * vec4(worldPos, 1.0);
 			EmitVertex();

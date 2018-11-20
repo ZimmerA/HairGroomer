@@ -231,7 +231,7 @@
             <item row="0" column="0">
              <widget class="QLabel" name="lb_hair_length">
               <property name="text">
-               <string>Hair Length</string>
+               <string>Max Hair Length</string>
               </property>
              </widget>
             </item>
