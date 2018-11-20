@@ -4,8 +4,26 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
+#include <QMessageBox>
 
 #include "glattributes.h"
+
+static void _check_shader(const std::unique_ptr<QOpenGLShaderProgram> &shader, const QString &info = nullptr)
+{
+	const QString log = shader->log().trimmed();
+
+	if (log.isEmpty())
+		return;
+
+	QString cause = log;
+
+	if (!info.isEmpty())
+		cause = info + "\n" + cause;
+
+	QMessageBox::critical(nullptr, "Error", cause);
+
+	exit(1);
+}
 
 void Scene::load()
 {
@@ -30,52 +48,86 @@ void Scene::load_shaders()
 
 	// Draws the growth-mesh
 	m_default_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_default_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/viewport/mesh.vert");
-	m_default_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/viewport/mesh.frag");
+	
+	if (!m_default_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/viewport/mesh.vert"))
+		_check_shader(m_default_shader, "Failed loading res/shaders/viewport/mesh.vert");
+	if (!m_default_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/viewport/mesh.frag"))
+		_check_shader(m_default_shader, "Failed loading res/shaders/viewport/mesh.frag");
+	
 	m_default_shader->bindAttributeLocation("aVertex", ATTRIBUTE_POSITION);
 	m_default_shader->bindAttributeLocation("aNormal", ATTRIBUTE_NORMAL);
 	m_default_shader->bindAttributeLocation("aTangent", ATTRIBUTE_TANGENT);
 	m_default_shader->bindAttributeLocation("aBitangent", ATTRIBUTE_BITANGENT);
 	m_default_shader->bindAttributeLocation("aUV", ATTRIBUTE_TEXCOORD);
+
 	m_default_shader->link();
+	_check_shader(m_default_shader, "Failed creating default_shader");
+
 
 	// Draws the UV map of the loaded growth-mesh
 	m_uv_map_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/uvmap.vert");
-	m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/uvmap.frag");
+
+	if (!m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/uvmap.vert"))
+		_check_shader(m_uv_map_shader, "Failed loading res/shaders/paintwindow/uvmap.vert");
+	if (!m_uv_map_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/uvmap.frag"))
+		_check_shader(m_uv_map_shader, "Failed loading res/shaders/paintwindow/uvmap.frag");
+
 	m_uv_map_shader->bindAttributeLocation("aVertex", ATTRIBUTE_POSITION);
 	m_uv_map_shader->bindAttributeLocation("aNormal", ATTRIBUTE_NORMAL);
 	m_uv_map_shader->bindAttributeLocation("aUV", ATTRIBUTE_TEXCOORD);
+	
 	m_uv_map_shader->link();
+	_check_shader(m_uv_map_shader, "Failed creating uv_map_shader");
+
 
 	// Used for drawing the framebuffer
 	m_drawbuffer_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/drawbuffer.vert");
-	m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/drawbuffer.frag");
+
+	if (!m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/drawbuffer.vert"))
+		_check_shader(m_drawbuffer_shader, "Failed loading res/shaders/paintwindow/drawbuffer.vert");
+	if (!m_drawbuffer_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/drawbuffer.frag"))
+		_check_shader(m_drawbuffer_shader, "Failed loading res/shaders/paintwindow/drawbuffer.frag");
+
 	m_drawbuffer_shader->bindAttributeLocation("aVertex", ATTRIBUTE_POSITION);
 	m_drawbuffer_shader->bindAttributeLocation("aUV", ATTRIBUTE_TEXCOORD);
+
 	m_drawbuffer_shader->link();
+	_check_shader(m_drawbuffer_shader, "Failed creating drawbuffer_shader");
+
 	m_drawbuffer_shader->bind();
 
 	// Look for the framebuffer texture in texture location 0
 	m_drawbuffer_shader->setUniformValue("screenTexture", 0);
 
+
 	// Used for drawing the paintbrush
 	m_paintbrush_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/paintbrush.vert");
-	m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/paintbrush.frag");
+
+	if (!m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/paintwindow/paintbrush.vert"))
+		_check_shader(m_paintbrush_shader, "Failed loading res/shaders/paintwindow/paintbrush.vert");
+	if (!m_paintbrush_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/paintwindow/paintbrush.frag"))
+		_check_shader(m_paintbrush_shader, "Failed loading res/shaders/paintwindow/paintbrush.frag");
+
 	m_paintbrush_shader->bindAttributeLocation("aVertex", ATTRIBUTE_POSITION);
 	m_paintbrush_shader->bindAttributeLocation("aUV", ATTRIBUTE_TEXCOORD);
+
 	m_paintbrush_shader->link();
+	_check_shader(m_paintbrush_shader, "Failed creating paintbrush_shader");
 
 	// Look for the framebuffer texture in texture location 0
 	m_paintbrush_shader->setUniformValue("screenTexture", 0);
 
+
 	// Used for drawing the hair
 	m_hair_shader = std::make_unique<QOpenGLShaderProgram>();
-	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/hair/hair.vert");
-	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Geometry, "res/shaders/hair/hair.geom");
-	m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/hair/hair.frag");
+	
+	if (!m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Vertex, "res/shaders/hair/hair.vert"))
+		_check_shader(m_hair_shader, "Failed loading res/shaders/hair/hair.vert");
+	if (!m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Geometry, "res/shaders/hair/hair.geom"))
+		_check_shader(m_hair_shader, "Failed loading res/shaders/hair/hair.geom");
+	if (!m_hair_shader->addShaderFromSourceFile(QOpenGLShader::Fragment, "res/shaders/hair/hair.frag"))
+		_check_shader(m_hair_shader, "Failed loading res/shaders/hair/hair.frag");
+
 	m_hair_shader->bindAttributeLocation("aVertex", ATTRIBUTE_POSITION);
 	m_hair_shader->bindAttributeLocation("aNormal", ATTRIBUTE_NORMAL);
 	m_hair_shader->bindAttributeLocation("aTangent", ATTRIBUTE_TANGENT);
@@ -88,6 +140,8 @@ void Scene::load_shaders()
 	
 	// Link the shader
 	m_hair_shader->link();
+	_check_shader(m_hair_shader, "Failed creating hair_shader");
+
 	m_hair_shader->bind();
 	
 	// Look for the framebuffer texture in texture location 0
