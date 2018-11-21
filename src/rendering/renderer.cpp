@@ -37,7 +37,7 @@ void Renderer::render_scene()
 	glm::mat4 vp = m_current_scene_->m_projection_matrix * view_matrix;
 
 	m_current_scene_->m_default_shader->bind();
-	m_current_scene_->m_default_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x, m_current_scene_->m_light.m_position.y, m_current_scene_->m_light.m_position.z);
+	m_current_scene_->m_default_shader->setUniformValue("lightPos", m_current_scene_->m_camera.m_position.x, m_current_scene_->m_camera.m_position.y, m_current_scene_->m_camera.m_position.z);
 	m_current_scene_->m_default_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x, m_current_scene_->m_light.m_color.y, m_current_scene_->m_light.m_color.z);
 
 	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(m_current_scene_->m_model_matrix));
@@ -70,7 +70,7 @@ void Renderer::render_scene()
 	// Draw the hair
 	m_current_scene_->m_hair_shader->bind();
 	m_current_scene_->m_hair_shader->setUniformValue("cameraPos", m_current_scene_->m_camera.m_position.x, m_current_scene_->m_camera.m_position.y, m_current_scene_->m_camera.m_position.z);
-	m_current_scene_->m_hair_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x, m_current_scene_->m_light.m_position.y, m_current_scene_->m_light.m_position.z);
+	m_current_scene_->m_hair_shader->setUniformValue("lightPos", m_current_scene_->m_camera.m_position.x, m_current_scene_->m_camera.m_position.y, m_current_scene_->m_camera.m_position.z);
 	m_current_scene_->m_hair_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x, m_current_scene_->m_light.m_color.y, m_current_scene_->m_light.m_color.z);
 	m_current_scene_->m_hair_shader->setUniformValue("lighting", m_should_light_hair);
 	m_current_scene_->m_hair_shader->setUniformValue("numSegments", m_current_scene_->m_hair.m_num_segments);

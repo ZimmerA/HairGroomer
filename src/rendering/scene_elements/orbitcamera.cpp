@@ -31,6 +31,7 @@ void Orbitcamera::calc_position()
 	m_view_ = rotate(m_view_, glm::radians(m_azimuth_), glm::vec3(0.f,1.f,0.f));
 	m_view_ = rotate(m_view_, glm::radians(m_elevation_ - 90.0f) , glm::vec3(1.f,0.f,0.f));
 	m_view_ = translate(m_view_, glm::vec3(0,0,m_distance_));
+	m_position = glm::vec3(m_view_[3][0],m_view_[3][1],m_view_[3][2]);
 	m_view_ = inverse(m_view_);
 }
 
