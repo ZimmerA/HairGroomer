@@ -12,7 +12,6 @@ void Renderer::init(const int width, const int height)
 
 	m_width_ = width;
 	m_height_ = height;
-
 }
 
 void Renderer::render_scene()
@@ -155,7 +154,7 @@ void Renderer::render_scene()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	m_current_scene_->m_paintbrush_shader->setUniformValue("intensity", 1.0f);
 	glm::mat4 matrix(1);
-	matrix = glm::rotate(matrix, glm::radians(90.0f), glm::vec3(1,0,0));
+	matrix = rotate(matrix, glm::radians(90.0f), glm::vec3(1,0,0));
 	matrix = vp * matrix;
 	m_current_scene_->m_floor_grid_texture->bind();
 	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(matrix));
@@ -191,7 +190,6 @@ void Renderer::render_scene()
 	// Render the paintbrush to default framebuffer
 	m_current_scene_->m_paint_brush_texture->bind();
 	m_current_scene_->m_paintbrush_shader->bind();
-	//m_current_scene_->m_brush.begin(m_current_scene_->m_paintbrush_shader, false);
 	glUniformMatrix4fv(m_current_scene_->m_paintbrush_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(m_current_scene_->m_brush.get_transform()));
 	glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"), m_current_scene_->m_brush.get_intensity());
 	m_current_scene_->m_quad_vao.bind();
