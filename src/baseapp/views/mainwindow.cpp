@@ -266,9 +266,6 @@ void MainWindow::connect_signals_and_slots()
 	// Should light Hair
 #pragma warning(suppress: 26444)
 	connect(m_ui_->cb_light_hair,SIGNAL(toggled(bool)), this, SLOT(light_hair_changed_listener(bool)));
-	// Should light mesh
-#pragma warning(suppress: 26444)
-	connect(m_ui_->cb_light_mesh,SIGNAL(toggled(bool)), this, SLOT(light_mesh_changed_listener(bool)));
 	// Light color
 #pragma warning(suppress: 26444)
 	connect(m_ui_->b_light_color,SIGNAL(clicked(bool)), this, SLOT(light_color_clicked_listener()));
@@ -365,16 +362,6 @@ void MainWindow::up_axis_changed_listener(const int index) const
 void MainWindow::light_hair_changed_listener(const bool enabled) const
 {
 	m_ui_->widget_gl->m_renderer.m_should_light_hair = enabled;
-	m_ui_->widget_gl->update();
-}
-
-/**
- * \brief Listener that gets called when the mesh lighting is turned on or off
- * \param enabled The state of the mesh lighting
- */
-void MainWindow::light_mesh_changed_listener(const bool enabled) const
-{
-	m_ui_->widget_gl->m_renderer.m_should_light_meshes = enabled;
 	m_ui_->widget_gl->update();
 }
 
@@ -595,11 +582,6 @@ void MainWindow::set_light_hair(const bool active) const
 	m_ui_->cb_light_hair->setChecked(active);
 }
 
-void MainWindow::set_light_mesh(const bool active) const
-{
-	m_ui_->cb_light_mesh->setChecked(active);
-}
-
 void MainWindow::set_light_color(const QColor& color)
 {
 	light_color_selected_listener(color);
@@ -663,7 +645,6 @@ UiSettings MainWindow::get_ui_settings() const
 	settings.m_brush_intensity = get_ui()->sb_intensity->value();
 	// Light settings
 	settings.m_light_hair = get_ui()->cb_light_hair->isChecked();
-	settings.m_light_mesh = get_ui()->cb_light_mesh->isChecked();
 	settings.m_light_color = m_light_color;
 	// Mesh settings
 	settings.m_growthmesh_show = get_ui()->cb_growthmesh_show->isChecked();
@@ -693,7 +674,6 @@ void MainWindow::set_ui_settings(const UiSettings& settings)
 	set_brush_intensity(settings.m_brush_intensity);
 	// Light settings
 	set_light_hair(settings.m_light_hair);
-	set_light_mesh(settings.m_light_mesh);
 	set_light_color(settings.m_light_color);
 	// Mesh settings
 	set_growthmesh_show(settings.m_growthmesh_show);

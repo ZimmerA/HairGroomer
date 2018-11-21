@@ -48,7 +48,6 @@ public:
 	void set_brush_size(double size) const;
 	void set_brush_intensity(double intensity) const;
 	void set_light_hair(bool active) const;
-	void set_light_mesh(bool active) const;
 	void set_light_color(const QColor& color);
 	void set_growthmesh_show(bool active) const;
 	void set_referencemodel_show(bool active) const;
@@ -93,7 +92,6 @@ private slots:
 
 	//light listeners
 	void light_hair_changed_listener(bool enabled) const;
-	void light_mesh_changed_listener(bool enabled) const;
 	void light_color_clicked_listener();
 	void light_color_selected_listener(const QColor& color);
 

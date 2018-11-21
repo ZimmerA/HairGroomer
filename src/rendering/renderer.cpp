@@ -39,7 +39,6 @@ void Renderer::render_scene()
 	m_current_scene_->m_default_shader->bind();
 	m_current_scene_->m_default_shader->setUniformValue("lightPos", m_current_scene_->m_light.m_position.x, m_current_scene_->m_light.m_position.y, m_current_scene_->m_light.m_position.z);
 	m_current_scene_->m_default_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x, m_current_scene_->m_light.m_color.y, m_current_scene_->m_light.m_color.z);
-	m_current_scene_->m_default_shader->setUniformValue("lighting", m_should_light_meshes);
 
 	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("model"), 1, GL_FALSE, value_ptr(m_current_scene_->m_model_matrix));
 	glUniformMatrix4fv(m_current_scene_->m_default_shader->uniformLocation("mvp"), 1, GL_FALSE, value_ptr(mvp));

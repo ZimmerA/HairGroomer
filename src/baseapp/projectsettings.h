@@ -28,7 +28,6 @@ struct UiSettings
 
 	// Light
 	bool m_light_hair{true};
-	bool m_light_mesh{true};
 	QColor m_light_color{255, 255, 255};
 
 	// meshes
@@ -87,7 +86,6 @@ inline void to_json(json& j, const ProjectSettings& s)
 		{
 			"light_settings", {
 				{"light_hair", s.m_ui_settings.m_light_hair},
-				{"light_mesh", s.m_ui_settings.m_light_mesh},
 				{
 					"light_color",
 					{
@@ -137,7 +135,6 @@ inline void from_json(const json& j, ProjectSettings& s)
 	s.m_ui_settings.m_brush_intensity = j.at("brush_settings").at("brush_intensity").get<double>();
 
 	s.m_ui_settings.m_light_hair = j.at("light_settings").at("light_hair").get<bool>();
-	s.m_ui_settings.m_light_mesh = j.at("light_settings").at("light_mesh").get<bool>();
 
 	r = j.at("light_settings").at("light_color").at(0).get<int>();
 	g = j.at("light_settings").at("light_color").at(1).get<int>();
