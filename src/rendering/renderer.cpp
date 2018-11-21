@@ -24,7 +24,7 @@ void Renderer::render_scene()
 		m_current_scene_->m_should_reset = false;
 	}
 
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClearColor(0.41f, 0.41f, 0.41f, 1.0f);
 
 	// Render left half of the context (viewport)
 	glViewport(0, 0, m_width_ / 2, m_height_);

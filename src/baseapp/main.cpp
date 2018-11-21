@@ -1,4 +1,3 @@
-
 #include <QApplication>
 #include <QMessageBox>
 #include <QOpenGLFunctions_3_3_Core>
@@ -7,14 +6,27 @@
 #include "views/mainwindow.h"
 #include "mvpmodel.h"
 #include "mvppresenter.h"
+#include <QFileDialog>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
-	QApplication::setStyle("plastique");
+
 	QCoreApplication::setApplicationName("Hair Groomer");
 	QCoreApplication::setOrganizationName("Adrian Zimmer");
 	QCoreApplication::setApplicationVersion("1.0");
+
+	QFile f(":qdarkstyle/style.qss");
+	if (!f.exists())
+	{
+		printf("Unable to set stylesheet, file not found\n");
+	}
+	else
+	{
+		f.open(QFile::ReadOnly | QFile::Text);
+		QTextStream ts(&f);
+		qApp->setStyleSheet(ts.readAll());
+	}
 
 	QCommandLineParser parser;
 	parser.addHelpOption();
