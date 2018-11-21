@@ -85,7 +85,7 @@
   <widget class="QDockWidget" name="dockWidget_4">
    <property name="minimumSize">
     <size>
-     <width>367</width>
+     <width>371</width>
      <height>618</height>
     </size>
    </property>
@@ -143,7 +143,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>364</width>
+          <width>368</width>
           <height>594</height>
          </rect>
         </property>
@@ -346,6 +346,12 @@
             </property>
             <item row="3" column="1">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QRadioButton" name="rb_brushmode_hair">
                 <property name="text">
