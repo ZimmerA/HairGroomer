@@ -26,10 +26,6 @@ struct UiSettings
 	double m_brush_size{0.10};
 	double m_brush_intensity{1.0};
 
-	// Light
-	bool m_light_hair{true};
-	QColor m_light_color{255, 255, 255};
-
 	// meshes
 	bool m_growthmesh_show{true};
 	bool m_referencemodel_show{true};
@@ -84,18 +80,6 @@ inline void to_json(json& j, const ProjectSettings& s)
 			}
 		},
 		{
-			"light_settings", {
-				{"light_hair", s.m_ui_settings.m_light_hair},
-				{
-					"light_color",
-					{
-						s.m_ui_settings.m_light_color.red(), s.m_ui_settings.m_light_color.green(),
-						s.m_ui_settings.m_light_color.blue()
-					}
-				}
-			}
-		},
-		{
 			"mesh_settings", {
 				{"show_reference_model", s.m_ui_settings.m_referencemodel_show},
 				{"show_growth_mesh", s.m_ui_settings.m_growthmesh_show}
@@ -133,13 +117,6 @@ inline void from_json(const json& j, ProjectSettings& s)
 	);
 	s.m_ui_settings.m_brush_size = j.at("brush_settings").at("brush_size").get<double>();
 	s.m_ui_settings.m_brush_intensity = j.at("brush_settings").at("brush_intensity").get<double>();
-
-	s.m_ui_settings.m_light_hair = j.at("light_settings").at("light_hair").get<bool>();
-
-	r = j.at("light_settings").at("light_color").at(0).get<int>();
-	g = j.at("light_settings").at("light_color").at(1).get<int>();
-	b = j.at("light_settings").at("light_color").at(2).get<int>();
-	s.m_ui_settings.m_light_color = QColor(r, g, b);
 
 	s.m_ui_settings.m_growthmesh_show = j.at("mesh_settings").at("show_growth_mesh").get<bool>();
 	s.m_ui_settings.m_referencemodel_show = j.at("mesh_settings").at("show_reference_model").get<bool>();

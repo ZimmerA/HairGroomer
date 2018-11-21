@@ -72,7 +72,6 @@ void Renderer::render_scene()
 	m_current_scene_->m_hair_shader->setUniformValue("cameraPos", m_current_scene_->m_camera.m_position.x, m_current_scene_->m_camera.m_position.y, m_current_scene_->m_camera.m_position.z);
 	m_current_scene_->m_hair_shader->setUniformValue("lightPos", m_current_scene_->m_camera.m_position.x, m_current_scene_->m_camera.m_position.y, m_current_scene_->m_camera.m_position.z);
 	m_current_scene_->m_hair_shader->setUniformValue("lightColor", m_current_scene_->m_light.m_color.x, m_current_scene_->m_light.m_color.y, m_current_scene_->m_light.m_color.z);
-	m_current_scene_->m_hair_shader->setUniformValue("lighting", m_should_light_hair);
 	m_current_scene_->m_hair_shader->setUniformValue("numSegments", m_current_scene_->m_hair.m_num_segments);
 	m_current_scene_->m_hair_shader->setUniformValue("maxHairLength", m_current_scene_->m_hair.m_length);
 	m_current_scene_->m_hair_shader->setUniformValue("hairColor", m_current_scene_->m_hair.m_hair_color.x, m_current_scene_->m_hair.m_hair_color.y, m_current_scene_->m_hair.m_hair_color.z);

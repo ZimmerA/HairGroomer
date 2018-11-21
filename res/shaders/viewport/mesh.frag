@@ -11,7 +11,6 @@ in vec2 UV;
 
 uniform vec3 lightPos;
 uniform vec3 lightColor;
-uniform bool lighting;
 
 uniform vec2 brushCenter;
 uniform float brushSize;

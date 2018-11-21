@@ -262,14 +262,6 @@ void MainWindow::connect_signals_and_slots()
 #pragma warning(suppress: 26444)
 	connect(m_ui_->b_hair_root_color, SIGNAL(clicked(bool)), this, SLOT(hair_root_color_clicked_listener()));
 
-	/* Light Settings */
-	// Should light Hair
-#pragma warning(suppress: 26444)
-	connect(m_ui_->cb_light_hair,SIGNAL(toggled(bool)), this, SLOT(light_hair_changed_listener(bool)));
-	// Light color
-#pragma warning(suppress: 26444)
-	connect(m_ui_->b_light_color,SIGNAL(clicked(bool)), this, SLOT(light_color_clicked_listener()));
-
 	// Mesh settings
 	// Should show grwothmesh
 #pragma warning(suppress: 26444)
@@ -352,44 +344,6 @@ void MainWindow::growthmesh_index_changed_listener(const int index) const
 void MainWindow::up_axis_changed_listener(const int index) const
 {
 	m_ui_->widget_gl->m_scene.set_up_axis(index);
-	m_ui_->widget_gl->update();
-}
-
-/**
- * \brief Listener that gets called when the hair lighting is turned on or off
- * \param enabled The state of the hair lighting
- */
-void MainWindow::light_hair_changed_listener(const bool enabled) const
-{
-	m_ui_->widget_gl->m_renderer.m_should_light_hair = enabled;
-	m_ui_->widget_gl->update();
-}
-
-/**
- * \brief Listener that gets called when the light color button is clicked. Opens a color dialog
- */
-void MainWindow::light_color_clicked_listener()
-{
-	// Connect the listener of the select color button
-#pragma warning(suppress: 26444)
-	connect(&m_color_picker_dialog_, SIGNAL(colorSelected(QColor)), this, SLOT(light_color_selected_listener(QColor)));
-	m_color_picker_dialog_.show();
-}
-
-/**
- * \brief Listener that gets called when the user selects a color after opening the color dialog via the light color button
- * \param color The selected color
- */
-void MainWindow::light_color_selected_listener(const QColor& color)
-{
-	// Disconnect the listener of the select color button
-	disconnect(&m_color_picker_dialog_, nullptr, nullptr, nullptr);
-	m_light_color = QColor(color);
-	// Set the new color of the button
-	const QString s("background-color: " + color.name() + ";");
-	m_ui_->b_light_color->setStyleSheet(s);
-	m_ui_->widget_gl->m_scene.m_light.m_color = glm::vec3(color.red() / 255.0f, color.green() / 255.0f,
-	                                                      color.blue() / 255.0f);
 	m_ui_->widget_gl->update();
 }
 
@@ -577,16 +531,6 @@ void MainWindow::set_brush_intensity(const double intensity) const
 	m_ui_->sb_intensity->setValue(intensity);
 }
 
-void MainWindow::set_light_hair(const bool active) const
-{
-	m_ui_->cb_light_hair->setChecked(active);
-}
-
-void MainWindow::set_light_color(const QColor& color)
-{
-	light_color_selected_listener(color);
-}
-
 void MainWindow::set_growthmesh_show(const bool active) const
 {
 	m_ui_->cb_growthmesh_show->setChecked(active);
@@ -643,9 +587,6 @@ UiSettings MainWindow::get_ui_settings() const
 	settings.m_brushmode = m_paintmode;
 	settings.m_brush_size = get_ui()->sb_size->value();
 	settings.m_brush_intensity = get_ui()->sb_intensity->value();
-	// Light settings
-	settings.m_light_hair = get_ui()->cb_light_hair->isChecked();
-	settings.m_light_color = m_light_color;
 	// Mesh settings
 	settings.m_growthmesh_show = get_ui()->cb_growthmesh_show->isChecked();
 	settings.m_referencemodel_show = get_ui()->cb_referencemodel_show->isChecked();
@@ -672,9 +613,6 @@ void MainWindow::set_ui_settings(const UiSettings& settings)
 	set_brush_mode(settings.m_brushmode);
 	set_brush_size(settings.m_brush_size);
 	set_brush_intensity(settings.m_brush_intensity);
-	// Light settings
-	set_light_hair(settings.m_light_hair);
-	set_light_color(settings.m_light_color);
 	// Mesh settings
 	set_growthmesh_show(settings.m_growthmesh_show);
 	set_referencemodel_show(settings.m_referencemodel_show);

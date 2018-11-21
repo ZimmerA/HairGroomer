@@ -18,7 +18,6 @@ public:
 	bool m_is_drawing = false;
 	bool m_should_render_growthmesh = false;
 	bool m_should_render_refrencemodel = true;
-	bool m_should_light_hair = true;
 	bool m_should_render_uv_overlay = true;
 	// determines wether transform feedback should be used to write the hair to a buffer
 	bool m_should_write_out_hair = false;
