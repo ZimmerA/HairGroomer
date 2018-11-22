@@ -196,7 +196,7 @@ void Renderer::render_scene()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 	// Render the paintbrush to the drawbuffer if left mouse is pressed
-	if (m_is_drawing)
+	if (m_current_scene_->m_brush.get_is_drawing() || m_current_scene_->m_brush.get_is_erasing())
 	{
 		m_current_scene_->m_drawbuffer.bind();
 
@@ -205,8 +205,20 @@ void Renderer::render_scene()
 		glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		glColorMask(m_current_scene_->m_brush.get_colormask()[0], m_current_scene_->m_brush.get_colormask()[1], m_current_scene_->m_brush.get_colormask()[2], GL_TRUE);
 
-		if (m_current_scene_->m_brush.get_opposite_mode())
+		if (m_current_scene_->m_brush.get_opposite_mode() && !m_current_scene_->m_brush.get_is_erasing())
+		{
 			glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"), 1.0f - m_current_scene_->m_brush.get_intensity());
+		}
+
+		if (m_current_scene_->m_brush.get_is_erasing())
+		{
+			float intensity = 0.5f;
+			if(m_current_scene_->m_brush.get_colormask()[0])
+			{
+				intensity = 0.0f;
+			}
+			glUniform1f(m_current_scene_->m_paintbrush_shader->uniformLocation("intensity"), intensity);
+		}
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glColorMask(GL_TRUE,GL_TRUE, GL_TRUE, GL_TRUE);

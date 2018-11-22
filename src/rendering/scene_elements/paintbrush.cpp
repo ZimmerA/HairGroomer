@@ -12,19 +12,19 @@ PaintBrush::PaintBrush() : m_brush_position_()
 	m_colormask_[0] = true;
 	m_colormask_[1] = m_colormask_[2] = false;
 
-	_update_transform();
+	update_transform();
 }
 
 void PaintBrush::set_brush_size(const float size)
 {
 	m_brush_size_ = size;
-	_update_transform();
+	update_transform();
 }
 
 void PaintBrush::set_brush_intensity(const float d)
 {
 	this->m_intensity_ = d;
-	_update_transform();
+	update_transform();
 }
 
 void PaintBrush::set_opposite_mode(const bool value) noexcept
@@ -32,10 +32,20 @@ void PaintBrush::set_opposite_mode(const bool value) noexcept
 	m_opposite_mode_ = value;
 }
 
+void PaintBrush::set_is_erasing(const bool value) noexcept
+{
+	m_is_erasing_ = value;
+}
+
+void PaintBrush::set_is_drawing(bool value) noexcept
+{
+	m_is_drawing_ = value;
+}
+
 void PaintBrush::set_position(const float x, const float y)
 {
 	m_brush_position_ = glm::vec2(x, y);
-	_update_transform();
+	update_transform();
 }
 
 /**
@@ -60,7 +70,7 @@ void PaintBrush::set_paintmode(const PaintMode p) noexcept
 	}
 }
 
-void PaintBrush::_update_transform()
+void PaintBrush::update_transform()
 {
 	glm::vec2 uv = m_brush_position_ * 2.0f - 1.0f;
 	uv.y = -uv.y;

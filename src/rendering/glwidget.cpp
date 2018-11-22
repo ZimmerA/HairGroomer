@@ -94,9 +94,8 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 	switch (event->button())
 	{
 		case Qt::LeftButton:
-
 			if (!m_keys_[Qt::Key_Alt])
-				m_renderer.m_is_drawing = true;
+				m_scene.m_brush.set_is_drawing(true);
 
 		case Qt::MiddleButton:
 			// Camera
@@ -112,6 +111,11 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 				m_has_mouse_started_in_viewport_ = false;
 			}
 
+			update();
+			break;
+		case Qt::RightButton:
+			if (!m_keys_[Qt::Key_Alt])
+				m_scene.m_brush.set_is_erasing(true);
 			update();
 			break;
 		default:
@@ -168,6 +172,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 		update();
 	}
 
+	// Handle camera controls
 	if (m_keys_[Qt::Key_Alt])
 	{
 		// If the first mouse click was in the viewport, update camera as well
@@ -202,8 +207,12 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event)
 	switch (event->button())
 	{
 	case Qt::LeftButton:
-		m_renderer.m_is_drawing = false;
+		m_scene.m_brush.set_is_drawing(false);
 		// query call of paintgl
+		update();
+		break;
+	case Qt::RightButton:
+		m_scene.m_brush.set_is_erasing(false);
 		update();
 		break;
 	default:

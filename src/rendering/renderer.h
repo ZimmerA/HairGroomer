@@ -15,7 +15,6 @@ public:
 	void render_scene();
 	void set_measurements(const int width, const int height) noexcept{ m_width_ = width; m_height_ = height;}
 	void set_current_scene(Scene * scene) noexcept { m_current_scene_ = scene; }
-	bool m_is_drawing = false;
 	bool m_should_render_growthmesh = false;
 	bool m_should_render_refrencemodel = true;
 	bool m_should_render_uv_overlay = true;
