@@ -135,7 +135,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 	// mouse is still inside the drawing window
 	if (mouse_pos_x >= 0.0f)
 	{
-		m_scene.m_brush.set_position(mouse_pos_x * 2.0f, - (mouse_pos_y + 1));
+		m_scene.m_brush.set_position(mouse_pos_x, mouse_pos_y * 0.5f + 0.5f);
 		// query call of paintgl
 		update();
 	}

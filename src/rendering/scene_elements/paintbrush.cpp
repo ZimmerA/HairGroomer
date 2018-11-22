@@ -62,8 +62,10 @@ void PaintBrush::set_paintmode(const PaintMode p) noexcept
 
 void PaintBrush::_update_transform()
 {
+	glm::vec2 uv = m_brush_position_ * 2.0f - 1.0f;
+	uv.y = -uv.y;
+
 	m_transform_ = glm::mat4(1.0f);
-	m_transform_ = translate(m_transform_, glm::vec3(-1.0f, 1.0f, 0.0f));
-	m_transform_ = translate(m_transform_, glm::vec3(m_brush_position_, 0.0f));
+	m_transform_ = translate(m_transform_, glm::vec3(uv, 0.0f));
 	m_transform_ = scale(m_transform_, glm::vec3(m_brush_size_));
 }
