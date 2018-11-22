@@ -146,15 +146,16 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 
 		const glm::mat4 proj = m_scene.m_projection_matrix;
 		const glm::mat4 view = m_scene.m_camera.get_view_matrix();
-		const glm::mat4 view_projection = proj * view;
+		const glm::mat4 model = m_scene.m_model_matrix;
+		const glm::mat4 mvp = proj * view * model;
 
-		const glm::vec3 origin = project_screen_to_world(glm::vec3(x, y, 0.0f), view_projection);
-		const glm::vec3 direction = glm::normalize(project_screen_to_world(glm::vec3(x, y, 1.0f), view_projection) - origin);
+		const glm::vec3 origin = project_screen_to_world(glm::vec3(x, y, 0.0f), mvp);
+		const glm::vec3 direction = normalize(project_screen_to_world(glm::vec3(x, y, 1.0f), mvp) - origin);
 
 		const ModelData *model_data = m_view_->get_presenter()->get_model()->get_fbx_model();
 		const MeshData *mesh_data = &model_data->m_meshes[m_scene.m_growth_mesh_index];
 
-		RaycastHit hit;
+		RaycastHit hit{};
 
 		if (raycast(origin, direction, mesh_data, hit))
 			m_scene.m_brush.set_position(hit.uv.x, hit.uv.y);
