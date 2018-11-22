@@ -23,6 +23,9 @@ Hair Groomer is a stand-alone software to generate guide hairs for NVIDIA HairWo
 | C | Set the brushmode to curl (Green) |
 | T | Set the brushmode to twist (Blue) |
 | R | Reset the drawing window content (hair) |
+| Left Click Drag | Draw |
+| Alt + Left Click Drag | Activate opposite mode |
+| Right Click Drag | Erase |
 
 ### Camera Controls
 
