@@ -207,6 +207,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\baseapp\views\mainToolbar.cpp" />
+    <ClCompile Include="src\math\raycast.cpp" />
     <ClCompile Include="src\rendering\scene_elements\glDrawbuffer.cpp" />
     <ClCompile Include="src\rendering\scene.cpp" />
     <ClCompile Include="src\rendering\glwidget.cpp" />
@@ -237,6 +238,7 @@
     </QtMoc>
     <ClInclude Include="src\baseapp\hairData.h" />
     <ClInclude Include="src\baseapp\projectsettings.h" />
+    <ClInclude Include="src\math\raycast.h" />
     <ClInclude Include="src\rendering\glattributes.h" />
     <ClInclude Include="src\rendering\scene_elements\hairSettings.h" />
     <ClInclude Include="src\rendering\scene_elements\light.h" />

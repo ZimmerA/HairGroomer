@@ -4,6 +4,8 @@
 #include <qapplication.h>
 #include <QMouseEvent>
 
+#include "math/raycast.h"
+
 GLWidget::GLWidget(QWidget* parent)
 	: QOpenGLWidget(parent)
 {
@@ -93,10 +95,8 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 	{
 		case Qt::LeftButton:
 
-			if (mouse_pos_x > 0.0f)
-			{
+			if (!m_keys_[Qt::Key_Alt])
 				m_renderer.m_is_drawing = true;
-			}
 
 		case Qt::MiddleButton:
 			// Camera
@@ -137,6 +137,33 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 	{
 		m_scene.m_brush.set_position(mouse_pos_x, mouse_pos_y * 0.5f + 0.5f);
 		// query call of paintgl
+		update();
+	}
+	else
+	{
+		const float x = mouse_pos_x + 1.0f;
+		const float y = 1.0f - (mouse_pos_y * 0.5f + 0.5f);
+
+		const glm::mat4 proj = m_scene.m_projection_matrix;
+		const glm::mat4 view = m_scene.m_camera.get_view_matrix();
+		const glm::mat4 view_projection = proj * view;
+
+		const glm::vec3 origin = project_screen_to_world(glm::vec3(x, y, 0.0f), view_projection);
+		const glm::vec3 direction = glm::normalize(project_screen_to_world(glm::vec3(x, y, 1.0f), view_projection) - origin);
+
+		const ModelData *model_data = m_view_->get_presenter()->get_model()->get_fbx_model();
+		const MeshData *mesh_data = &model_data->m_meshes[m_scene.m_growth_mesh_index];
+
+		RaycastHit hit;
+
+		if (raycast(origin, direction, mesh_data, hit))
+			m_scene.m_brush.set_position(hit.uv.x, hit.uv.y);
+		else
+		{
+			// TODO: Be able to hide brush
+			m_scene.m_brush.set_position(2.0f, 2.0f);
+		}
+
 		update();
 	}
 

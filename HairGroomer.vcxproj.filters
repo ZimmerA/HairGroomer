@@ -105,6 +105,9 @@
     <ClCompile Include="src\baseapp\views\mainToolbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\math\raycast.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\rendering\renderer.h">
@@ -153,6 +156,9 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\glattributes.h">
+      <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\raycast.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
