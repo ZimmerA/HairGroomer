@@ -10,11 +10,12 @@
 
 using json = nlohmann::json;
 
-struct UiSettings
+struct UISettings
 {
 	bool m_grid_visibility{true};
 	int m_growth_mesh_index{0};
 	int m_up_axis_index{0};
+
 	// Hair
 	double m_hairlength{3.00};
 	int m_hairsegment_count{4};
@@ -26,20 +27,19 @@ struct UiSettings
 	double m_brush_size{0.10};
 	double m_brush_intensity{1.0};
 
-	// meshes
+	// Meshes
 	bool m_growthmesh_show{true};
 	bool m_referencemodel_show{true};
 };
 
-
 struct ProjectSettings
 {
-	UiSettings m_ui_settings;
+	UISettings m_ui_settings;
 	std::string m_growthmesh_name;
 	std::string m_hair_style_name;
 };
 
-inline void to_json(json& j, const ProjectSettings& s)
+static void to_json(json& j, const ProjectSettings& s)
 {
 	j = json
 	{
@@ -94,7 +94,7 @@ inline void to_json(json& j, const ProjectSettings& s)
 	};
 }
 
-inline void from_json(const json& j, ProjectSettings& s)
+static void from_json(const json& j, ProjectSettings& s)
 {
 	// UI settings
 	s.m_ui_settings.m_grid_visibility = j.at("general_settings").at("show_uv_grid").get<bool>();
@@ -113,8 +113,7 @@ inline void from_json(const json& j, ProjectSettings& s)
 	b = j.at("hair_settings").at("root_color").at(2).get<int>();
 	s.m_ui_settings.m_hair_root_color = QColor(r, g, b);
 
-	s.m_ui_settings.m_brushmode = static_cast<PaintBrush::PaintMode>(j.at("brush_settings").at("paint_mode").get<int>()
-	);
+	s.m_ui_settings.m_brushmode = static_cast<PaintBrush::PaintMode>(j.at("brush_settings").at("paint_mode").get<int>());
 	s.m_ui_settings.m_brush_size = j.at("brush_settings").at("brush_size").get<double>();
 	s.m_ui_settings.m_brush_intensity = j.at("brush_settings").at("brush_intensity").get<double>();
 
@@ -125,4 +124,5 @@ inline void from_json(const json& j, ProjectSettings& s)
 	s.m_growthmesh_name = j.at("file_settings").at("growth_mesh").get<std::string>();
 	s.m_hair_style_name = j.at("file_settings").at("hair_style").get<std::string>();
 }
+
 #endif

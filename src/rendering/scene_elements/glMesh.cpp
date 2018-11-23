@@ -7,10 +7,9 @@
 
 #include "rendering/glattributes.h"
 
-GlMesh::GlMesh(MeshData* mesh_data)
-	: m_indicie_count(0), m_vertex_count(0), m_ibo_(QOpenGLBuffer::IndexBuffer)
+GLMesh::GLMesh(MeshData *mesh_data) : m_index_count(0), m_vertex_count(0), m_ibo_(QOpenGLBuffer::IndexBuffer)
 {
-	m_indicie_count = static_cast<unsigned int>(mesh_data->m_indices.size());
+	m_index_count = static_cast<unsigned int>(mesh_data->m_indices.size());
 	m_vao_.create();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
 	m_vbo_.create();
@@ -31,27 +30,27 @@ GlMesh::GlMesh(MeshData* mesh_data)
 	f->glEnableVertexAttribArray(ATTRIBUTE_BITANGENT);
 	f->glEnableVertexAttribArray(ATTRIBUTE_TEXCOORD);
 
-	f->glVertexAttribPointer(ATTRIBUTE_POSITION, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
-	f->glVertexAttribPointer(ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
-	f->glVertexAttribPointer(ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
+	f->glVertexAttribPointer(ATTRIBUTE_POSITION,  3, GL_FLOAT, GL_FALSE, sizeof(Vertex), static_cast<void*>(nullptr));
+	f->glVertexAttribPointer(ATTRIBUTE_NORMAL,    3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_normal)));
+	f->glVertexAttribPointer(ATTRIBUTE_TANGENT,   3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_tangent)));
 	f->glVertexAttribPointer(ATTRIBUTE_BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_bitangent)));
-	f->glVertexAttribPointer(ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
+	f->glVertexAttribPointer(ATTRIBUTE_TEXCOORD,  2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, m_uv)));
 }
 
 /**
  * \brief Draws the indexed mesh
  */
-void GlMesh::draw()
+void GLMesh::draw()
 {
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);
-	f->glDrawElements(GL_TRIANGLES, m_indicie_count, GL_UNSIGNED_INT, nullptr);
+	f->glDrawElements(GL_TRIANGLES, m_index_count, GL_UNSIGNED_INT, nullptr);
 }
 
 /**
  * \brief Draws un-indexed mesh in point mode
  */
-void GlMesh::draw_points()
+void GLMesh::draw_points()
 {
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 	QOpenGLVertexArrayObject::Binder vao_binder(&m_vao_);

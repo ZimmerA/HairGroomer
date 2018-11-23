@@ -8,8 +8,9 @@
 #include <QString>
 #include <QFileDialog>
 
-MvpPresenter::MvpPresenter() noexcept: m_model_(nullptr), m_view_(nullptr)
+MvpPresenter::MvpPresenter() noexcept : m_model_(nullptr), m_view_(nullptr)
 {
+
 }
 
 /**
@@ -32,7 +33,8 @@ void MvpPresenter::export_hairworks(const QString& hair_file_path) const
 	catch (std::runtime_error& e)
 	{
 		get_view()->display_errorbox("Failed exporting hairfile", e.what());
-	}catch (...)
+	}
+	catch (...)
 	{
 		get_view()->display_errorbox("Failed exporting hairfile", "Unknown error when exporting hairfile");
 	}
@@ -55,14 +57,9 @@ void MvpPresenter::export_hairstyle(const QString& hairstyle_file_path) const
 	const bool sucess = get_model()->export_hairstyle_to_disk(image, hairstyle_file_path);
 
 	if (!sucess)
-	{
-		get_view()->display_messagebox("Hairstyle could not be saved", "");		
-	}
+		get_view()->display_messagebox("Hairstyle could not be saved", "");
 	else
-	{
 		get_model()->m_loaded_hairstyle_path = hairstyle_file_path.toLocal8Bit().data();
-	}
-
 }
 
 /**
@@ -108,7 +105,8 @@ void MvpPresenter::load_fbx_model(const QString& fbx_model_file_path) const
 	catch (std::runtime_error& e)
 	{
 		get_view()->display_errorbox("Failed loading FBX model", e.what());
-	}catch (...)
+	}
+	catch (...)
 	{
 		get_view()->display_errorbox("Failed loading FBX model", "Unknown error when loading model");
 	}
@@ -123,13 +121,13 @@ void MvpPresenter::new_project() const
 {
 	get_model()->m_loaded_project_path = "";
 	get_model()->m_loaded_hairstyle_path = "";
-	// Reset the opengl scene
+	// Reset the OpenGL scene
 	get_view()->get_ui()->widget_gl->m_scene.reset();
-	// Reset the modeldata
+	// Reset the ModelData
 	get_model()->reset_fbx_model();
 	// Reset the UI to standard settings
 	get_view()->clear_growthmesh_index_content();
-	get_view()->set_ui_settings(UiSettings{});
+	get_view()->set_ui_settings(UISettings{});
 	get_view()->set_window_title_prefix("New Project");
 }
 
@@ -143,16 +141,15 @@ void MvpPresenter::load_project_file(const QString& project_file_path) const
 		return;
 
 	if (get_view()->display_questionbox("Save?", "Do you want to save your current project?"))
-	{
 		get_view()->on_actionSave_Project_triggered();
-	}
 
 	ProjectSettings project;
 
 	try
 	{
 		project = get_model()->load_project_file_from_disk(project_file_path);
-	}catch(...)
+	}
+	catch(...)
 	{
 		get_view()->display_errorbox("Error", "The project file you were trying to load is corrupted");
 		return;
@@ -207,9 +204,7 @@ void MvpPresenter::save_project_file_as(const QString& project_file_path) const
 
 	// If an fbx model is currently loaded, store it's name in the project
 	if (get_model()->get_fbx_model())
-	{
 		project.m_growthmesh_name = get_filename_from_path(get_model()->get_fbx_model()->m_path).toLocal8Bit().data();
-	}
 
 	QString hair_file_path;
 
@@ -218,7 +213,8 @@ void MvpPresenter::save_project_file_as(const QString& project_file_path) const
 	{
 		hair_file_path = get_directory_from_path(project_file_path).append("Hairstyle.hairstyle");
 		project.m_hair_style_name = "Hairstyle.hairstyle";
-	}else // Export it to the project directory using the name of the previously opened Hairstyle
+	}
+	else // Export it to the project directory using the name of the previously opened Hairstyle
 	{
 		hair_file_path = get_directory_from_path(project_file_path).append(get_filename_from_path(get_model()->m_loaded_hairstyle_path.data()));
 		project.m_hair_style_name = get_filename_from_path(get_model()->m_loaded_hairstyle_path.data()).toLocal8Bit().data();

@@ -58,7 +58,7 @@ bool ray_mesh_intersects(
 	float t_min = std::numeric_limits<float>::infinity();
 	float _t, _u, _v;
 
-	for (int face = 0; face < mesh_data->m_num_faces; ++face)
+	for (int face = 0; face < mesh_data->m_num_triangles; ++face)
 	{
 		const Vertex &v1 = mesh_data->m_vertices[mesh_data->m_indices[face * 3 + 0]];
 		const Vertex &v2 = mesh_data->m_vertices[mesh_data->m_indices[face * 3 + 1]];

@@ -1,3 +1,4 @@
+
 #include "renderer.h"
 
 #include <glm.hpp>
@@ -127,26 +128,26 @@ void Renderer::render_scene()
 		{
 			const glm::vec3 position(feedback[i], feedback[i + 1], feedback[i + 2]);
 			m_hairdata_cache.m_vertices.push_back(position);
+
 			if (counter < (m_current_scene_->m_hair.m_num_segments - 1))
 			{
 				i += 2 * 3;
-				counter++;
+				++counter;
 			}
 			else
 			{
 				i += 1 * 3;
-				counter++;
+				++counter;
+
 				if (counter == (m_current_scene_->m_hair.m_num_segments + 1))
-				{
 					counter = 0;
-				}
 			}
 		}
 		m_should_write_out_hair = false;
 	}
 
 	m_current_scene_->m_hair_shader->release();
-	
+
 	m_current_scene_->m_paintbrush_shader->bind();
 	m_current_scene_->m_grid_vao.bind();
 

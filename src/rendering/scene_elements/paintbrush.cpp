@@ -5,7 +5,7 @@
 
 PaintBrush::PaintBrush() : m_brush_position_()
 {
-	m_brush_size_ = .10f;
+	m_brush_size_ = 0.10f;
 	m_intensity_ = 1.0f;
 
 	// Set hair length as default channel (red)

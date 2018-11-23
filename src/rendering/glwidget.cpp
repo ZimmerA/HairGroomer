@@ -6,8 +6,7 @@
 
 #include "math/raycast.h"
 
-GLWidget::GLWidget(QWidget* parent)
-	: QOpenGLWidget(parent)
+GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
 	setMouseTracking(true);
 	setFocus();
@@ -29,9 +28,7 @@ void GLWidget::initializeGL()
 	m_renderer.set_measurements(width(), height());
 	m_renderer.set_current_scene(&m_scene);
 	m_scene.load();
-	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f),
-	                                               (width() / 2.0f) / static_cast<float>(height()), 0.1f,
-	                                               1000.0f);
+	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f), (width() / 2.0f) / static_cast<float>(height()), 0.1f, 1000.0f);
 }
 
 void GLWidget::load_glmodel_data()
@@ -49,8 +46,7 @@ void GLWidget::load_glmodel_data()
 void GLWidget::resizeGL(const int w, const int h)
 {
 	m_renderer.set_measurements(w, h);
-	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f), w / static_cast<float>(h) / 2.0f, 0.1f,
-	                                               1000.0f);
+	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f), w / static_cast<float>(h) / 2.0f, 0.1f, 1000.0f);
 }
 
 /**
@@ -83,7 +79,7 @@ void GLWidget::process_input()
  * \brief Gets called when a mouse button is pressed
  * \param event The mouse event
  */
-void GLWidget::mousePressEvent(QMouseEvent* event)
+void GLWidget::mousePressEvent(QMouseEvent *event)
 {
 	if (!event)
 		return;
@@ -103,13 +99,9 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
 
 			// Save whether the first click was inside of the model viewport
 			if (mouse_pos_x <= 0.0f)
-			{
 				m_has_mouse_started_in_viewport_ = true;
-			}
 			else
-			{
 				m_has_mouse_started_in_viewport_ = false;
-			}
 
 			update();
 			break;
@@ -128,7 +120,7 @@ void GLWidget::mousePressEvent(QMouseEvent* event)
  * \brief Gets called when the mouse is moved
  * \param event The mouse event sent by QT
  */
-void GLWidget::mouseMoveEvent(QMouseEvent* event)
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	if (!event)
 		return;
@@ -159,7 +151,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 		const ModelData *model_data = m_view_->get_presenter()->get_model()->get_fbx_model();
 		const MeshData *mesh_data = &model_data->m_meshes[m_scene.m_growth_mesh_index];
 
-		RaycastHit hit{};
+		RaycastHit hit;
 
 		if (raycast(origin, direction, mesh_data, hit))
 			m_scene.m_brush.set_position(hit.uv.x, hit.uv.y);
@@ -180,14 +172,12 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
 		{
 			const int delta_x = event->x() - m_last_mouse_pos_.x();
 			const int delta_y = event->y() - m_last_mouse_pos_.y();
+
 			if (event->buttons() & Qt::MiddleButton)
-			{
 				m_scene.m_camera.move_pivot_point(delta_x, delta_y);
-			}
 			else if (event->buttons() & Qt::LeftButton)
-			{
 				m_scene.m_camera.handle_mouse_move(delta_x, delta_y);
-			}
+			
 			// query call of paintgl
 			update();
 			m_last_mouse_pos_ = event->pos();
@@ -199,7 +189,7 @@ void GLWidget::mouseMoveEvent(QMouseEvent* event)
  * \brief Gets called on mouse button release
  * \param event The Mouse event
  */
-void GLWidget::mouseReleaseEvent(QMouseEvent* event)
+void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
 	if (!event)
 		return;
@@ -225,7 +215,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent* event)
  * \brief Gets called when the mousewheel is scrolled
  * \param event The scroll event
  */
-void GLWidget::wheelEvent(QWheelEvent* event)
+void GLWidget::wheelEvent(QWheelEvent *event)
 {
 	if (!event)
 		return;
@@ -239,7 +229,7 @@ void GLWidget::wheelEvent(QWheelEvent* event)
 /**
  * \brief Gets called on key press
  */
-void GLWidget::keyPressEvent(QKeyEvent* event)
+void GLWidget::keyPressEvent(QKeyEvent *event)
 {
 	if (!event)
 		return;
@@ -252,7 +242,7 @@ void GLWidget::keyPressEvent(QKeyEvent* event)
 /**
  * \brief Gets called on key release
  */
-void GLWidget::keyReleaseEvent(QKeyEvent* event)
+void GLWidget::keyReleaseEvent(QKeyEvent *event)
 {
 	if (!event)
 		return;

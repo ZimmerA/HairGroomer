@@ -18,12 +18,13 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 class Scene
 {
 public:
+
 	void load();
 	void reset();
 	void resize_hair_feedback_buffer(int size);
 	void set_up_axis(int i);
 
-	// mvp matrices used by hair and meshes
+	// MVP matrices used by hair and meshes
 	glm::mat4 m_model_matrix{1};
 	glm::mat4 m_view_matrix{1};
 	glm::mat4 m_projection_matrix{1};
@@ -36,7 +37,7 @@ public:
 	std::unique_ptr<QOpenGLShaderProgram> m_paintbrush_shader;
 
 	// Drawbuffer for painting to 
-	GlDrawbuffer m_drawbuffer;
+	GLDrawbuffer m_drawbuffer;
 	QOpenGLBuffer m_hair_output_vbo;
 
 	// Quad for rendering textures
@@ -51,12 +52,12 @@ public:
 	std::unique_ptr<QOpenGLTexture> m_paint_brush_texture;
 	std::unique_ptr<QOpenGLTexture> m_floor_grid_texture;
 
-	/* Scene Elements */
-	Orbitcamera m_camera;
+	// Scene Elements
+	OrbitCamera m_camera;
 	Light m_light;
 	HairSettings m_hair;
 	PaintBrush m_brush;
-	GlModel m_fbx_glmodel;
+	GLModel m_fbx_glmodel;
 
 	// index of the growthmesh in the fbx model
 	int m_growth_mesh_index;
@@ -64,6 +65,7 @@ public:
 	bool m_should_reset{false};
 
 private:
+
 	void load_shaders();
 	void load_textures();
 	void create_quad_vao();
@@ -71,4 +73,3 @@ private:
 };
 
 #endif
-

@@ -1,12 +1,13 @@
+
 #include <QApplication>
 #include <QMessageBox>
 #include <QOpenGLFunctions_3_3_Core>
 #include <QCommandLineParser>
+#include <QFileDialog>
 
 #include "views/mainwindow.h"
 #include "mvpmodel.h"
 #include "mvppresenter.h"
-#include <QFileDialog>
 
 int main(int argc, char* argv[])
 {
@@ -69,7 +70,7 @@ int main(int argc, char* argv[])
 
 	view.show();
 	
-	const UiSettings defaultsettings;
+	const UISettings defaultsettings;
 	// Load the default values of the ui control elements
 	view.set_ui_settings(defaultsettings);
 	

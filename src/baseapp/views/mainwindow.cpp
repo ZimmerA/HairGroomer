@@ -567,12 +567,12 @@ void MainWindow::clear_growthmesh_index_content() const
 }
 
 /**
- * \brief Returns a UiSettings object that holds the current settings
- * \return The current UiSettings
+ * \brief Returns a UISettings object that holds the current settings
+ * \return The current UISettings
  */
-UiSettings MainWindow::get_ui_settings() const
+UISettings MainWindow::get_ui_settings() const
 {
-	UiSettings settings;
+	UISettings settings;
 
 	// General settings
 	settings.m_grid_visibility = get_ui()->cb_show_uv->isChecked();
@@ -595,10 +595,10 @@ UiSettings MainWindow::get_ui_settings() const
 }
 
 /**
- * \brief Loads the given UiSettings into the UI
- * \param settings The UiSettings to be loaded
+ * \brief Loads the given UISettings into the UI
+ * \param settings The UISettings to be loaded
  */
-void MainWindow::set_ui_settings(const UiSettings& settings)
+void MainWindow::set_ui_settings(const UISettings& settings)
 {
 	// General settings
 	set_uv_grid_visibility(settings.m_grid_visibility);

@@ -24,7 +24,9 @@ inline QString get_directory_from_path(const QString& path)
 class MvpPresenter
 {
 public:
+
 	MvpPresenter() noexcept;
+	
 	void export_hairworks(const QString& hair_file_path) const;
 	void export_hairstyle(const QString& hairstyle_file_path) const;
 	void load_hairstyle(const QString& hairstyle_file_path) const;
@@ -41,6 +43,7 @@ public:
 	MainWindow* get_view() const noexcept{ return m_view_; }
 
 private:
+
 	MvpModel* m_model_;
 	MainWindow* m_view_;
 };

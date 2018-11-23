@@ -109,11 +109,9 @@ void ModelData::process_mesh_nodes(FbxNode* node, FbxManager* manager)
 		}
 	}
 
-	// Process childnodes
+	// Process child nodes
 	for (int i = 0; i < node->GetChildCount(); i++)
-	{
 		process_mesh_nodes(node->GetChild(i), manager);
-	}
 }
 
 MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::string mesh_name)
@@ -123,6 +121,7 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 	{
 		FbxGeometryConverter converter(manager);
 		mesh = static_cast<FbxMesh*>(converter.Triangulate(mesh, true));
+
 		if (!mesh)
 		{
 			std::stringstream error_stream;
@@ -131,17 +130,16 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 	}
 
 	// Generate Tangent/Binormals if needed
-	if (mesh->GetElementBinormalCount() <= 0 || mesh->GetElementTangentCount() <= 0)
-	{
+	if ((mesh->GetElementBinormalCount() <= 0) || (mesh->GetElementTangentCount() <= 0))
 		mesh->GenerateTangentsData(0, true);
-	}
 
 	// Preload control points to make skeleton loading easier
-	std::vector<ControlpointInfo> control_points;
+	std::vector<ControlPointInfo> control_points;
 	const unsigned int controlpoint_count = mesh->GetControlPointsCount();
-	for (unsigned int i = 0; i < controlpoint_count; i++)
+
+	for (unsigned int i = 0; i < controlpoint_count; ++i)
 	{
-		ControlpointInfo controlpoint;
+		ControlPointInfo controlpoint;
 		const FbxVector4 position = mesh->mControlPoints[i];
 		controlpoint.m_position.x = position.mData[0];
 		controlpoint.m_position.y = position.mData[1];
@@ -151,17 +149,17 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 
 	// Load Vertex Bone info
 	const unsigned int num_deformers = mesh->GetDeformerCount();
-	for (unsigned int deformer_index = 0; deformer_index < num_deformers; deformer_index++)
+
+	for (unsigned int deformer_index = 0; deformer_index < num_deformers; ++deformer_index)
 	{
-		auto* curr_skin = reinterpret_cast<FbxSkin*>(mesh->GetDeformer(deformer_index, FbxDeformer::eSkin));
+		auto *curr_skin = reinterpret_cast<FbxSkin*>(mesh->GetDeformer(deformer_index, FbxDeformer::eSkin));
+		
 		// Deformer isn't a skin
 		if (!curr_skin)
-		{
 			continue;
-		}
 
 		const unsigned int num_clusters = curr_skin->GetClusterCount();
-		for (unsigned int cluster_index = 0; cluster_index < num_clusters; cluster_index++)
+		for (unsigned int cluster_index = 0; cluster_index < num_clusters; ++cluster_index)
 		{
 			FbxCluster* curr_cluster = curr_skin->GetCluster(cluster_index);
 			std::string bone_name = curr_cluster->GetLink()->GetName();
@@ -176,19 +174,15 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 			FbxAMatrix global_bindpose = (transform_link_matrix.Inverse() * transform_matrix).Inverse();
 
 			// set the bindpose Matrix in the bone
-			for (int x = 0; x < 4; x++)
-			{
-				for (int y = 0; y < 4; y++)
-				{
+			for (int x = 0; x < 4; ++x)
+				for (int y = 0; y < 4; ++y)
 					m_bone_list[bone_id].m_global_bindpose[x][y] = global_bindpose[x][y];
-				}
-			}
 
 			// Get amount of control points this bone affects
 			const unsigned int num_indices = curr_cluster->GetControlPointIndicesCount();
 
 			// Assign the weight and bone id info to the control points
-			for (unsigned int i = 0; i < num_indices; i++)
+			for (unsigned int i = 0; i < num_indices; ++i)
 			{
 				VertexBoneInfo bone_info{};
 				bone_info.m_id = bone_id;
@@ -204,22 +198,22 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 	std::vector<unsigned int> indices;
 
 	// Hashmap for finding duplicate vertices
-	std::unordered_map<Vertex, uint32_t> unique_vertices = {};
+	std::unordered_map<Vertex, uint32_t> unique_vertices;
 
 	// Used for reading out normals, uv, tangent, binormal that have a per polygon vertex mapping
 	int index_count = 0;
 
 	// Iterate over every triangle in the mesh
-	for (int triangle = 0; triangle < num_triangles; triangle++)
+	for (int triangle = 0; triangle < num_triangles; ++triangle)
 	{
 		// 3 points per polygon (triangulated)
-		for (int index_in_polygon = 0; index_in_polygon < 3; index_in_polygon++)
+		for (int index_in_polygon = 0; index_in_polygon < 3; ++index_in_polygon)
 		{
 			Vertex vert;
 
 			const int control_point_index = mesh->GetPolygonVertex(triangle, index_in_polygon);
 
-			const ControlpointInfo control_point = control_points.at(control_point_index);
+			const ControlPointInfo control_point = control_points.at(control_point_index);
 
 			// Get the vertex info
 			vert.m_position = control_point.m_position;
@@ -238,7 +232,7 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 
 			// Get the correct index of the vert using the hashmap
 			indices.push_back(unique_vertices[vert]);
-			index_count++;
+			++index_count;
 		}
 	}
 	m_name_list.push_back(mesh_name);
@@ -248,6 +242,7 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 glm::vec3 ModelData::read_normal(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
 {
 	glm::vec3 out_normal(0, 0, 0);
+
 	if (mesh->GetElementNormalCount() >= 1)
 	{
 		FbxGeometryElementNormal* vertex_normal = mesh->GetElementNormal(0);
@@ -322,12 +317,13 @@ glm::vec2 ModelData::read_uv(FbxMesh* mesh, const int control_point_index, const
 		FbxGeometryElementUV* uv_elemnt = mesh->GetElementUV(0);
 
 		const bool lUseIndex = uv_elemnt->GetReferenceMode() != FbxGeometryElement::eDirect;
+
 		if (uv_elemnt->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
 			//the UV index depends on the reference mode
 			const int uv_index = lUseIndex
-				                     ? uv_elemnt->GetIndexArray().GetAt(control_point_index)
-				                     : control_point_index;
+			                     ? uv_elemnt->GetIndexArray().GetAt(control_point_index)
+			                     : control_point_index;
 
 			const FbxVector2 uv_value = uv_elemnt->GetDirectArray().GetAt(uv_index);
 
@@ -361,12 +357,13 @@ glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index,
 		FbxGeometryElementBinormal* binormal_element = mesh->GetElementBinormal(0);
 
 		const bool uses_index = binormal_element->GetReferenceMode() != FbxGeometryElement::eDirect;
+
 		if (binormal_element->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
-			//the UV index depends on the reference mode
+			// The UV index depends on the reference mode
 			const int binormal_index = uses_index
-				                           ? binormal_element->GetIndexArray().GetAt(control_point_index)
-				                           : control_point_index;
+			                           ? binormal_element->GetIndexArray().GetAt(control_point_index)
+			                           : control_point_index;
 
 			const FbxVector4 binormal_value = binormal_element->GetDirectArray().GetAt(binormal_index);
 			binormal.x = binormal_value.mData[0];
@@ -375,9 +372,8 @@ glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index,
 		}
 		else if (binormal_element->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 		{
-			//the UV index depends on the reference mode
-			const int binormal_index =
-				uses_index ? binormal_element->GetIndexArray().GetAt(vertex_counter) : vertex_counter;
+			// The UV index depends on the reference mode
+			const int binormal_index = uses_index ? binormal_element->GetIndexArray().GetAt(vertex_counter) : vertex_counter;
 
 			const FbxVector4 binormal_value = binormal_element->GetDirectArray().GetAt(binormal_index);
 			binormal.x = binormal_value.mData[0];
@@ -390,24 +386,25 @@ glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index,
 		qDebug() << "Mesh doesn't have binormals";
 	}
 
-
 	return binormal;
 }
 
 glm::vec3 ModelData::read_tangent(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
 {
 	glm::vec3 tangent(0, 0, 0);
+
 	if (mesh->GetElementTangentCount() >= 1)
 	{
 		FbxGeometryElementTangent* tangent_element = mesh->GetElementTangent(0);
 
 		const bool uses_index = tangent_element->GetReferenceMode() != FbxGeometryElement::eDirect;
+
 		if (tangent_element->GetMappingMode() == FbxGeometryElement::eByControlPoint)
 		{
-			//the UV index depends on the reference mode
+			// The UV index depends on the reference mode
 			const int tangent_index = uses_index
-				                          ? tangent_element->GetIndexArray().GetAt(control_point_index)
-				                          : control_point_index;
+			                          ? tangent_element->GetIndexArray().GetAt(control_point_index)
+			                          : control_point_index;
 
 			const FbxVector4 tangent_value = tangent_element->GetDirectArray().GetAt(tangent_index);
 			tangent.x = tangent_value.mData[0];
@@ -416,10 +413,11 @@ glm::vec3 ModelData::read_tangent(FbxMesh* mesh, const int control_point_index, 
 		}
 		else if (tangent_element->GetMappingMode() == FbxGeometryElement::eByPolygonVertex)
 		{
-			//the UV index depends on the reference mode
+			// The UV index depends on the reference mode
 			const int tangent_index = uses_index
-				                          ? tangent_element->GetIndexArray().GetAt(vertex_counter)
-				                          : vertex_counter;
+			                          ? tangent_element->GetIndexArray().GetAt(vertex_counter)
+			                          : vertex_counter;
+			
 			const FbxVector4 tangent_value = tangent_element->GetDirectArray().GetAt(tangent_index);
 			tangent.x = tangent_value.mData[0];
 			tangent.y = tangent_value.mData[1];
@@ -430,5 +428,6 @@ glm::vec3 ModelData::read_tangent(FbxMesh* mesh, const int control_point_index, 
 	{
 		qDebug() << "Mesh doesn't have tangents";
 	}
+
 	return tangent;
 }
