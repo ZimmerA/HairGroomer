@@ -13,14 +13,14 @@ class GLMesh
 {
 public:
 
+	unsigned int m_index_count;
+	unsigned int m_vertex_count;
+	
 	explicit GLMesh(MeshData *mesh_data);
 
 	void draw();
 	void draw_points();
 	
-	unsigned int m_index_count;
-	unsigned int m_vertex_count;
-
 private:
 
 	// Don't allow copy or assignment

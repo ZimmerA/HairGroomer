@@ -19,14 +19,7 @@ public:
 
 	PaintBrush();
 
-	void set_brush_size(float size);
-	void set_brush_intensity(float d);
-	void set_opposite_mode(bool value) noexcept;
-	void set_is_erasing(bool value) noexcept;
-	void set_is_drawing(bool value) noexcept;
-	void set_position(float x, float y);
-	void set_paintmode(PaintMode p) noexcept;
-
+	// Getters/Setters
 	const glm::mat4& get_transform() const noexcept { return m_transform_; }
 	float get_size() const noexcept { return m_brush_size_; }
 	float get_intensity() const noexcept { return m_intensity_; }
@@ -34,6 +27,14 @@ public:
 	bool get_is_erasing() const noexcept { return m_is_erasing_; }
 	bool get_is_drawing() const noexcept { return m_is_drawing_; }
 	bool* get_colormask() noexcept { return m_colormask_; }
+	
+	void set_brush_size(float size);
+	void set_brush_intensity(float d);
+	void set_opposite_mode(bool value) noexcept;
+	void set_is_erasing(bool value) noexcept;
+	void set_is_drawing(bool value) noexcept;
+	void set_position(float x, float y);
+	void set_paintmode(PaintMode p) noexcept;
 
 private:
 

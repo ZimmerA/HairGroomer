@@ -29,18 +29,20 @@ public:
 	
 	void export_hairworks(const QString& hair_file_path) const;
 	void export_hairstyle(const QString& hairstyle_file_path) const;
-	void load_hairstyle(const QString& hairstyle_file_path) const;
+	void import_hairstyle(const QString& hairstyle_file_path) const;
 	void load_fbx_model(const QString& fbx_model_file_path) const;
 	void load_project_file(const QString& project_file_path) const;
 	void new_project() const;
 	bool save_project_file() const;
 	void save_project_file_as(const QString& project_file_path) const;
 
-	// Getters and Setters
-	void set_model(MvpModel* model) noexcept{ this->m_model_ = model; }
-	void set_view(MainWindow* view) noexcept{ this->m_view_ = view; }
+	// Getters/Setters
 	MvpModel* get_model() const noexcept { return m_model_; }
 	MainWindow* get_view() const noexcept{ return m_view_; }
+
+	void set_model(MvpModel* model) noexcept{ this->m_model_ = model; }
+	void set_view(MainWindow* view) noexcept{ this->m_view_ = view; }
+
 
 private:
 

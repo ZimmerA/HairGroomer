@@ -16,12 +16,12 @@ public:
 
 	void draw();
 	void draw_points();
-	void draw_points_at_index(int i);
 	void draw_at_index(int i);
-
-	// Takes model data and creates the according glMeshes
+	void draw_points_at_index(int i);
 	void setup_model(ModelData *model_data);
 	void cleanup_model();
+
+	// Getters/Setters
 	unsigned int get_vertex_amount() noexcept;
 
 private:

@@ -55,7 +55,7 @@ void MvpModel::save_project_file_to_disk(const QString &filename, const ProjectS
  * \param hairdata The data of the hair
  * \param up_axis_index 0 = y, 1 = z
  */
-void MvpModel::export_hair_to_disk(const QString& filename, const HairData& hairdata, const int up_axis_index) const
+void MvpModel::export_hairworks_to_disk(const QString& filename, const HairData& hairdata, const int up_axis_index) const
 {
 	QFile file(filename);
 	if (!m_fbx_model_)
@@ -567,7 +567,7 @@ bool MvpModel::export_hairstyle_to_disk(const QImage &image, const QString &file
  * \param filename The path of the file to be opened
  * \return The requested image if succeeded, a null QImage image if failed
  */
-QImage MvpModel::load_hairstyle_from_disk(const QString &filename) const
+QImage MvpModel::import_hairstyle_from_disk(const QString &filename) const
 {
 	QImage hairstyle;
 

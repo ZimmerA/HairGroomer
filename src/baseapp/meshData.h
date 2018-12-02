@@ -60,20 +60,22 @@ class MeshData
 {
 public:
 
+	std::vector<Vertex> m_vertices;
+	std::vector<unsigned int> m_indices;
+	int m_num_triangles;
+	std::string m_name;
+
 	MeshData(
 		std::string name,
 		std::vector<Vertex> vertices,
 		std::vector<unsigned int> indices,
 		int num_triangles);
 
+	// Getters/Setters
 	int get_num_triangles() const noexcept;
 	const std::vector<unsigned int>& get_indices() const noexcept;
 	std::vector<glm::vec2> get_face_uvs();
 
-	std::vector<Vertex> m_vertices;
-	std::vector<unsigned int> m_indices;
-	int m_num_triangles;
-	std::string m_name;
 };
 
 #endif //MESHDATA_H

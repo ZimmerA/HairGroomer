@@ -101,7 +101,7 @@ void MainWindow::on_actionSave_Project_as_triggered()
 void MainWindow::on_actionLoad_Hairstyle_triggered()
 {
 	const QString file_name = open_file_dialog("Load Hairstyle", "Hairstyle (*.hairstyle)");
-	get_presenter()->load_hairstyle(file_name);
+	get_presenter()->import_hairstyle(file_name);
 }
 
 /**
@@ -289,7 +289,7 @@ void MainWindow::dropEvent(QDropEvent* e)
 			get_presenter()->load_fbx_model(file_path);
 		}else if(file_extension == "hairstyle")
 		{
-			get_presenter()->load_hairstyle(file_path);	
+			get_presenter()->import_hairstyle(file_path);	
 		}else if(file_extension == "grrproj")
 		{
 			get_presenter()->load_project_file(file_path);

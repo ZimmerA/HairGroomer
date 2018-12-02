@@ -27,7 +27,7 @@ void MvpPresenter::export_hairworks(const QString& hair_file_path) const
 	try
 	{
 		const HairData& d = m_view_->get_ui()->widget_gl->m_renderer.m_hairdata_cache;
-		get_model()->export_hair_to_disk(hair_file_path, d, m_view_->get_ui()->cmb_up_axis->currentIndex());
+		get_model()->export_hairworks_to_disk(hair_file_path, d, m_view_->get_ui()->cmb_up_axis->currentIndex());
 		get_view()->display_messagebox("Successfully exported", "The hair file has successfully been exported");
 	}
 	catch (std::runtime_error& e)
@@ -66,12 +66,12 @@ void MvpPresenter::export_hairstyle(const QString& hairstyle_file_path) const
  * \brief Tries to load a hairstyle from disk and puts it into the drawbuffer
  * \param hairstyle_file_path The path to the hairstyle image
  */
-void MvpPresenter::load_hairstyle(const QString& hairstyle_file_path) const
+void MvpPresenter::import_hairstyle(const QString& hairstyle_file_path) const
 {
 	if (hairstyle_file_path.isEmpty())
 		return;
 
-	QImage hairstyle = get_model()->load_hairstyle_from_disk(hairstyle_file_path);
+	QImage hairstyle = get_model()->import_hairstyle_from_disk(hairstyle_file_path);
 
 	if (hairstyle.isNull())
 		get_view()->display_messagebox("Couldn't load file", "");
@@ -166,7 +166,7 @@ void MvpPresenter::load_project_file(const QString& project_file_path) const
 	if (!project.m_hair_style_name.empty())
 	{
 		const QString path = get_directory_from_path(project_file_path).append(project.m_hair_style_name.data());
-		load_hairstyle(path);
+		import_hairstyle(path);
 	}
 
 	get_view()->set_ui_settings(project.m_ui_settings);

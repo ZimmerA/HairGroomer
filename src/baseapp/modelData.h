@@ -35,18 +35,24 @@ struct ControlPointInfo
  */
 class ModelData
 {
+private:
+
+	static glm::vec3 read_normal(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec2 read_uv(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec3 read_binormal(FbxMesh* mesh, int control_point_index, int vertex_counter);
+	static glm::vec3 read_tangent(FbxMesh* mesh, int control_point_index, int vertex_counter);
+
 public:
+
+	std::vector<MeshData> m_meshes;
+	std::vector<std::string> m_name_list;
+	std::vector<Bone> m_bone_list;
+	QString m_path;
 
 	explicit ModelData(const QString& path);
 
+	// Getters/Setters
 	size_t get_num_bones() const noexcept { return m_bone_map_.size(); }
-
-	// MeshData for every sub mesh of the model
-	std::vector<MeshData> m_meshes;
-	std::vector<std::string> m_name_list;
-	// Contains the Bones
-	std::vector<Bone> m_bone_list;
-	QString m_path;
 
 private:
 
@@ -57,11 +63,6 @@ private:
 	
 	MeshData process_mesh(FbxMesh* mesh, FbxManager* manager, std::string mesh_name);
 	
-	static glm::vec3 read_normal(FbxMesh* mesh, int control_point_index, int vertex_counter);
-	static glm::vec2 read_uv(FbxMesh* mesh, int control_point_index, int vertex_counter);
-	static glm::vec3 read_binormal(FbxMesh* mesh, int control_point_index, int vertex_counter);
-	static glm::vec3 read_tangent(FbxMesh* mesh, int control_point_index, int vertex_counter);
-
 	// Maps bone names to the index in the bone_list
 	std::map<std::string, uint> m_bone_map_;
 };
@@ -76,9 +77,7 @@ class FbxPointer : public std::unique_ptr<T, void(*)(T*)>
 public:
 
 	explicit FbxPointer(T *ptr = nullptr);
-
 	FbxPointer(FbxPointer &&other) noexcept;
-
 	FbxPointer& operator=(FbxPointer &&other) noexcept;
 
 private:

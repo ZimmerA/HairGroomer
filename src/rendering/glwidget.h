@@ -12,10 +12,10 @@ Q_OBJECT
 
 public:
 
-	explicit GLWidget(QWidget *parent = nullptr);
-
 	Renderer m_renderer;
 	Scene m_scene;
+
+	explicit GLWidget(QWidget *parent = nullptr);
 	
 	void load_glmodel_data();
 
@@ -40,9 +40,8 @@ private:
 	// MVP design pattern reference of view
 	MainWindow *m_view_{};
 
-	/* Input related*/
 	QPoint m_last_mouse_pos_;
-	bool m_has_mouse_started_in_viewport_{}; // tells us if the mouse is in viewport
+	bool m_has_mouse_started_in_viewport_{};
 	QMap<int, bool> m_keys_;
 };
 

@@ -19,11 +19,6 @@ class Scene
 {
 public:
 
-	void load();
-	void reset();
-	void resize_hair_feedback_buffer(int size);
-	void set_up_axis(int i);
-
 	// MVP matrices used by hair and meshes
 	glm::mat4 m_model_matrix{1};
 	glm::mat4 m_view_matrix{1};
@@ -63,6 +58,13 @@ public:
 	int m_growth_mesh_index;
 
 	bool m_should_reset{false};
+
+	void load();
+	void reset();
+	void resize_hair_feedback_buffer(int size);
+
+	// Getters/Setters
+	void set_up_axis(int i);
 
 private:
 
