@@ -4,7 +4,7 @@
 #include <vector>
 
 /**
- * \brief Stores the data of the generated hair to write to the Hairworks file, the data is retrieved using transform feedback on the geometry shader
+ * \brief Stores the data of the generated hair. USed to write to the HairWorks file, the data is retrieved using transform feedback on the geometry shader
  */
 struct HairData
 {

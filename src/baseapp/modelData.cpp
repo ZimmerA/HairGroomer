@@ -6,13 +6,17 @@
 
 #include <QDebug>
 
+/**
+ * \brief The constructor of the model loads the model at the specified path
+ * \param path The path to the fbx model
+ */
 ModelData::ModelData(const QString& path)
 {
 	load_model(path);
 }
 
 /**
- * \brief Loads the model at the given path using the Fbx Sdk
+ * \brief Loads the model at the given path using the Fbx sdk
  * \param path The path to the model on the harddrive
  */
 void ModelData::load_model(const QString& path)
@@ -54,6 +58,10 @@ void ModelData::load_model(const QString& path)
 	}
 }
 
+/**
+ * \brief Iterates over every childnode of node and starts the recursive iteration process
+ * \param node The current Fbx node
+ */
 void ModelData::process_skeleton_nodes(FbxNode* node)
 {
 	for (int i = 0; i < node->GetChildCount(); i++)
@@ -63,6 +71,11 @@ void ModelData::process_skeleton_nodes(FbxNode* node)
 	}
 }
 
+/**
+ * \brief Recursively iterates over every child node. If it is a bone, its added to the list of bones
+ * \param node The current Fbx node
+ * \param parent_index The index of the parent bone
+ */
 void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_index)
 {
 	uint bone_index = 0;
@@ -94,6 +107,11 @@ void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_in
 	}
 }
 
+/**
+ * \brief Recursively iterates over every node. Calls the process_mesh function to add it to the list of meshes if the node is a mesh
+ *  * \param node The current Fbx node
+ * \param manager The Fbx Sdk manager
+ */
 void ModelData::process_mesh_nodes(FbxNode* node, FbxManager* manager)
 {
 	if (node->GetNodeAttribute() != nullptr)
@@ -114,6 +132,13 @@ void ModelData::process_mesh_nodes(FbxNode* node, FbxManager* manager)
 		process_mesh_nodes(node->GetChild(i), manager);
 }
 
+/**
+ * \brief Tries to retrieve the data of the Fbx mesh and creates a MeshData object to be added to the list of meshes
+ * \param mesh The current Fbx mesh
+ * \param manager The Fbx Sdk manager
+ * \param mesh_name The name of the mesh
+ * \return A MeshData object that contains the data of the given Fbx mesh
+ */
 MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::string mesh_name)
 {
 	// Triangulate mesh if needed
@@ -239,6 +264,13 @@ MeshData ModelData::process_mesh(FbxMesh* mesh, FbxManager* manager, const std::
 	return MeshData(mesh_name, vertices, indices, num_triangles);
 }
 
+/**
+ * \brief Loads the normals for the given vertex
+ * \param mesh The current Fbx mesh
+ * \param control_point_index The index of the current control point of this vertex
+ * \param vertex_counter The according vertex
+ * \return A glm::vec3 containing the normal of the vertex
+ */
 glm::vec3 ModelData::read_normal(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
 {
 	glm::vec3 out_normal(0, 0, 0);
@@ -308,6 +340,13 @@ glm::vec3 ModelData::read_normal(FbxMesh* mesh, const int control_point_index, c
 	return out_normal;
 }
 
+/**
+ * \brief Loads the UV for the given vertex
+ * \param mesh The current Fbx mesh
+ * \param control_point_index The index of the current control point of this vertex
+ * \param vertex_counter The according vertex
+ * \return A glm::vec2 containing the UV of the vertex
+ */
 glm::vec2 ModelData::read_uv(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
 {
 	glm::vec2 uv(0, 0);
@@ -348,6 +387,13 @@ glm::vec2 ModelData::read_uv(FbxMesh* mesh, const int control_point_index, const
 	return uv;
 }
 
+/**
+ * \brief Loads the binormal for the given vertex
+ * \param mesh The current Fbx mesh
+ * \param control_point_index The index of the current control point of this vertex
+ * \param vertex_counter The according vertex
+ * \return A glm::vec3 containing the binormal of the vertex
+ */
 glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
 {
 	glm::vec3 binormal(0, 0, 0);
@@ -389,6 +435,13 @@ glm::vec3 ModelData::read_binormal(FbxMesh* mesh, const int control_point_index,
 	return binormal;
 }
 
+/**
+ * \brief Loads the tangent for the given vertex
+ * \param mesh The current Fbx mesh
+ * \param control_point_index The index of the current control point of this vertex
+ * \param vertex_counter The according vertex
+ * \return A glm::vec3 containing the tangent of the vertex
+ */
 glm::vec3 ModelData::read_tangent(FbxMesh* mesh, const int control_point_index, const int vertex_counter)
 {
 	glm::vec3 tangent(0, 0, 0);

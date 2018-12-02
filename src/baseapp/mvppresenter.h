@@ -19,7 +19,7 @@ inline QString get_directory_from_path(const QString& path)
 }
 
 /**
- * \brief Serves as the connection between MvpModel and MainWindow(the view)
+ * \brief Serves as the connection between MvpModel and MainWindow
  */
 class MvpPresenter
 {
@@ -42,7 +42,6 @@ public:
 
 	void set_model(MvpModel* model) noexcept{ this->m_model_ = model; }
 	void set_view(MainWindow* view) noexcept{ this->m_view_ = view; }
-
 
 private:
 

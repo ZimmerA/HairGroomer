@@ -1,6 +1,13 @@
 
 #include "meshData.h"
 
+/**
+ * \brief The constructor of the mesh initializes its attributes
+ * \param name The name of the mesh
+ * \param vertices The vertices the mesh consists of
+ * \param indices The indices describing the faces (triangles) of the mesh
+ * \param num_triangles The amount of triangles the mesh consists of
+ */
 MeshData::MeshData(
 	const std::string name,
 	std::vector<Vertex> vertices,
@@ -15,8 +22,8 @@ MeshData::MeshData(
 }
 
 /**
- * \brief Returns the amount of faces the mesh has
- * \return The amount of faces
+ * \brief Returns the amount of triangles the mesh has
+ * \return The amount of triangles
  */
 int MeshData::get_num_triangles() const noexcept
 {
@@ -24,7 +31,7 @@ int MeshData::get_num_triangles() const noexcept
 }
 
 /**
- * \brief Returns the indices of the mesh
+ * \brief Returns the indices describing the faces(triangles) of the mesh
  * \return A const std::vector<int> reference to the indices
  */
 const std::vector<unsigned int>& MeshData::get_indices() const noexcept

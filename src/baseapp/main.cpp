@@ -17,6 +17,7 @@ int main(int argc, char* argv[])
 	QCoreApplication::setOrganizationName("Adrian Zimmer");
 	QCoreApplication::setApplicationVersion("1.0");
 
+	// Load dark theme
 	QFile f(":qdarkstyle/style.qss");
 	if (!f.exists())
 	{
@@ -29,6 +30,7 @@ int main(int argc, char* argv[])
 		qApp->setStyleSheet(ts.readAll());
 	}
 
+	// Setup the command line argument Parser
 	QCommandLineParser parser;
 	parser.addHelpOption();
 	parser.addVersionOption();
@@ -70,8 +72,8 @@ int main(int argc, char* argv[])
 
 	view.show();
 	
-	const UISettings defaultsettings;
 	// Load the default values of the ui control elements
+	const UISettings defaultsettings;
 	view.set_ui_settings(defaultsettings);
 	
 	if (!parser.value(fbx_model_option).isEmpty())

@@ -3,6 +3,9 @@
 
 #include "paintbrush.h"
 
+/**
+ * \brief Sets the default values and calculates the initial transform
+ */
 PaintBrush::PaintBrush() : m_brush_position_()
 {
 	m_brush_size_ = 0.10f;
@@ -15,33 +18,58 @@ PaintBrush::PaintBrush() : m_brush_position_()
 	update_transform();
 }
 
+/**
+ * \brief Sets the brush size
+ * \param size The new size
+ */
 void PaintBrush::set_brush_size(const float size)
 {
 	m_brush_size_ = size;
 	update_transform();
 }
 
-void PaintBrush::set_brush_intensity(const float d)
+/**
+ * \brief Sets the brush intensity
+ * \param intensity The new intensity
+ */
+void PaintBrush::set_brush_intensity(const float intensity)
 {
-	this->m_intensity_ = d;
+	this->m_intensity_ = intensity;
 	update_transform();
 }
 
+/**
+ * \brief Sets wether the opposite mode should be on or off
+ * \param value The new state of the opposite mode
+ */
 void PaintBrush::set_opposite_mode(const bool value) noexcept
 {
 	m_opposite_mode_ = value;
 }
 
+/**
+ * \brief Sets wether the erase mode should be on or off
+ * \param value The new state of the erase mode
+ */
 void PaintBrush::set_is_erasing(const bool value) noexcept
 {
 	m_is_erasing_ = value;
 }
 
+/**
+ * \brief Sets wether the brush is currently being used to draw
+ * \param value The new state of the draw mode
+ */
 void PaintBrush::set_is_drawing(bool value) noexcept
 {
 	m_is_drawing_ = value;
 }
 
+/**
+ * \brief Sets the position of the brush in screen space
+ * \param x The x position
+ * \param y The y position
+ */
 void PaintBrush::set_position(const float x, const float y)
 {
 	m_brush_position_ = glm::vec2(x, y);
@@ -70,6 +98,9 @@ void PaintBrush::set_paintmode(const PaintMode p) noexcept
 	}
 }
 
+/**
+ * \brief Calculate the transform matrix of the brush
+ */
 void PaintBrush::update_transform()
 {
 	glm::vec2 uv = m_brush_position_ * 2.0f - 1.0f;

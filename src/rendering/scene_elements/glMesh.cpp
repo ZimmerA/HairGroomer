@@ -7,6 +7,10 @@
 
 #include "rendering/glattributes.h"
 
+/**
+ * \brief Loads the given MeshData into an openGl buffer and sets the attribute pointers 
+ * \param mesh_data The meshdata
+ */
 GLMesh::GLMesh(MeshData *mesh_data) : m_index_count(0), m_vertex_count(0), m_ibo_(QOpenGLBuffer::IndexBuffer)
 {
 	m_index_count = static_cast<unsigned int>(mesh_data->m_indices.size());
@@ -48,7 +52,7 @@ void GLMesh::draw()
 }
 
 /**
- * \brief Draws un-indexed mesh in point mode
+ * \brief Draws mesh in un-indexed point mode
  */
 void GLMesh::draw_points()
 {

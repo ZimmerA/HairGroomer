@@ -5,6 +5,9 @@
 #include <QOpenGLFunctions>
 #include <QOpenGLFunctions_3_3_Core>
 
+/**
+ * \brief Creates a framebuffer for drawing the hair
+ */
 void GLDrawbuffer::create()
 {
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
@@ -16,11 +19,17 @@ void GLDrawbuffer::create()
 	m_drawbuffer_->release();
 }
 
+/**
+ * \brief Bind the framebuffer
+ */
 void GLDrawbuffer::bind() const
 {
 	m_drawbuffer_->bind();
 }
 
+/**
+ * \brief Release the framebuffer
+ */
 void GLDrawbuffer::release() const
 {
 	m_drawbuffer_->release();
@@ -38,8 +47,8 @@ void GLDrawbuffer::set_content(QImage &image) const
 }
 
 /**
- * \brief Takes the content of the painting framebuffer and stores it in an image
- * \param image the returned image
+ * \brief Takes the content of the painting framebuffer and stores it in the image parameter
+ * \param image The returned image
  */
 void GLDrawbuffer::grab_drawbuffer_content_to_image(QImage &image) const
 {
@@ -76,6 +85,10 @@ void GLDrawbuffer::reset() const
 	m_drawbuffer_->release();
 }
 
+/**
+ * \brief Returns the openGl texture handle of the framebuffer texture
+ * \return The openGl texture handle
+ */
 int GLDrawbuffer::get_texture_handle() const
 {
 	return m_drawbuffer_->texture();

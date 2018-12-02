@@ -8,6 +8,11 @@
 
 #include "glattributes.h"
 
+/**
+ * \brief Checks for shader linking errors
+ * \param shader The current shader
+ * \param info The info string
+ */
 static void _check_shader(const std::unique_ptr<QOpenGLShaderProgram> &shader, const QString &info = nullptr)
 {
 	const QString log = shader->log().trimmed();
@@ -25,6 +30,9 @@ static void _check_shader(const std::unique_ptr<QOpenGLShaderProgram> &shader, c
 	exit(1);
 }
 
+/**
+ * \brief Loads the current scene
+ */
 void Scene::load()
 {
 	load_shaders();
@@ -41,11 +49,17 @@ void Scene::load()
 	m_hair_output_vbo.setUsagePattern(QOpenGLBuffer::StaticRead);
 }
 
+/**
+ * \brief Tells the renderer to reset the current scene (delete model and hair)
+ */
 void Scene::reset()
 {
 	m_should_reset = true;
 }
 
+/**
+ * \brief Load and initalize all shaders
+ */
 void Scene::load_shaders()
 {
 	auto *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_3_3_Core>();
@@ -153,7 +167,7 @@ void Scene::load_shaders()
 }
 
 /**
- * \brief Load all relevant textures
+ * \brief Load all textures
  */
 void Scene::load_textures()
 {
@@ -201,6 +215,9 @@ void Scene::create_quad_vao()
 	m_quad_vao.release();
 }
 
+/**
+ * \brief Creates and fills the quad vao/vbo for rendering the floorgrid
+ */
 void Scene::create_floor_grid()
 {
 	QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
@@ -245,6 +262,10 @@ void Scene::resize_hair_feedback_buffer(const int size)
 	m_hair_output_vbo.allocate(nullptr, size);
 }
 
+/**
+ * \brief Sets what axis is the up axis, rotates the loaded model accordingly
+ * \param i The up axis index 0 = y, 1 = z
+ */
 void Scene::set_up_axis(const int i)
 {
 	m_model_matrix = glm::mat4(1);

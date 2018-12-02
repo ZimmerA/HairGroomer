@@ -20,7 +20,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 }
 
 /**
- * \brief Initialize anything opengl related
+ * \brief Initialize the openGl data
  */
 void GLWidget::initializeGL()
 {
@@ -31,6 +31,9 @@ void GLWidget::initializeGL()
 	m_scene.m_projection_matrix = glm::perspective(glm::radians(45.0f), (width() / 2.0f) / static_cast<float>(height()), 0.1f, 1000.0f);
 }
 
+/**
+ * \brief Loads the model data stored in MvpModel object into the openGl context
+ */
 void GLWidget::load_glmodel_data()
 {
 	makeCurrent();
@@ -58,6 +61,9 @@ void GLWidget::paintGL()
 	m_renderer.render_scene();
 }
 
+/**
+ * \brief Processes pressed keys
+ */
 void GLWidget::process_input()
 {
 	if (m_keys_[Qt::Key_R])

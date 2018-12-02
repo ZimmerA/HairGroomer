@@ -5,6 +5,9 @@
 
 #include <QOpenGLFramebufferObject>
 
+/**
+ * \brief Wrapper class for an OpenGl framebuffer. Used for drawing the hair.
+ */
 class GLDrawbuffer
 {
 public:

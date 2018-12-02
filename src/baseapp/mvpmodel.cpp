@@ -11,6 +11,11 @@
 
 #include "rendering/glwidget.h"
 
+/**
+ * \brief Attempts to load the project file at the given path
+ * \param filename The path to the project file
+ * \return The data of the loaded project
+ */
 ProjectSettings MvpModel::load_project_file_from_disk(const QString &filename) const
 {
 	std::ifstream file(filename.toLocal8Bit().constData());
@@ -23,6 +28,11 @@ ProjectSettings MvpModel::load_project_file_from_disk(const QString &filename) c
 	return project;
 }
 
+/**
+ * \brief Attempts to save the given ProjectSettings to a file
+ * \param filename The path to the where the project file should be saved
+ * \param proj The project data
+ */
 void MvpModel::save_project_file_to_disk(const QString &filename, const ProjectSettings &proj) const
 {
 	// Copy the loaded fbx model into the project directory
@@ -552,8 +562,8 @@ void MvpModel::export_hairworks_to_disk(const QString& filename, const HairData&
 
 /**
  * \brief Saves the given hairstyle to disk
- * \param image The image to be saved
- * \param filename The path where the file should be saved
+ * \param image The hairstyle image data to be saved
+ * \param filename The path to the saved file
  * \return True if saving succeeded false if saving failed
  */
 bool MvpModel::export_hairstyle_to_disk(const QImage &image, const QString &filename) const
@@ -564,8 +574,8 @@ bool MvpModel::export_hairstyle_to_disk(const QImage &image, const QString &file
 
 /**
  * \brief Loads a hairstyle image from the disk
- * \param filename The path of the file to be opened
- * \return The requested image if succeeded, a null QImage image if failed
+ * \param filename The path to the image file
+ * \return The requested Qimage if succeeded, a null QImage image if failed
  */
 QImage MvpModel::import_hairstyle_from_disk(const QString &filename) const
 {
@@ -582,11 +592,18 @@ QImage MvpModel::import_hairstyle_from_disk(const QString &filename) const
 	return hairstyle;
 }
 
+/**
+ * \brief Tries to load the fbx model at the given path
+ * \param filename The path to the model File
+ */
 void MvpModel::load_fbx_model_from_disk(const QString &filename)
 {
 	m_fbx_model_ = std::make_unique<ModelData>(filename);
 }
 
+/**
+ * \brief Resets the currently loaded fbx model resulting in m_fbx_model_ being null
+ */
 void MvpModel::reset_fbx_model()
 {
 	m_fbx_model_.reset();

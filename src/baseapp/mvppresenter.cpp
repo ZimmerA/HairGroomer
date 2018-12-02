@@ -14,7 +14,7 @@ MvpPresenter::MvpPresenter() noexcept : m_model_(nullptr), m_view_(nullptr)
 }
 
 /**
- * \brief Tries to store the hairworks file to disk
+ * \brief Tries to export the hairworks file to disk
  * \param hair_file_path The path to the resulting hairworks file
  */
 void MvpPresenter::export_hairworks(const QString& hair_file_path) const
@@ -43,7 +43,7 @@ void MvpPresenter::export_hairworks(const QString& hair_file_path) const
 }
 
 /**
- * \brief Tries to store the current hairstyle to disk
+ * \brief Tries to export the current hairstyle to disk
  * \param hairstyle_file_path The path to the exported hairstyle image
  */
 void MvpPresenter::export_hairstyle(const QString& hairstyle_file_path) const
@@ -63,7 +63,7 @@ void MvpPresenter::export_hairstyle(const QString& hairstyle_file_path) const
 }
 
 /**
- * \brief Tries to load a hairstyle from disk and puts it into the drawbuffer
+ * \brief Tries to load a hairstyle from disk and puts it into the drawbuffer of the openGL renderer
  * \param hairstyle_file_path The path to the hairstyle image
  */
 void MvpPresenter::import_hairstyle(const QString& hairstyle_file_path) const
@@ -81,7 +81,7 @@ void MvpPresenter::import_hairstyle(const QString& hairstyle_file_path) const
 }
 
 /**
- * \brief Tries to load the specified fbx model data and create buffers for it in opengl
+ * \brief Tries to load the specified fbx model data and create buffers for it in openGl
  * \param fbx_model_file_path The path to the fbx file
  */
 void MvpPresenter::load_fbx_model(const QString& fbx_model_file_path) const
@@ -132,7 +132,7 @@ void MvpPresenter::new_project() const
 }
 
 /**
- * \brief Tries to open the project file at the specified path
+ * \brief Tries to load the project file at the specified path
  * \param project_file_path The path to the file to open
  */
 void MvpPresenter::load_project_file(const QString& project_file_path) const
@@ -191,7 +191,7 @@ bool MvpPresenter::save_project_file() const
 }
 
 /**
- * \brief Saves the current project to the specified file
+ * \brief Tries to save the current project to the specified file
  * \param project_file_path The path to the file to save to
  */
 void MvpPresenter::save_project_file_as(const QString& project_file_path) const

@@ -10,6 +10,9 @@ const float default_distance = 550.f;
 const float default_sensitivity = 20.0f;
 const float default_scrollspeed = 15;
 
+/**
+ * \brief Loads the default values and calculates the starting position
+ */
 OrbitCamera::OrbitCamera() noexcept
 {
 	m_azimuth_ = default_azimuth;
@@ -39,8 +42,8 @@ void OrbitCamera::calc_position()
 }
 
 /**
- * \brief Generates the lookat matrix for the camera using position and pivot point
- * \return The lookatmatrix
+ * \brief Returns the view matrix of the camera
+ * \return The view matrix as glm::mat4
  */
 glm::mat4 OrbitCamera::get_view_matrix() const noexcept
 {

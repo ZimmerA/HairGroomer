@@ -4,6 +4,9 @@
 #include <QWidget>
 #include <ui_mainToolbar.h>
 
+/**
+ * \brief Toolbar Widget on top of the viewport
+ */
 class MainToolbar : public QWidget
 {
 	Q_OBJECT

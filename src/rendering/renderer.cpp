@@ -4,6 +4,11 @@
 #include <glm.hpp>
 #include <gtc/type_ptr.hpp>
 
+/**
+ * \brief Initializes the renderer
+ * \param width The width of the viewport
+ * \param height The height of the viewport
+ */
 void Renderer::init(const int width, const int height)
 {
 	initializeOpenGLFunctions();
@@ -15,6 +20,9 @@ void Renderer::init(const int width, const int height)
 	m_height_ = height;
 }
 
+/**
+ * \brief Renders the current scene
+ */
 void Renderer::render_scene()
 {
 	if (m_current_scene_->m_should_reset)

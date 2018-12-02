@@ -5,16 +5,34 @@
 
 #define CMP_EPSILON 0.00001f
 
+/**
+ * \brief Projects a point on screen into world space
+ * \param screen The point in screen space
+ * \param model_view_projection The mvp Matrix
+ * \return The given point in world space
+ */
 glm::vec3 project_screen_to_world(
 	const glm::vec3 &screen,
-	const glm::mat4 &view_projection)
+	const glm::mat4 &model_view_projection)
 {
-	const glm::mat4 inv_vp = glm::inverse(view_projection);
+	const glm::mat4 inv_vp = glm::inverse(model_view_projection);
 	const glm::vec4 world = inv_vp * glm::vec4(screen * 2.0f - 1.0f, 1.0);
 
 	return glm::vec3(world) / world.w;
 }
 
+/**
+ * \brief Checks if the specified ray hit this triangle and returns where in relation to the texture coordinates
+ * \param origin The origin of the ray
+ * \param direction The direction of the ray
+ * \param p1 Point 1 of the checked triangle
+ * \param p2 Point 2 of the checked triangle
+ * \param p3 Point 3 of the checked triangle
+ * \param t The hit time along the ray
+ * \param u The hit time along the u texture coordinate
+ * \param v The normalized hit time along the v texture coordinate
+ * \return True if the ray hit the triangle, false if not
+ */
 bool ray_triangle_intersects(
 	const glm::vec3 &origin, const glm::vec3 &direction,
 	const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3,
@@ -48,6 +66,19 @@ bool ray_triangle_intersects(
 	return t > CMP_EPSILON;
 }
 
+/**
+ * \brief Iterates over every face of the given mesh to check if the given ray hit it
+ * \param origin The origin of the ray
+ * \param direction The direction of the ray
+ * \param mesh_data The data of the checked mesh
+ * \param vertex1 The first Vertex of the face that was hit
+ * \param vertex2 The second Vertex of the face that was hit
+ * \param vertex3 The third Vertex of the face that was hit
+ * \param t The hit time along the ray
+ * \param u The hit time along the u texture coordinate
+ * \param v The normalized hit time along the v texture coordinate
+ * \return True if the ray hit the mesh, false if not
+ */
 bool ray_mesh_intersects(
 	const glm::vec3 &origin, const glm::vec3 &direction,
 	const MeshData *mesh_data,
@@ -88,6 +119,14 @@ bool ray_mesh_intersects(
 	return hit;
 }
 
+/**
+ * \brief Casts a ray from origin to direction and checks for intersection with the given mesh
+ * \param origin The origin of the ray
+ * \param direction The direction of the ray
+ * \param mesh_data The mesh data to check for intersections
+ * \param hit The resulting hit
+ * \return True if the ray hit the mesh, false if not
+ */
 bool raycast(
 	const glm::vec3 &origin, const glm::vec3 &direction,
 	const MeshData *mesh_data,

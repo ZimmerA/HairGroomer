@@ -16,7 +16,7 @@ struct VertexBoneInfo
 };
 
 /**
- * \brief Structure for storing vertex Data
+ * \brief Structure for storing vertex data of meshes
  */
 struct Vertex
 {
@@ -54,7 +54,7 @@ namespace std
 }
 
 /**
-* \brief Holds the data of loaded Meshes to be used by e.g OpenGL.
+* \brief Holds the data of loaded meshes
 */
 class MeshData
 {

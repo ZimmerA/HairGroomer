@@ -5,6 +5,9 @@
 
 #include "baseapp/meshData.h"
 
+/**
+ * \brief Struct that holds the information of a raycast hit
+ */
 struct RaycastHit
 {
 	glm::vec3 point;

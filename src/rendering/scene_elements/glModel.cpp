@@ -40,7 +40,7 @@ void GLModel::draw_at_index(const int i)
 }
 
 /**
- * \brief Iterates over every meshData in the modelData and creates a glMesh for it, then sets up the buffers
+ * \brief Iterates over every meshData in the modelData and creates a glMesh for it
  * \param model_data The model data
  */
 void GLModel::setup_model(ModelData *model_data)

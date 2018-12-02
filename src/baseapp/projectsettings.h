@@ -5,11 +5,14 @@
 
 #include <QColor>
 
-#undef snprintf // BAD FBX SDK!
+#undef snprintf // Undefine snprintf (defined by fbxsdk) because it breaks the functionality of nlohmann json
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
+/**
+ * \brief Struct used to load or save current UI Settings
+ */
 struct UISettings
 {
 	bool m_grid_visibility{true};
@@ -32,6 +35,9 @@ struct UISettings
 	bool m_referencemodel_show{true};
 };
 
+/**
+ * \brief Struct used to load or save current Project settings (including UI settings)
+ */
 struct ProjectSettings
 {
 	UISettings m_ui_settings;
@@ -39,6 +45,11 @@ struct ProjectSettings
 	std::string m_hair_style_name;
 };
 
+/**
+ * \brief Stores the given ProjectSettings object in a json object
+ * \param j The resulting json data
+ * \param s The project settings
+ */
 static void to_json(json& j, const ProjectSettings& s)
 {
 	j = json
@@ -94,6 +105,11 @@ static void to_json(json& j, const ProjectSettings& s)
 	};
 }
 
+/**
+ * \brief Loads the given json object into a ProjectSettings object
+ * \param j The json object
+ * \param s The resulting ProjectSettings object
+ */
 static void from_json(const json& j, ProjectSettings& s)
 {
 	// UI settings
