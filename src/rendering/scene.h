@@ -19,9 +19,7 @@ class Scene
 {
 public:
 
-	// MVP matrices used by hair and meshes
 	glm::mat4 m_model_matrix{1};
-	glm::mat4 m_view_matrix{1};
 	glm::mat4 m_projection_matrix{1};
 
 	// Shader programs
