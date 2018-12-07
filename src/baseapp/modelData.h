@@ -57,8 +57,7 @@ public:
 private:
 
 	void load_model(const QString& path);
-	void process_skeleton_nodes(FbxNode* node);
-	void process_skeleton_hierachy_rec(FbxNode* node, int parent_index);
+	void process_skeleton_hierachy(FbxNode* node, int parent_index);
 	void process_mesh_nodes(FbxNode* node, FbxManager* manager);
 	
 	MeshData process_mesh(FbxMesh* mesh, FbxManager* manager, std::string mesh_name);

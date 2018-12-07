@@ -49,7 +49,7 @@ void ModelData::load_model(const QString& path)
 	importer->GetFileVersion(file_major, file_minor, file_revision);
 
 	// Traverse Nodes to load skeleton and model data
-	process_skeleton_nodes(scene->GetRootNode());
+	process_skeleton_hierachy(scene->GetRootNode(), -1);
 	process_mesh_nodes(scene->GetRootNode(), sdk_manager.get());
 
 	if (m_meshes.empty())
@@ -59,26 +59,13 @@ void ModelData::load_model(const QString& path)
 }
 
 /**
- * \brief Iterates over every childnode of node and starts the recursive iteration process
- * \param node The current Fbx node
- */
-void ModelData::process_skeleton_nodes(FbxNode* node)
-{
-	for (int i = 0; i < node->GetChildCount(); i++)
-	{
-		FbxNode* curr_node = node->GetChild(i);
-		process_skeleton_hierachy_rec(curr_node, -1);
-	}
-}
-
-/**
  * \brief Recursively iterates over every child node. If it is a bone, its added to the list of bones
  * \param node The current Fbx node
  * \param parent_index The index of the parent bone
  */
-void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_index)
+void ModelData::process_skeleton_hierachy(FbxNode* node, const int parent_index)
 {
-	uint bone_index = 0;
+	uint next_parent_index = parent_index;
 	if (node->GetNodeAttribute() && node->GetNodeAttribute()->GetAttributeType() && node->GetNodeAttribute()->GetAttributeType() ==FbxNodeAttribute::eSkeleton)
 	{
 		const std::string bone_name = node->GetName();
@@ -86,24 +73,26 @@ void ModelData::process_skeleton_hierachy_rec(FbxNode* node, const int parent_in
 		// Check if the bone is in the map, if no add it
 		if (m_bone_map_.find(bone_name) == m_bone_map_.end())
 		{
-			bone_index = static_cast<uint>(m_bone_map_.size());
+			const uint current_bone_index = static_cast<uint>(m_bone_map_.size());
 			Bone bone;
 
 			bone.m_name = bone_name;
 			bone.m_parent = parent_index;
 
 			m_bone_list.push_back(bone);
-			m_bone_map_[bone_name] = bone_index;
+			m_bone_map_[bone_name] = current_bone_index;
+
+			next_parent_index = current_bone_index;
 		}
 		else // Bone is already in the map get the index of the bone
 		{
-			bone_index = m_bone_map_[bone_name];
+			next_parent_index = m_bone_map_[bone_name];
 		}
 	}
 
 	for (int i = 0; i < node->GetChildCount(); i++)
 	{
-		process_skeleton_hierachy_rec(node->GetChild(i), bone_index);
+		process_skeleton_hierachy(node->GetChild(i), next_parent_index);
 	}
 }
 
