@@ -8,7 +8,6 @@ layout (line_strip, max_vertices = 50) out;
 
 in VS_OUT {
 	vec2 texCoord;
-	vec2 uv;
 	vec3 normal;
 	vec3 tangent;
 	vec3 bitangent;

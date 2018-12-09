@@ -11,7 +11,6 @@ in vec2 aUV;
 
 out VS_OUT {
 	vec2 texCoord;
-	vec2 uv;
 	vec3 normal;
 	vec3 tangent;
 	vec3 bitangent;
@@ -28,7 +27,6 @@ void main()
 	vs_out.bitangent = vec3(model * vec4(aBitangent, 0.0));
 	vs_out.worldPos = vec3(model * vec4(aVertex, 1.0));
 	vs_out.texCoord = vec2(aUV.x, 1.0 - aUV.y);
-	vs_out.uv = aUV;
 
 	gl_Position = mvp * vec4(aVertex, 1.0);
 }
