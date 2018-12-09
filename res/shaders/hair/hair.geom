@@ -59,11 +59,7 @@ mat3 rotYMatrix(float rad)
 // Maps a color with a range from 0 to 1 to a range of -maxHairBendAngle to maxHairBendAngle (in radians)
 float reMapColorValue(float colorValue)
 {
-	// Map to -1 to 1
-	float minusOneToOne = colorValue * 2.0 - 1.0;
-
-	// Map from -1 to 1 to -maxHairBendAngle to maxHairBendAngle (radians)
-	float minusPiToPi = (minusOneToOne + 1.0) / (1.0 + 1.0) * (rad(maxHairBendAngle) + rad(maxHairBendAngle)) - rad(maxHairBendAngle);
+	float minusPiToPi = colorValue * (2 * rad(maxHairBendAngle)) - rad(maxHairBendAngle);
 
 	return minusPiToPi;
 }
