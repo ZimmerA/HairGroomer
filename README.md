@@ -78,8 +78,6 @@ Download and install [FBX SDK 2019.0 installer for VS2015](https://www.autodesk.
 
 After cloning the repository a few things need to be done to get the build working.
 
-**TODO:** either copy or run fbxsdk.py
-
 1. Obtain the required git submodules by using `git submodule update --recursive --remote` in the repository
 2. FBX SDK
    - Execute the `libs/fbxsdk.py` Python script to automatically setup FBX SDK
