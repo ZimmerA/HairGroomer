@@ -18,7 +18,8 @@ MainWindow::MainWindow(QWidget* parent) :
 {
 
 	m_ui_->setupUi(this);
-	m_ui_->mainToolbar->addWidget(new MainToolbar(this));
+	// Uncomment to add toolbar
+	//m_ui_->mainToolbar->addWidget(new MainToolbar(this));
 	connect_signals_and_slots();
 	m_ui_->statusBar->showMessage("");
 	setAcceptDrops(true);
