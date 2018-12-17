@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget* parent) :
 {
 
 	m_ui_->setupUi(this);
-	// Uncomment to add toolbar
+	// Uncomment to add toolbar, mainToolbar needs to be added to mainWindow
 	//m_ui_->mainToolbar->addWidget(new MainToolbar(this));
 	connect_signals_and_slots();
 	m_ui_->statusBar->showMessage("");
