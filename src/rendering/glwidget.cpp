@@ -155,17 +155,21 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 		const glm::vec3 direction = normalize(project_screen_to_world(glm::vec3(x, y, 1.0f), mvp) - origin);
 
 		const ModelData *model_data = m_view_->get_presenter()->get_model()->get_fbx_model();
-		const MeshData *mesh_data = &model_data->m_meshes[m_scene.m_growth_mesh_index];
-
-		RaycastHit hit;
-
-		if (raycast(origin, direction, mesh_data, hit))
-			m_scene.m_brush.set_position(hit.uv.x, hit.uv.y);
-		else
+		if(model_data)
 		{
-			// TODO: Be able to hide brush
-			m_scene.m_brush.set_position(2.0f, 2.0f);
+			const MeshData *mesh_data = &model_data->m_meshes[m_scene.m_growth_mesh_index];
+
+			RaycastHit hit;
+
+			if (raycast(origin, direction, mesh_data, hit))
+				m_scene.m_brush.set_position(hit.uv.x, hit.uv.y);
+			else
+			{
+				// TODO: Be able to hide brush
+				m_scene.m_brush.set_position(2.0f, 2.0f);
+			}	
 		}
+
 
 		update();
 	}
