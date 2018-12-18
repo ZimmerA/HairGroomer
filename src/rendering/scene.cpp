@@ -171,7 +171,7 @@ void Scene::load_shaders()
  */
 void Scene::load_textures()
 {
-	m_paint_brush_texture = std::make_unique<QOpenGLTexture>(QImage("res/brush.png").mirrored());
+	m_paint_brush_texture = std::make_unique<QOpenGLTexture>(QImage("res/textures/brush.png").mirrored());
 	m_paint_brush_texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 	m_paint_brush_texture->setMagnificationFilter(QOpenGLTexture::Linear);
 
