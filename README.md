@@ -1,6 +1,6 @@
 
 # HairGroomer
-
+![](git-res/hairgroomer.PNG)
 Hair Groomer is a stand-alone software to generate guide hairs for NVIDIA HairWorks.
 
 ## Controls
